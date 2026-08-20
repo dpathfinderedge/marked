@@ -8,14 +8,18 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: "prompt",
-      includeAssets: ["icons/*.png", "icons/*.svg"],
+      includeAssets: [
+        "favicon.svg",
+        "icons/apple-touch-icon.png",
+        "icons/*.png",
+      ],
       manifest: {
         name: "Marked — Trade Journal",
         short_name: "Marked",
         description:
           "A personal trade journal and analytics tool for Forex and Crypto.",
-        theme_color: "#0B0E14",
-        background_color: "#0B0E14",
+        theme_color: "#A8321F",
+        background_color: "#ECEAE3",
         display: "standalone",
         start_url: "/",
         scope: "/",
