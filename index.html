@@ -15,6 +15,16 @@
       rel="stylesheet"
     />
     <title>Marked — Trade Journal</title>
+    <script>
+      (function () {
+        var stored = window.localStorage.getItem("marked-theme");
+        var isDark =
+          stored === "dark" ||
+          (stored !== "light" &&
+            window.matchMedia("(prefers-color-scheme: dark)").matches);
+        if (isDark) document.documentElement.classList.add("dark");
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>
