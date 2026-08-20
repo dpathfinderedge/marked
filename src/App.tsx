@@ -1,7 +1,11 @@
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { AuthProvider } from "@/context/AuthContext";
+import { ThemeProvider } from "@/context/ThemeContext";
 import { useAuth } from "@/hooks/useAuth";
 import { AuthPage } from "@/components/auth/AuthPage";
 import { AppShell } from "@/components/layout/AppShell";
+import { DashboardPage } from "@/components/stats/DashboardPage";
+import { TradesPage } from "@/components/trades/TradesPage";
 
 function AppContent(): JSX.Element {
   const { session, isLoading } = useAuth();
@@ -21,19 +25,26 @@ function AppContent(): JSX.Element {
   }
 
   return (
-    <AppShell>
-      <p className="font-sans text-sm text-ink">
-        Signed in. Trade entry and layout arrive in Phase 4.
-      </p>
-    </AppShell>
+    <BrowserRouter>
+      <AppShell>
+        <Routes>
+          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          <Route path="/dashboard" element={<DashboardPage />} />
+          <Route path="/trades" element={<TradesPage />} />
+          <Route path="*" element={<Navigate to="/dashboard" replace />} />
+        </Routes>
+      </AppShell>
+    </BrowserRouter>
   );
 }
 
 function App(): JSX.Element {
   return (
-    <AuthProvider>
-      <AppContent />
-    </AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <AppContent />
+      </AuthProvider>
+    </ThemeProvider>
   );
 }
 
