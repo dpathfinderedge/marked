@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import { useTrades } from "@/hooks/useTrades";
+import { useSettings } from "@/hooks/useSettings";
 import { StatCard } from "@/components/ui/StatCard";
 import { EquityCurveChart } from "@/components/stats/EquityCurveChart";
 import { BreakdownTable } from "@/components/stats/BreakdownTable";
@@ -12,6 +13,7 @@ import {
   breakdownByPair,
   breakdownBySession,
   breakdownByTag,
+  detectConsecutiveLossFlags,
 } from "@/lib/calculations";
 
 function formatPercent(value: number | null): string {
@@ -29,6 +31,7 @@ function formatSignedDollars(value: number): string {
 
 export function DashboardPage(): JSX.Element {
   const { trades, isLoading } = useTrades();
+  const { threshold } = useSettings();
 
   const stats = useMemo(
     () => ({
@@ -40,8 +43,9 @@ export function DashboardPage(): JSX.Element {
       byPair: breakdownByPair(trades),
       bySession: breakdownBySession(trades),
       byTag: breakdownByTag(trades),
+      flaggedCount: detectConsecutiveLossFlags(trades, threshold).size,
     }),
-    [trades],
+    [trades, threshold],
   );
 
   if (isLoading) {
@@ -58,7 +62,7 @@ export function DashboardPage(): JSX.Element {
 
       <EquityCurveChart points={stats.equityCurve} />
 
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-5">
         <StatCard
           label="Total P&L"
           value={formatSignedDollars(stats.totalPnl)}
@@ -70,6 +74,11 @@ export function DashboardPage(): JSX.Element {
           value={formatRatio(stats.profitFactor)}
         />
         <StatCard label="Avg R" value={formatRatio(stats.avgR)} />
+        <StatCard
+          label="Flagged"
+          value={String(stats.flaggedCount)}
+          tone={stats.flaggedCount > 0 ? "negative" : "neutral"}
+        />
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">

@@ -6,6 +6,7 @@ import { AuthPage } from "@/components/auth/AuthPage";
 import { AppShell } from "@/components/layout/AppShell";
 import { DashboardPage } from "@/components/stats/DashboardPage";
 import { TradesPage } from "@/components/trades/TradesPage";
+import { SettingsPage } from "@/components/settings/SettingsPage";
 
 function AppContent(): JSX.Element {
   const { session, isLoading } = useAuth();
@@ -31,6 +32,7 @@ function AppContent(): JSX.Element {
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
           <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/trades" element={<TradesPage />} />
+          <Route path="/settings" element={<SettingsPage />} />
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Routes>
       </AppShell>

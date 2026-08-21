@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { NavLink } from "react-router-dom";
-import { LayoutDashboard, NotebookPen, Sun, Moon } from "lucide-react";
+import { LayoutDashboard, NotebookPen, Settings, Sun, Moon } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useTheme } from "@/hooks/useTheme";
 import { Stamp } from "@/components/ui/Stamp";
@@ -30,6 +30,9 @@ export function AppShell({ children }: AppShellProps): JSX.Element {
             </NavLink>
             <NavLink to="/trades" className={navLinkClass} title="Trades">
               <NotebookPen size={18} />
+            </NavLink>
+            <NavLink to="/settings" className={navLinkClass} title="Settings">
+              <Settings size={18} />
             </NavLink>
           </div>
         </div>

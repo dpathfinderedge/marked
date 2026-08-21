@@ -38,3 +38,24 @@ create policy "Users can update their own trades"
 create policy "Users can delete their own trades"
   on public.trades for delete
   using (auth.uid() = user_id);
+
+
+create table if not exists public.user_settings (
+  user_id uuid primary key references auth.users (id) on delete cascade,
+  consecutive_loss_threshold integer not null default 2,
+  updated_at timestamptz not null default now()
+);
+
+alter table public.user_settings enable row level security;
+
+create policy "Users can view their own settings"
+  on public.user_settings for select
+  using (auth.uid() = user_id);
+
+create policy "Users can insert their own settings"
+  on public.user_settings for insert
+  with check (auth.uid() = user_id);
+
+create policy "Users can update their own settings"
+  on public.user_settings for update
+  using (auth.uid() = user_id);
