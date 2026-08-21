@@ -10,6 +10,9 @@ export default defineConfig({
       registerType: "prompt",
       includeAssets: [
         "favicon.svg",
+        "favicon-16.png",
+        "favicon-32.png",
+        "safari-pinned-tab.svg",
         "icons/apple-touch-icon.png",
         "icons/*.png",
       ],

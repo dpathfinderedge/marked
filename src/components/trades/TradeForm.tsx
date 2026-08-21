@@ -1,4 +1,5 @@
 import { useMemo, useState, type FormEvent } from "react";
+import { useOnlineStatus } from "@/hooks/useOnlineStatus";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 import { Button } from "@/components/ui/Button";
@@ -49,6 +50,7 @@ function todayIso(): string {
 }
 
 export function TradeForm({ onSubmit }: TradeFormProps): JSX.Element {
+  const isOnline = useOnlineStatus();
   const [date, setDate] = useState(todayIso());
   const [market, setMarket] = useState<Market>("forex");
   const [pair, setPair] = useState("");
@@ -131,6 +133,11 @@ export function TradeForm({ onSubmit }: TradeFormProps): JSX.Element {
   const handleSubmit = async (event: FormEvent): Promise<void> => {
     event.preventDefault();
     setError(null);
+
+    if (!isOnline) {
+      setError("You're offline — connect to log a trade.");
+      return;
+    }
 
     if (finalPnl === null || Number.isNaN(finalPnl)) {
       setError(
@@ -335,8 +342,8 @@ export function TradeForm({ onSubmit }: TradeFormProps): JSX.Element {
 
       {error ? <p className="font-mono text-xs text-stamp">{error}</p> : null}
 
-      <Button type="submit" isLoading={isSubmitting}>
-        Log trade
+      <Button type="submit" isLoading={isSubmitting} disabled={!isOnline}>
+        {isOnline ? "Log trade" : "Offline"}
       </Button>
     </form>
   );
