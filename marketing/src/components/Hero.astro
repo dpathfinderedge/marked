@@ -1,0 +1,76 @@
+---
+import { APP_URL } from "../lib/constants";
+---
+
+<section class="mx-auto grid max-w-6xl gap-12 px-6 py-20 sm:grid-cols-2 sm:items-center sm:py-32">
+  <div>
+    <h1 class="font-display text-4xl italic leading-tight text-ink sm:text-5xl">
+      Know why you're<br />actually winning.
+    </h1>
+    <p class="mt-4 max-w-md font-sans text-lg text-muted">
+      A trade journal that does the real math — forex pip and contract-size
+      P&L, crypto P&L, win rate, profit factor, equity curve — and flags
+      losing streaks before they become a habit.
+    </p>
+    <div class="mt-8 flex flex-wrap items-center gap-4">
+      <a
+        href={APP_URL}
+        class="rounded-lg bg-stamp px-5 py-3 font-sans text-sm font-medium text-paper transition-opacity hover:opacity-90"
+      >
+        Start journaling free
+      </a>
+      <a
+        href="#how-it-works"
+        class="font-mono text-xs uppercase tracking-wider text-muted underline underline-offset-4"
+      >
+        See how it works
+      </a>
+    </div>
+  </div>
+
+  
+  <div class="rounded-2xl border border-rule bg-surface p-5 shadow-sm">
+    <div class="grid grid-cols-3 gap-3">
+      <div class="rounded-lg border border-rule bg-paper px-3 py-2">
+        <p class="font-mono text-[10px] uppercase tracking-wider text-muted">
+          Win rate
+        </p>
+        <p class="font-mono text-lg font-medium text-ink">62%</p>
+      </div>
+      <div class="rounded-lg border border-rule bg-paper px-3 py-2">
+        <p class="font-mono text-[10px] uppercase tracking-wider text-muted">
+          Profit factor
+        </p>
+        <p class="font-mono text-lg font-medium text-ink">2.10</p>
+      </div>
+      <div class="rounded-lg border border-rule bg-paper px-3 py-2">
+        <p class="font-mono text-[10px] uppercase tracking-wider text-muted">
+          Avg R
+        </p>
+        <p class="font-mono text-lg font-medium text-ink">1.40</p>
+      </div>
+    </div>
+
+    <div class="mt-4 h-28 rounded-lg border border-rule bg-paper p-3">
+      <svg viewBox="0 0 200 60" class="h-full w-full" preserveAspectRatio="none" aria-hidden="true">
+        <polyline
+          points="0,50 20,45 40,47 60,32 80,35 100,20 120,24 140,10 160,14 180,4 200,8"
+          fill="none"
+          stroke="rgb(47 107 79)"
+          stroke-width="2"
+        ></polyline>
+      </svg>
+    </div>
+
+    <div class="mt-4 overflow-hidden rounded-lg border border-rule bg-paper">
+      <div class="flex items-center justify-between border-b border-rule px-3 py-2">
+        <span class="font-mono text-xs text-ink">EURUSD</span>
+        <span class="font-mono text-xs text-green">+412.60</span>
+      </div>
+      <div class="flex items-center justify-between px-3 py-2">
+        <span class="font-mono text-xs text-ink">BTCUSDT</span>
+        <span class="font-mono text-xs text-stamp">−128.00</span>
+      </div>
+    </div>
+  </div>
+</section>
