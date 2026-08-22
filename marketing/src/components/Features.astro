@@ -1,0 +1,41 @@
+---
+const features = [
+  {
+    title: "Real P&L math",
+    body: "Direct, converted, and manual pricing paths for forex — including a clear fallback for true cross pairs — plus straightforward crypto math.",
+  },
+  {
+    title: "Equity curve & breakdowns",
+    body: "Win rate, profit factor, average R, and cumulative P&L, broken down by pair, session, and setup tag.",
+  },
+  {
+    title: "The consecutive-loss flag",
+    body: "Set your own threshold. Trades that follow a losing streak get marked automatically, in the ledger and on the dashboard.",
+  },
+  {
+    title: "Installable, offline-aware",
+    body: "A real installable app on desktop and mobile — not just a bookmarked tab — with clear offline handling instead of silently failed writes.",
+  },
+];
+---
+
+<section id="features" class="py-20">
+  <div class="mx-auto max-w-6xl px-6">
+    <h2 class="font-display text-3xl italic text-ink">
+      Everything to find your edge. Nothing you don't need.
+    </h2>
+
+    <div class="mt-12 grid gap-6 sm:grid-cols-2">
+      {
+        features.map((feature) => (
+          <div class="rounded-xl border border-rule bg-surface p-6">
+            <h3 class="font-sans text-base font-medium text-ink">
+              {feature.title}
+            </h3>
+            <p class="mt-2 font-sans text-sm text-muted">{feature.body}</p>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</section>

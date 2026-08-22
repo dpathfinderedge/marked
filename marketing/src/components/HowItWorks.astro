@@ -1,0 +1,41 @@
+---
+const steps = [
+  {
+    number: "01",
+    title: "Log a trade",
+    body: "Pair, direction, entry/exit, size, session, setup tag. Takes seconds.",
+  },
+  {
+    number: "02",
+    title: "The math happens for you",
+    body: "Real pip and contract-size math for forex, real price × quantity math for crypto — not a rough estimate.",
+  },
+  {
+    number: "03",
+    title: "See your actual edge",
+    body: "Win rate, profit factor, avg R, equity curve, and breakdowns by pair, session, and setup — plus a flag when you're on a losing streak.",
+  },
+];
+---
+
+<section id="how-it-works" class="border-t border-rule bg-surface py-20">
+  <div class="mx-auto max-w-6xl px-6">
+    <h2 class="font-display text-3xl italic text-ink">
+      From scattered trades to a real edge.
+    </h2>
+
+    <div class="mt-12 grid gap-8 sm:grid-cols-3">
+      {
+        steps.map((step) => (
+          <div>
+            <p class="font-mono text-xs text-stamp">{step.number}</p>
+            <h3 class="mt-2 font-sans text-base font-medium text-ink">
+              {step.title}
+            </h3>
+            <p class="mt-2 font-sans text-sm text-muted">{step.body}</p>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</section>

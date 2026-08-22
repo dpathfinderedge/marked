@@ -1,0 +1,29 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-paper: 236 234 227;
+  --color-ink: 33 32 28;
+  --color-rule: 216 213 203;
+  --color-stamp: 168 50 31;
+  --color-green: 47 107 79;
+  --color-muted: 107 104 95;
+  --color-surface: 226 224 215;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-paper: 20 21 27;
+    --color-ink: 232 230 221;
+    --color-rule: 44 46 56;
+    --color-stamp: 196 80 58;
+    --color-green: 76 146 112;
+    --color-muted: 139 138 128;
+    --color-surface: 28 30 38;
+  }
+}
+
+body {
+  @apply bg-paper text-ink;
+}

@@ -1,0 +1,57 @@
+---
+import { APP_URL } from "../lib/constants";
+---
+
+<header class="border-b border-rule">
+  <div class="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+    <a href="/" class="flex items-center gap-2">
+      <svg
+        width="24"
+        height="24"
+        viewBox="0 0 36 36"
+        fill="none"
+        style="transform: rotate(-9deg)"
+        aria-hidden="true"
+      >
+        <circle
+          cx="18"
+          cy="18"
+          r="15.5"
+          stroke="currentColor"
+          stroke-width="2.5"
+          class="text-stamp"
+        />
+        <circle
+          cx="18"
+          cy="18"
+          r="11"
+          stroke="currentColor"
+          stroke-width="1"
+          opacity="0.55"
+          class="text-stamp"
+        />
+        <path
+          d="M12 19L16 23L25 12"
+          stroke="currentColor"
+          stroke-width="2.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          class="text-stamp"
+        />
+      </svg>
+      <span class="font-display text-xl italic text-ink">Marked</span>
+    </a>
+
+    <nav class="hidden items-center gap-6 font-mono text-xs uppercase tracking-wider text-muted sm:flex">
+      <a href="#how-it-works" class="transition-colors hover:text-ink">How it works</a>
+      <a href="#features" class="transition-colors hover:text-ink">Features</a>
+    </nav>
+
+    <a
+      href={APP_URL}
+      class="rounded-lg bg-stamp px-4 py-2 font-sans text-sm font-medium text-paper transition-opacity hover:opacity-90"
+    >
+      Start free
+    </a>
+  </div>
+</header>
