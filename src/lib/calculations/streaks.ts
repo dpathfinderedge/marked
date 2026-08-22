@@ -1,8 +1,5 @@
 import type { Trade } from "@/types/trade";
-
-function chronological(trades: Trade[]): Trade[] {
-  return [...trades].sort((a, b) => a.date.localeCompare(b.date));
-}
+import { chronological } from "@/lib/calculations/chronological";
 
 export function detectConsecutiveLossFlags(
   trades: Trade[],
