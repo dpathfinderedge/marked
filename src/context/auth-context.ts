@@ -13,6 +13,7 @@ export interface AuthContextValue {
     email: string,
     password: string,
   ) => Promise<{ error: AuthError | null }>;
+  signInWithGoogle: () => Promise<{ error: AuthError | null }>;
   signOut: () => Promise<void>;
 }
 

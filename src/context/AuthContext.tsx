@@ -40,6 +40,16 @@ export function AuthProvider({
     return { error };
   };
 
+  const signInWithGoogle: AuthContextValue["signInWithGoogle"] = async () => {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: window.location.origin,
+      },
+    });
+    return { error };
+  };
+
   const signOut = async (): Promise<void> => {
     await supabase.auth.signOut();
   };
@@ -50,6 +60,7 @@ export function AuthProvider({
     isLoading,
     signUp,
     signIn,
+    signInWithGoogle,
     signOut,
   };
 
