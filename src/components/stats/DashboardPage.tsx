@@ -1,15 +1,24 @@
 import { useMemo } from "react";
+import { useAuth } from "@/hooks/useAuth";
 import { useTrades } from "@/hooks/useTrades";
 import { useSettings } from "@/hooks/useSettings";
 import { StatCard } from "@/components/ui/StatCard";
+import { NotableTradeCard } from "@/components/stats/NotableTradeCard";
+import { WeekStrip } from "@/components/stats/WeekStrip";
 import { EquityCurveChart } from "@/components/stats/EquityCurveChart";
 import { BreakdownTable } from "@/components/stats/BreakdownTable";
+import { getTimeOfDayGreeting, getDisplayName } from "@/utils/greeting";
+import { toIsoDate } from "@/utils/dates";
 import {
   calculateWinRate,
   calculateProfitFactor,
   calculateAverageRMultiple,
   calculateTotalPnl,
   calculateEquityCurve,
+  calculateDailyPnl,
+  calculateCurrentStreak,
+  calculateLargestGain,
+  calculateLargestLoss,
   breakdownByPair,
   breakdownBySession,
   breakdownByTag,
@@ -30,23 +39,34 @@ function formatSignedDollars(value: number): string {
 }
 
 export function DashboardPage(): JSX.Element {
+  const { user } = useAuth();
   const { trades, isLoading } = useTrades();
   const { threshold } = useSettings();
 
-  const stats = useMemo(
-    () => ({
+  const stats = useMemo(() => {
+    const todayIso = toIsoDate(new Date());
+    const todayTrades = trades.filter((t) => t.date === todayIso);
+
+    return {
       winRate: calculateWinRate(trades),
       profitFactor: calculateProfitFactor(trades),
       avgR: calculateAverageRMultiple(trades),
       totalPnl: calculateTotalPnl(trades),
+      todayPnl: calculateTotalPnl(todayTrades),
       equityCurve: calculateEquityCurve(trades),
+      dailyPnl: calculateDailyPnl(trades),
+      currentStreak: calculateCurrentStreak(trades),
+      largestGain: calculateLargestGain(trades),
+      largestLoss: calculateLargestLoss(trades),
       byPair: breakdownByPair(trades),
       bySession: breakdownBySession(trades),
       byTag: breakdownByTag(trades),
       flaggedCount: detectConsecutiveLossFlags(trades, threshold).size,
-    }),
-    [trades, threshold],
-  );
+    };
+  }, [trades, threshold]);
+
+  const greeting = useMemo(() => getTimeOfDayGreeting(), []);
+  const displayName = getDisplayName(user);
 
   if (isLoading) {
     return (
@@ -58,11 +78,26 @@ export function DashboardPage(): JSX.Element {
 
   return (
     <div className="mx-auto flex max-w-3xl flex-col gap-6">
-      <h1 className="font-display text-2xl italic text-ink">Dashboard</h1>
+      <div>
+        <h1 className="font-display text-3xl italic text-ink">
+          {greeting}
+          {displayName ? `, ${displayName}` : ""}.
+        </h1>
+        <p className="mt-1 font-mono text-sm">
+          <span
+            className={stats.todayPnl >= 0 ? "text-green" : "text-stamp"}
+          >
+            {formatSignedDollars(stats.todayPnl)}
+          </span>{" "}
+          <span className="text-muted">today</span>
+        </p>
+      </div>
+
+      <WeekStrip dailyPnl={stats.dailyPnl} />
 
       <EquityCurveChart points={stats.equityCurve} />
 
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-5">
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
         <StatCard
           label="Total P&L"
           value={formatSignedDollars(stats.totalPnl)}
@@ -74,10 +109,40 @@ export function DashboardPage(): JSX.Element {
           value={formatRatio(stats.profitFactor)}
         />
         <StatCard label="Avg R" value={formatRatio(stats.avgR)} />
+      </div>
+
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+        <StatCard
+          label="Current streak"
+          value={
+            stats.currentStreak.type
+              ? `${stats.currentStreak.count}${
+                  stats.currentStreak.type === "win" ? "W" : "L"
+                }`
+              : "—"
+          }
+          tone={
+            stats.currentStreak.type === "win"
+              ? "positive"
+              : stats.currentStreak.type === "loss"
+                ? "negative"
+                : "neutral"
+          }
+        />
         <StatCard
           label="Flagged"
           value={String(stats.flaggedCount)}
           tone={stats.flaggedCount > 0 ? "negative" : "neutral"}
+        />
+        <NotableTradeCard
+          label="Largest gain"
+          trade={stats.largestGain}
+          tone="positive"
+        />
+        <NotableTradeCard
+          label="Largest loss"
+          trade={stats.largestLoss}
+          tone="negative"
         />
       </div>
 

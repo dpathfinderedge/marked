@@ -1,5 +1,6 @@
 import { useMemo, useState, type FormEvent } from "react";
 import { useOnlineStatus } from "@/hooks/useOnlineStatus";
+import { toIsoDate } from "@/utils/dates";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 import { Button } from "@/components/ui/Button";
@@ -45,13 +46,10 @@ const CONTRACT_SIZE_OPTIONS = [
   { value: "custom", label: "Custom" },
 ];
 
-function todayIso(): string {
-  return new Date().toISOString().slice(0, 10);
-}
 
 export function TradeForm({ onSubmit }: TradeFormProps): JSX.Element {
   const isOnline = useOnlineStatus();
-  const [date, setDate] = useState(todayIso());
+  const [date, setDate] = useState(toIsoDate(new Date()));
   const [market, setMarket] = useState<Market>("forex");
   const [pair, setPair] = useState("");
   const [direction, setDirection] = useState<Direction>("long");

@@ -1,13 +1,10 @@
 import type { Trade } from "@/types/trade";
+import { chronological } from "@/lib/calculations/chronological";
 
 export interface EquityPoint {
   tradeId: string;
   date: string;
   cumulativePnl: number;
-}
-
-function chronological(trades: Trade[]): Trade[] {
-  return [...trades].sort((a, b) => a.date.localeCompare(b.date));
 }
 
 export function calculateWinRate(trades: Trade[]): number | null {
@@ -24,7 +21,7 @@ export function calculateProfitFactor(trades: Trade[]): number | null {
     trades.filter((t) => t.pnl < 0).reduce((sum, t) => sum + t.pnl, 0),
   );
 
-  if (grossLoss === 0) return grossWin > 0 ? null : null; 
+  if (grossLoss === 0) return grossWin > 0 ? null : null;
   return grossWin / grossLoss;
 }
 
@@ -84,4 +81,71 @@ export function breakdownBySession(trades: Trade[]): GroupStats[] {
 
 export function breakdownByTag(trades: Trade[]): GroupStats[] {
   return groupBy(trades, (t) => t.tag || "Untagged");
+}
+
+export function calculateDailyPnl(trades: Trade[]): Map<string, number> {
+  const map = new Map<string, number>();
+  for (const trade of trades) {
+    map.set(trade.date, (map.get(trade.date) ?? 0) + trade.pnl);
+  }
+  return map;
+}
+
+export interface CurrentStreak {
+  count: number;
+  type: "win" | "loss" | null;
+}
+
+function outcome(pnl: number): "win" | "loss" | "breakeven" {
+  if (pnl > 0) return "win";
+  if (pnl < 0) return "loss";
+  return "breakeven";
+}
+
+export function calculateCurrentStreak(trades: Trade[]): CurrentStreak {
+  const sorted = chronological(trades);
+  if (sorted.length === 0) return { count: 0, type: null };
+
+  const lastTrade = sorted[sorted.length - 1];
+  if (!lastTrade) return { count: 0, type: null };
+
+  const lastOutcome = outcome(lastTrade.pnl);
+  if (lastOutcome === "breakeven") return { count: 0, type: null };
+
+  let count = 0;
+  for (let i = sorted.length - 1; i >= 0; i--) {
+    const trade = sorted[i];
+    if (trade && outcome(trade.pnl) === lastOutcome) count++;
+    else break;
+  }
+
+  return { count, type: lastOutcome };
+}
+
+export interface NotableTrade {
+  tradeId: string;
+  pair: string;
+  pnl: number;
+  date: string;
+}
+
+export function calculateLargestGain(trades: Trade[]): NotableTrade | null {
+  const winners = trades.filter((t) => t.pnl > 0);
+  if (winners.length === 0) return null;
+
+  const best = winners.reduce((max, t) => (t.pnl > max.pnl ? t : max));
+  return { tradeId: best.id, pair: best.pair, pnl: best.pnl, date: best.date };
+}
+
+export function calculateLargestLoss(trades: Trade[]): NotableTrade | null {
+  const losers = trades.filter((t) => t.pnl < 0);
+  if (losers.length === 0) return null;
+
+  const worst = losers.reduce((min, t) => (t.pnl < min.pnl ? t : min));
+  return {
+    tradeId: worst.id,
+    pair: worst.pair,
+    pnl: worst.pnl,
+    date: worst.date,
+  };
 }
