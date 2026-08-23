@@ -73,6 +73,30 @@ export interface Database {
         };
         Relationships: [];
       };
+      trade_attachments: {
+        Row: {
+          id: string;
+          trade_id: string;
+          user_id: string;
+          storage_path: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          trade_id: string;
+          user_id: string;
+          storage_path: string;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          trade_id?: string;
+          user_id?: string;
+          storage_path?: string;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     Functions: Record<string, never>;
