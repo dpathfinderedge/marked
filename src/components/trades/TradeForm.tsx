@@ -1,4 +1,4 @@
-import { useMemo, useState, type FormEvent } from "react";
+import { useMemo, useState, type ChangeEvent, type FormEvent } from "react";
 import { useOnlineStatus } from "@/hooks/useOnlineStatus";
 import { toIsoDate } from "@/utils/dates";
 import { Input } from "@/components/ui/Input";
@@ -19,8 +19,13 @@ import type {
 } from "@/types/trade";
 
 interface TradeFormProps {
-  onSubmit: (input: NewTradeInput) => Promise<{ error: string | null }>;
+  onSubmit: (
+    input: NewTradeInput,
+    files: File[],
+  ) => Promise<{ error: string | null }>;
 }
+
+const MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024; // 5MB
 
 const MARKET_OPTIONS = [
   { value: "forex", label: "Forex" },
@@ -46,7 +51,6 @@ const CONTRACT_SIZE_OPTIONS = [
   { value: "custom", label: "Custom" },
 ];
 
-
 export function TradeForm({ onSubmit }: TradeFormProps): JSX.Element {
   const isOnline = useOnlineStatus();
   const [date, setDate] = useState(toIsoDate(new Date()));
@@ -64,6 +68,7 @@ export function TradeForm({ onSubmit }: TradeFormProps): JSX.Element {
   const [risk, setRisk] = useState("");
   const [manualPnl, setManualPnl] = useState("");
   const [notes, setNotes] = useState("");
+  const [screenshots, setScreenshots] = useState<File[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -126,6 +131,21 @@ export function TradeForm({ onSubmit }: TradeFormProps): JSX.Element {
     setManualPnl("");
     setTag("");
     setNotes("");
+    setScreenshots([]);
+  };
+
+  const handleScreenshotsChange = (event: ChangeEvent<HTMLInputElement>): void => {
+    const files = Array.from(event.target.files ?? []);
+    const tooLarge = files.find((f) => f.size > MAX_FILE_SIZE_BYTES);
+
+    if (tooLarge) {
+      setError(`${tooLarge.name} is over 5MB — choose a smaller image.`);
+      event.target.value = "";
+      setScreenshots([]);
+      return;
+    }
+
+    setScreenshots(files);
   };
 
   const handleSubmit = async (event: FormEvent): Promise<void> => {
@@ -155,20 +175,23 @@ export function TradeForm({ onSubmit }: TradeFormProps): JSX.Element {
         : "manual";
 
     setIsSubmitting(true);
-    const { error: submitError } = await onSubmit({
-      date,
-      market,
-      pair: market === "crypto" ? pair : pair.toUpperCase(),
-      direction,
-      session,
-      tag,
-      risk: riskValue,
-      pnl: finalPnl,
-      pips,
-      rMultiple: calculateRMultiple(finalPnl, riskValue),
-      notes,
-      calcMode,
-    });
+    const { error: submitError } = await onSubmit(
+      {
+        date,
+        market,
+        pair: market === "crypto" ? pair : pair.toUpperCase(),
+        direction,
+        session,
+        tag,
+        risk: riskValue,
+        pnl: finalPnl,
+        pips,
+        rMultiple: calculateRMultiple(finalPnl, riskValue),
+        notes,
+        calcMode,
+      },
+      screenshots,
+    );
     setIsSubmitting(false);
 
     if (submitError) {
@@ -320,6 +343,25 @@ export function TradeForm({ onSubmit }: TradeFormProps): JSX.Element {
             </span>
           </div>
         )}
+      </div>
+
+      <div className="flex flex-col gap-1.5">
+        <label className="font-mono text-xs uppercase tracking-wider text-muted">
+          Screenshots (optional)
+        </label>
+        <input
+          type="file"
+          accept="image/*"
+          multiple
+          onChange={handleScreenshotsChange}
+          className="font-sans text-sm text-ink file:mr-4 file:rounded-lg file:border file:border-rule file:bg-paper file:px-3 file:py-2 file:font-sans file:text-sm file:text-ink"
+        />
+        {screenshots.length > 0 ? (
+          <p className="font-mono text-xs text-muted">
+            {screenshots.length} file{screenshots.length === 1 ? "" : "s"}{" "}
+            selected
+          </p>
+        ) : null}
       </div>
 
       <div className="flex flex-col gap-1.5">
