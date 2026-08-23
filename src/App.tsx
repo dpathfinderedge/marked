@@ -19,6 +19,11 @@ const TradesPage = lazy(() =>
     default: m.TradesPage,
   })),
 );
+const ImportTradesPage = lazy(() =>
+  import("@/components/trades/ImportTradesPage").then((m) => ({
+    default: m.ImportTradesPage,
+  })),
+);
 const SettingsPage = lazy(() =>
   import("@/components/settings/SettingsPage").then((m) => ({
     default: m.SettingsPage,
@@ -54,6 +59,7 @@ function AppContent(): JSX.Element {
             <Route path="/" element={<Navigate to="/dashboard" replace />} />
             <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/trades" element={<TradesPage />} />
+            <Route path="/trades/import" element={<ImportTradesPage />} />
             <Route path="/settings" element={<SettingsPage />} />
             <Route path="*" element={<Navigate to="/dashboard" replace />} />
           </Routes>
