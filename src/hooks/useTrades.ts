@@ -9,6 +9,9 @@ interface UseTradesResult {
   isLoading: boolean;
   error: string | null;
   addTrade: (input: NewTradeInput) => Promise<{ error: string | null }>;
+  addTrades: (
+    inputs: NewTradeInput[],
+  ) => Promise<{ error: string | null; count: number }>;
   refetch: () => Promise<void>;
 }
 
@@ -63,5 +66,23 @@ export function useTrades(): UseTradesResult {
     return { error: null };
   };
 
-  return { trades, isLoading, error, addTrade, refetch: fetchTrades };
+  const addTrades = async (
+    inputs: NewTradeInput[],
+  ): Promise<{ error: string | null; count: number }> => {
+    if (!user) return { error: "Not signed in.", count: 0 };
+    if (inputs.length === 0) return { error: null, count: 0 };
+
+    const { data, error: insertError } = await supabase
+      .from("trades")
+      .insert(inputs.map((input) => newTradeToRow(input, user.id)))
+      .select();
+
+    if (insertError) return { error: insertError.message, count: 0 };
+
+    const inserted = (data ?? []).map(rowToTrade);
+    setTrades((prev) => [...inserted, ...prev]);
+    return { error: null, count: inserted.length };
+  };
+
+  return { trades, isLoading, error, addTrade, addTrades, refetch: fetchTrades };
 }
