@@ -1,4 +1,4 @@
-import { useMemo, useState, type ChangeEvent, type FormEvent } from "react";
+import { useEffect, useMemo, useState, type ChangeEvent, type FormEvent } from "react";
 import { useOnlineStatus } from "@/hooks/useOnlineStatus";
 import { toIsoDate } from "@/utils/dates";
 import { Input } from "@/components/ui/Input";
@@ -7,9 +7,11 @@ import { Button } from "@/components/ui/Button";
 import {
   calculateForexPnl,
   calculateCryptoPnl,
+  calculateCrossPairPnl,
   calculateRMultiple,
   ForexCrossPairError,
 } from "@/lib/calculations";
+import { fetchFxRate, FxRateError } from "@/lib/fx/fetchFxRate";
 import type { NewTradeInput } from "@/utils/tradeMappers";
 import type {
   ContractSize,
@@ -25,7 +27,7 @@ interface TradeFormProps {
   ) => Promise<{ error: string | null }>;
 }
 
-const MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024; // 5MB
+const MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024;
 
 const MARKET_OPTIONS = [
   { value: "forex", label: "Forex" },
@@ -69,6 +71,9 @@ export function TradeForm({ onSubmit }: TradeFormProps): JSX.Element {
   const [manualPnl, setManualPnl] = useState("");
   const [notes, setNotes] = useState("");
   const [screenshots, setScreenshots] = useState<File[]>([]);
+  const [isFetchingRate, setIsFetchingRate] = useState(false);
+  const [rateInfo, setRateInfo] = useState<string | null>(null);
+  const [rateError, setRateError] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -120,6 +125,61 @@ export function TradeForm({ onSubmit }: TradeFormProps): JSX.Element {
   const computedPnl = preview !== null && "pnl" in preview ? preview.pnl : null;
   const finalPnl = needsManualEntry ? Number(manualPnl) : computedPnl;
 
+  useEffect(() => {
+    setRateInfo(null);
+    setRateError(null);
+  }, [pair]);
+
+  const handleLookupRate = async (): Promise<void> => {
+    const quoteCurrency = pair.trim().toUpperCase().slice(3, 6);
+    const entry = Number(entryPrice);
+    const exit = Number(exitPrice);
+    const lotsNum = Number(lots);
+
+    if (quoteCurrency.length !== 3) {
+      setRateError("Enter a full 6-letter pair (e.g. EURGBP) first.");
+      return;
+    }
+    if (
+      !entryPrice ||
+      !exitPrice ||
+      !lots ||
+      Number.isNaN(entry) ||
+      Number.isNaN(exit) ||
+      Number.isNaN(lotsNum)
+    ) {
+      setRateError("Fill in entry/exit price and lots first.");
+      return;
+    }
+
+    setIsFetchingRate(true);
+    setRateError(null);
+
+    try {
+      const { rate, date } = await fetchFxRate(quoteCurrency, "USD");
+      const { pnl } = calculateCrossPairPnl({
+        pair,
+        direction,
+        entryPrice: entry,
+        exitPrice: exit,
+        lots: lotsNum,
+        contractSize,
+        customContractUnits: customUnits ? Number(customUnits) : undefined,
+        quoteToUsdRate: rate,
+      });
+      setManualPnl(pnl.toFixed(2));
+      setRateInfo(
+        `Priced via ${quoteCurrency}USD = ${rate.toFixed(4)} (ECB rate, ${date}). Adjust below if needed.`,
+      );
+    } catch (err) {
+      setRateError(
+        err instanceof FxRateError ? err.message : "Couldn't fetch a rate.",
+      );
+    } finally {
+      setIsFetchingRate(false);
+    }
+  };
+
   const resetForm = (): void => {
     setPair("");
     setEntryPrice("");
@@ -132,6 +192,8 @@ export function TradeForm({ onSubmit }: TradeFormProps): JSX.Element {
     setTag("");
     setNotes("");
     setScreenshots([]);
+    setRateInfo(null);
+    setRateError(null);
   };
 
   const handleScreenshotsChange = (event: ChangeEvent<HTMLInputElement>): void => {
@@ -326,6 +388,20 @@ export function TradeForm({ onSubmit }: TradeFormProps): JSX.Element {
             <p className="font-mono text-xs text-stamp">
               {(preview as { crossPairError: string }).crossPairError}
             </p>
+            <button
+              type="button"
+              onClick={() => void handleLookupRate()}
+              disabled={isFetchingRate}
+              className="self-start font-mono text-xs uppercase tracking-wider text-ink underline underline-offset-4 disabled:opacity-50"
+            >
+              {isFetchingRate ? "Looking up rate…" : "Look up live rate"}
+            </button>
+            {rateInfo ? (
+              <p className="font-mono text-xs text-muted">{rateInfo}</p>
+            ) : null}
+            {rateError ? (
+              <p className="font-mono text-xs text-stamp">{rateError}</p>
+            ) : null}
             <Input
               label="Manual P&L ($)"
               type="number"

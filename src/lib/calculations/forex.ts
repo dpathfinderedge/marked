@@ -22,17 +22,13 @@ const CONTRACT_UNITS: Record<Exclude<ContractSize, "custom">, number> = {
   micro: 1_000,
 };
 
-export class ForexCrossPairError extends Error {
-  constructor(pair: string) {
-    super(
-      `${pair} is a cross pair with no USD leg — P&L can't be auto-priced. ` +
-        "Enter it manually.",
-    );
-    this.name = "ForexCrossPairError";
-  }
+export interface ContractUnitsInput {
+  lots: number;
+  contractSize: ContractSize;
+  customContractUnits?: number;
 }
 
-function resolveUnits(input: ForexCalcInput): number {
+export function resolveContractUnits(input: ContractUnitsInput): number {
   if (input.contractSize === "custom") {
     if (!input.customContractUnits || input.customContractUnits <= 0) {
       throw new Error(
@@ -44,6 +40,16 @@ function resolveUnits(input: ForexCalcInput): number {
   return CONTRACT_UNITS[input.contractSize] * input.lots;
 }
 
+export class ForexCrossPairError extends Error {
+  constructor(pair: string) {
+    super(
+      `${pair} is a cross pair with no USD leg — P&L can't be auto-priced ` +
+        "without a rate lookup.",
+    );
+    this.name = "ForexCrossPairError";
+  }
+}
+
 export function calculateForexPnl(input: ForexCalcInput): ForexCalcResult {
   const pair = input.pair.toUpperCase();
   const pipSize = pair.endsWith("JPY") ? 0.01 : 0.0001;
@@ -51,7 +57,7 @@ export function calculateForexPnl(input: ForexCalcInput): ForexCalcResult {
   const priceDiff =
     (input.exitPrice - input.entryPrice) * (input.direction === "long" ? 1 : -1);
   const pips = priceDiff / pipSize;
-  const units = resolveUnits(input);
+  const units = resolveContractUnits(input);
 
   if (pair.endsWith("USD")) {
     return { pnl: priceDiff * units, pips, calcMode: "direct" };
