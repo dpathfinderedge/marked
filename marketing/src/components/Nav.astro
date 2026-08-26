@@ -2,56 +2,128 @@
 import { APP_URL } from "../lib/constants";
 ---
 
-<header class="border-b border-rule">
+<header class="sticky top-0 z-50 border-b border-line/60 bg-bg-0/80 backdrop-blur-md">
   <div class="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-    <a href="/" class="flex items-center gap-2">
+    <a href="/" class="flex items-center gap-2.5">
       <svg
-        width="24"
-        height="24"
+        width="22"
+        height="22"
         viewBox="0 0 36 36"
         fill="none"
         style="transform: rotate(-9deg)"
         aria-hidden="true"
       >
-        <circle
-          cx="18"
-          cy="18"
-          r="15.5"
-          stroke="currentColor"
-          stroke-width="2.5"
-          class="text-stamp"
-        />
-        <circle
-          cx="18"
-          cy="18"
-          r="11"
-          stroke="currentColor"
-          stroke-width="1"
-          opacity="0.55"
-          class="text-stamp"
-        />
+        <circle cx="18" cy="18" r="15.5" stroke="currentColor" stroke-width="2.5" class="text-signal-red" />
+        <circle cx="18" cy="18" r="11" stroke="currentColor" stroke-width="1" opacity="0.5" class="text-signal-red" />
         <path
           d="M12 19L16 23L25 12"
           stroke="currentColor"
           stroke-width="2.5"
           stroke-linecap="round"
           stroke-linejoin="round"
-          class="text-stamp"
+          class="text-signal-red"
         />
       </svg>
-      <span class="font-display text-xl italic text-ink">Marked</span>
+      <span class="text-[15px] font-semibold tracking-tight text-text">Marked</span>
     </a>
 
-    <nav class="hidden items-center gap-6 font-mono text-xs uppercase tracking-wider text-muted sm:flex">
-      <a href="#how-it-works" class="transition-colors hover:text-ink">How it works</a>
-      <a href="#features" class="transition-colors hover:text-ink">Features</a>
+    <nav class="hidden items-center gap-8 text-[13px] font-medium text-text-muted sm:flex">
+      <a href="#how-it-works" class="transition-colors hover:text-text">How it works</a>
+      <a href="#features" class="transition-colors hover:text-text">Features</a>
     </nav>
 
-    <a
-      href={APP_URL}
-      class="rounded-lg bg-stamp px-4 py-2 font-sans text-sm font-medium text-paper transition-opacity hover:opacity-90"
+    <div class="hidden items-center gap-5 sm:flex">
+      <a
+        href={APP_URL}
+        class="text-[13px] font-medium text-text-muted transition-colors hover:text-text"
+      >
+        Sign in
+      </a>
+      <a
+        href={APP_URL}
+        class="rounded-lg bg-signal-red px-4 py-2 text-[13px] font-semibold text-white transition-opacity hover:opacity-90"
+      >
+        Start free
+      </a>
+    </div>
+
+    <button
+      type="button"
+      id="mobile-menu-button"
+      aria-expanded="false"
+      aria-controls="mobile-menu"
+      class="flex h-9 w-9 items-center justify-center rounded-lg text-text transition-colors hover:bg-bg-1 sm:hidden"
     >
-      Start free
+      <svg id="icon-menu" width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+        <path d="M3 5H17M3 10H17M3 15H17" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+      </svg>
+      <svg id="icon-close" width="20" height="20" viewBox="0 0 20 20" fill="none" class="hidden" aria-hidden="true">
+        <path d="M4 4L16 16M16 4L4 16" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+      </svg>
+      <span class="sr-only">Toggle menu</span>
+    </button>
+  </div>
+
+  <div
+    id="mobile-menu"
+    class="hidden flex-col gap-1 border-t border-line/60 px-6 py-4 sm:hidden"
+  >
+    <a
+      href="#how-it-works"
+      class="rounded-lg px-3 py-2.5 text-[14px] font-medium text-text-muted transition-colors hover:bg-bg-1 hover:text-text"
+    >
+      How it works
     </a>
+    <a
+      href="#features"
+      class="rounded-lg px-3 py-2.5 text-[14px] font-medium text-text-muted transition-colors hover:bg-bg-1 hover:text-text"
+    >
+      Features
+    </a>
+    <div class="mt-2 flex flex-col gap-2 border-t border-line/60 pt-4">
+      <a
+        href={APP_URL}
+        class="rounded-lg px-3 py-2.5 text-center text-[14px] font-medium text-text-muted transition-colors hover:bg-bg-1 hover:text-text"
+      >
+        Sign in
+      </a>
+      <a
+        href={APP_URL}
+        class="rounded-lg bg-signal-red px-3 py-2.5 text-center text-[14px] font-semibold text-white transition-opacity hover:opacity-90"
+      >
+        Start free
+      </a>
+    </div>
   </div>
 </header>
+
+<script>
+  const button = document.getElementById("mobile-menu-button");
+  const menu = document.getElementById("mobile-menu");
+  const iconMenu = document.getElementById("icon-menu");
+  const iconClose = document.getElementById("icon-close");
+
+  function closeMenu(): void {
+    menu?.classList.add("hidden");
+    iconMenu?.classList.remove("hidden");
+    iconClose?.classList.add("hidden");
+    button?.setAttribute("aria-expanded", "false");
+  }
+
+  function openMenu(): void {
+    menu?.classList.remove("hidden");
+    iconMenu?.classList.add("hidden");
+    iconClose?.classList.remove("hidden");
+    button?.setAttribute("aria-expanded", "true");
+  }
+
+  button?.addEventListener("click", () => {
+    const isOpen = !menu?.classList.contains("hidden");
+    if (isOpen) closeMenu();
+    else openMenu();
+  });
+
+  menu?.querySelectorAll("a").forEach((link) => {
+    link.addEventListener("click", closeMenu);
+  });
+</script>

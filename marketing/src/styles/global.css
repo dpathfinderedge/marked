@@ -3,27 +3,44 @@
 @tailwind utilities;
 
 :root {
-  --color-paper: 236 234 227;
-  --color-ink: 33 32 28;
-  --color-rule: 216 213 203;
-  --color-stamp: 168 50 31;
-  --color-green: 47 107 79;
-  --color-muted: 107 104 95;
-  --color-surface: 226 224 215;
+  --bg-0: 10 10 12;       
+  --bg-1: 19 19 22;       
+  --bg-2: 27 27 31;       
+  --line: 39 39 44;       
+  --line-strong: 52 52 59; 
+  --text: 242 242 240;
+  --text-muted: 140 140 147;
+  --text-faint: 92 92 100;
+  --signal-red: 226 88 75;
+  --signal-green: 63 174 114;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --color-paper: 20 21 27;
-    --color-ink: 232 230 221;
-    --color-rule: 44 46 56;
-    --color-stamp: 196 80 58;
-    --color-green: 76 146 112;
-    --color-muted: 139 138 128;
-    --color-surface: 28 30 38;
-  }
+html {
+  color-scheme: dark;
 }
 
 body {
-  @apply bg-paper text-ink;
+  @apply bg-bg-0 text-text antialiased;
+  font-feature-settings: "ss01" 1;
+}
+
+.reveal {
+  opacity: 0;
+  transform: translateY(16px);
+  transition:
+    opacity 0.6s ease,
+    transform 0.6s ease;
+}
+
+.reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
 }

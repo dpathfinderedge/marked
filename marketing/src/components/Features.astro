@@ -2,7 +2,7 @@
 const features = [
   {
     title: "Real P&L math",
-    body: "Direct, converted, and manual pricing paths for forex — including a clear fallback for true cross pairs — plus straightforward crypto math.",
+    body: "Direct, converted, and manual pricing paths for forex — including a live rate lookup for true cross pairs — plus straightforward crypto math.",
   },
   {
     title: "Equity curve & breakdowns",
@@ -19,20 +19,28 @@ const features = [
 ];
 ---
 
-<section id="features" class="py-20">
+<section id="features" class="border-t border-line py-24 sm:py-32">
   <div class="mx-auto max-w-6xl px-6">
-    <h2 class="font-display text-3xl italic text-ink">
-      Everything to find your edge. Nothing you don't need.
-    </h2>
+    <div class="reveal">
+      <p class="text-[11px] font-semibold uppercase tracking-widest text-signal-red">
+        Features
+      </p>
+      <h2 class="mt-3 max-w-md text-[28px] font-bold leading-tight tracking-tight text-text sm:text-[34px]">
+        Everything to find your edge. Nothing you don't need.
+      </h2>
+    </div>
 
-    <div class="mt-12 grid gap-6 sm:grid-cols-2">
+    <div class="mt-16 grid gap-4 sm:grid-cols-2">
       {
-        features.map((feature) => (
-          <div class="rounded-xl border border-rule bg-surface p-6">
-            <h3 class="font-sans text-base font-medium text-ink">
-              {feature.title}
-            </h3>
-            <p class="mt-2 font-sans text-sm text-muted">{feature.body}</p>
+        features.map((feature, i) => (
+          <div
+            class="reveal rounded-xl border border-line bg-bg-1 p-6 transition-colors hover:border-line-strong"
+            style={`transition-delay: ${i * 70}ms`}
+          >
+            <h3 class="text-[15px] font-semibold text-text">{feature.title}</h3>
+            <p class="mt-2 text-[14px] leading-relaxed text-text-muted">
+              {feature.body}
+            </p>
           </div>
         ))
       }
