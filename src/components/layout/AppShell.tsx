@@ -14,6 +14,8 @@ import { useAuth } from "@/hooks/useAuth";
 import { useTheme } from "@/hooks/useTheme";
 import { Stamp } from "@/components/ui/Stamp";
 import { Button } from "@/components/ui/Button";
+import { MobileTopBar } from "@/components/layout/MobileTopBar";
+import { MobileTabBar } from "@/components/layout/MobileTabBar";
 
 interface AppShellProps {
   children: ReactNode;
@@ -52,9 +54,9 @@ export function AppShell({ children }: AppShellProps): JSX.Element {
     "flex items-center gap-3 rounded-lg px-2.5 py-2 text-sm font-medium text-text-muted transition-colors hover:bg-bg-2 hover:text-text";
 
   return (
-    <div className="flex min-h-screen">
+    <div className="flex min-h-screen flex-col sm:flex-row">
       <aside
-        className={`flex shrink-0 flex-col justify-between border-r border-line bg-bg-1 py-5 transition-[width] duration-200 ${
+        className={`hidden shrink-0 flex-col justify-between border-r border-line bg-bg-1 py-5 transition-[width] duration-200 sm:flex ${
           isCollapsed ? "w-16 items-center px-2" : "w-56 px-3"
         }`}
       >
@@ -116,8 +118,10 @@ export function AppShell({ children }: AppShellProps): JSX.Element {
         </div>
       </aside>
 
+      <MobileTopBar />
+
       <div className="flex flex-1 flex-col">
-        <header className="flex items-center justify-between border-b border-line px-6 py-4">
+        <header className="hidden items-center justify-between border-b border-line px-6 py-4 sm:flex">
           <span className="font-mono text-xs text-text-muted">{user?.email}</span>
           <Button variant="secondary" onClick={() => void signOut()}>
             <span className="flex items-center gap-1.5">
@@ -127,8 +131,10 @@ export function AppShell({ children }: AppShellProps): JSX.Element {
           </Button>
         </header>
 
-        <main className="flex-1 p-6">{children}</main>
+        <main className="flex-1 p-6 pb-24 sm:pb-6">{children}</main>
       </div>
+
+      <MobileTabBar />
     </div>
   );
 }
