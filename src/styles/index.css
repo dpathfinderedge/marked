@@ -3,27 +3,33 @@
 @tailwind utilities;
 
 :root {
-  --color-paper: 236 234 227;
-  --color-ink: 33 32 28;
-  --color-rule: 216 213 203;
-  --color-stamp: 168 50 31;
-  --color-green: 47 107 79;
-  --color-muted: 107 104 95;
-  --color-surface: 226 224 215;
+  --bg-0: 250 250 250;    
+  --bg-1: 255 255 255;    
+  --bg-2: 244 244 245;    
+  --line: 228 228 231;    
+  --line-strong: 209 209 214; 
+  --text: 19 19 22;
+  --text-muted: 110 110 118;
+  --text-faint: 161 161 170;
+  --signal-red: 193 55 42;
+  --signal-green: 31 122 77;
 }
 
 .dark {
-  --color-paper: 20 21 27;
-  --color-ink: 232 230 221;
-  --color-rule: 44 46 56;
-  --color-stamp: 196 80 58;
-  --color-green: 76 146 112;
-  --color-muted: 139 138 128;
-  --color-surface: 28 30 38;
+  --bg-0: 10 10 12;
+  --bg-1: 19 19 22;
+  --bg-2: 27 27 31;
+  --line: 39 39 44;
+  --line-strong: 52 52 59;
+  --text: 242 242 240;
+  --text-muted: 140 140 147;
+  --text-faint: 92 92 100;
+  --signal-red: 226 88 75;
+  --signal-green: 63 174 114;
 }
 
 body {
-  @apply bg-paper text-ink;
+  @apply bg-bg-0 text-text antialiased;
   transition:
     background-color 0.2s ease,
     color 0.2s ease;

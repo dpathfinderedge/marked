@@ -46,14 +46,14 @@ export function SignUpForm({
   if (confirmationSent) {
     return (
       <div className="flex flex-col gap-3 text-center">
-        <p className="font-sans text-sm text-ink">
+        <p className="font-sans text-sm text-text">
           Check <span className="font-medium">{email}</span> for a
           confirmation link to finish setting up your account.
         </p>
         <button
           type="button"
           onClick={onSwitchToLogin}
-          className="font-mono text-xs uppercase tracking-wider text-muted underline underline-offset-4"
+          className="font-mono text-xs uppercase tracking-wider text-text-muted underline underline-offset-4"
         >
           Back to log in
         </button>
@@ -94,7 +94,7 @@ export function SignUpForm({
       <button
         type="button"
         onClick={onSwitchToLogin}
-        className="font-mono text-xs uppercase tracking-wider text-muted underline underline-offset-4"
+        className="font-mono text-xs uppercase tracking-wider text-text-muted underline underline-offset-4"
       >
         Already have an account? Log in
       </button>

@@ -33,7 +33,7 @@ const SettingsPage = lazy(() =>
 function LoadingScreen(): JSX.Element {
   return (
     <div className="flex min-h-screen items-center justify-center">
-      <p className="font-mono text-xs uppercase tracking-wider text-muted">
+      <p className="font-mono text-xs uppercase tracking-wider text-text-muted">
         Loading…
       </p>
     </div>

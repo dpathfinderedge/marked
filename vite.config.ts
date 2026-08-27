@@ -21,8 +21,8 @@ export default defineConfig({
         short_name: "Marked",
         description:
           "A personal trade journal and analytics tool for Forex and Crypto.",
-        theme_color: "#A8321F",
-        background_color: "#ECEAE3",
+        theme_color: "#E2584B",
+        background_color: "#FAFAFA",
         display: "standalone",
         start_url: "/",
         scope: "/",

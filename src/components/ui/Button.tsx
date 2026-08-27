@@ -14,11 +14,12 @@ export function Button({
   ...rest
 }: ButtonProps): JSX.Element {
   const base =
-    "rounded-lg px-4 py-2 font-sans text-sm font-medium transition-opacity disabled:cursor-not-allowed disabled:opacity-50";
+    "rounded-lg px-4 py-2 text-sm font-semibold transition-opacity disabled:cursor-not-allowed disabled:opacity-50";
 
   const variants: Record<NonNullable<ButtonProps["variant"]>, string> = {
-    primary: "bg-stamp text-paper hover:opacity-90",
-    secondary: "border border-rule bg-transparent text-ink hover:bg-surface",
+    primary: "bg-signal-red text-white hover:opacity-90",
+    secondary:
+      "border border-line bg-transparent text-text hover:bg-bg-2",
   };
 
   return (

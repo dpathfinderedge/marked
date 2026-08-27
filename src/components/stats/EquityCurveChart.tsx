@@ -6,19 +6,28 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { useTheme } from "@/hooks/useTheme";
 import type { EquityPoint } from "@/lib/calculations";
 
 interface EquityCurveChartProps {
   points: EquityPoint[];
 }
 
+const PALETTE = {
+  light: { green: "#1F7A4D", red: "#C1372A", line: "#E4E4E7", muted: "#6E6E76" },
+  dark: { green: "#3FAE72", red: "#E2584B", line: "#27272C", muted: "#8C8C93" },
+};
+
 export function EquityCurveChart({
   points,
 }: EquityCurveChartProps): JSX.Element {
+  const { theme } = useTheme();
+  const palette = PALETTE[theme];
+
   if (points.length === 0) {
     return (
-      <div className="flex h-56 items-center justify-center rounded-xl border border-rule bg-surface">
-        <p className="font-sans text-sm text-muted">
+      <div className="flex h-56 items-center justify-center rounded-xl border border-line bg-bg-1">
+        <p className="text-sm text-text-muted">
           Your equity curve will show up once you've logged a trade.
         </p>
       </div>
@@ -29,16 +38,13 @@ export function EquityCurveChart({
   const isPositive = (lastPoint?.cumulativePnl ?? 0) >= 0;
 
   return (
-    <div className="h-56 rounded-xl border border-rule bg-surface p-4">
+    <div className="h-56 rounded-xl border border-line bg-bg-1 p-4">
       <ResponsiveContainer width="100%" height="100%">
         <LineChart data={points}>
-          <XAxis
-            dataKey="date"
-            hide
-          />
+          <XAxis dataKey="date" hide />
           <YAxis
             width={56}
-            tick={{ fontFamily: "JetBrains Mono", fontSize: 11, fill: "#6B685F" }}
+            tick={{ fontFamily: "Geist Mono", fontSize: 11, fill: palette.muted }}
             axisLine={false}
             tickLine={false}
           />
@@ -46,16 +52,16 @@ export function EquityCurveChart({
             formatter={(value: number) => value.toFixed(2)}
             labelFormatter={(label: string) => label}
             contentStyle={{
-              fontFamily: "JetBrains Mono",
+              fontFamily: "Geist Mono",
               fontSize: 12,
               borderRadius: 8,
-              border: "1px solid #D8D5CB",
+              border: `1px solid ${palette.line}`,
             }}
           />
           <Line
             type="monotone"
             dataKey="cumulativePnl"
-            stroke={isPositive ? "#2F6B4F" : "#A8321F"}
+            stroke={isPositive ? palette.green : palette.red}
             strokeWidth={2}
             dot={false}
           />

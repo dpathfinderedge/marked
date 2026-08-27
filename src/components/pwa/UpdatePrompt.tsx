@@ -10,8 +10,8 @@ export function UpdatePrompt(): JSX.Element | null {
   if (!needRefresh) return null;
 
   return (
-    <div className="flex items-center justify-between gap-3 border-b border-rule bg-stamp/10 px-4 py-2.5">
-      <p className="font-sans text-xs text-ink">
+    <div className="flex items-center justify-between gap-3 border-b border-line bg-signal-red/10 px-4 py-2.5">
+      <p className="font-sans text-xs text-text">
         A new version of Marked is available.
       </p>
       <Button onClick={() => void updateServiceWorker(true)}>Reload</Button>

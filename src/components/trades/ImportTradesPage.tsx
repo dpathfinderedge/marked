@@ -59,7 +59,7 @@ export function ImportTradesPage(): JSX.Element {
   return (
     <div className="mx-auto flex max-w-3xl flex-col gap-6">
       <div className="flex items-center justify-between">
-        <h1 className="font-display text-2xl italic text-ink">
+        <h1 className="text-2xl font-bold tracking-tight text-text">
           Import trades
         </h1>
         <Link

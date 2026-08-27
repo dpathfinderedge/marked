@@ -43,19 +43,19 @@ export function TradeAttachments({ tradeId }: TradeAttachmentsProps): JSX.Elemen
 
   if (isLoading) {
     return (
-      <p className="px-4 py-3 font-mono text-xs text-muted">
+      <p className="px-4 py-3 font-mono text-xs text-text-muted">
         Loading attachments…
       </p>
     );
   }
 
   if (error) {
-    return <p className="px-4 py-3 font-mono text-xs text-stamp">{error}</p>;
+    return <p className="px-4 py-3 font-mono text-xs text-signal-red">{error}</p>;
   }
 
   if (attachments.length === 0) {
     return (
-      <p className="px-4 py-3 font-sans text-xs text-muted">
+      <p className="px-4 py-3 font-sans text-xs text-text-muted">
         No screenshots attached.
       </p>
     );
@@ -69,13 +69,13 @@ export function TradeAttachments({ tradeId }: TradeAttachmentsProps): JSX.Elemen
             <img
               src={attachment.signedUrl}
               alt="Trade screenshot"
-              className="h-20 w-20 rounded-lg border border-rule object-cover"
+              className="h-20 w-20 rounded-lg border border-line object-cover"
             />
           </a>
           <button
             type="button"
             onClick={() => void handleDelete(attachment)}
-            className="absolute -right-1.5 -top-1.5 hidden h-5 w-5 items-center justify-center rounded-full bg-stamp text-paper group-hover:flex"
+            className="absolute -right-1.5 -top-1.5 hidden h-5 w-5 items-center justify-center rounded-full bg-signal-red text-paper group-hover:flex"
             title="Remove"
           >
             ×

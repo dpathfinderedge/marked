@@ -79,7 +79,7 @@ export function DashboardPage(): JSX.Element {
   return (
     <div className="mx-auto flex max-w-3xl flex-col gap-6">
       <div>
-        <h1 className="font-display text-3xl italic text-ink">
+        <h1 className="text-3xl font-bold tracking-tight text-text">
           {greeting}
           {displayName ? `, ${displayName}` : ""}.
         </h1>
