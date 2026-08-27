@@ -26,7 +26,7 @@ export function EquityCurveChart({
 
   if (points.length === 0) {
     return (
-      <div className="flex h-56 items-center justify-center rounded-xl border border-line bg-bg-1">
+      <div className="flex h-72 items-center justify-center rounded-xl border border-line bg-bg-1">
         <p className="text-sm text-text-muted">
           Your equity curve will show up once you've logged a trade.
         </p>
@@ -38,7 +38,7 @@ export function EquityCurveChart({
   const isPositive = (lastPoint?.cumulativePnl ?? 0) >= 0;
 
   return (
-    <div className="h-56 rounded-xl border border-line bg-bg-1 p-4">
+    <div className="h-72 rounded-xl border border-line bg-bg-1 p-4">
       <ResponsiveContainer width="100%" height="100%">
         <LineChart data={points}>
           <XAxis dataKey="date" hide />

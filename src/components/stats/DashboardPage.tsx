@@ -38,6 +38,14 @@ function formatSignedDollars(value: number): string {
   return `${sign}$${Math.abs(value).toFixed(2)}`;
 }
 
+function SectionLabel({ children }: { children: string }): JSX.Element {
+  return (
+    <p className="text-xs font-medium uppercase tracking-widest text-text-faint">
+      {children}
+    </p>
+  );
+}
+
 export function DashboardPage(): JSX.Element {
   const { user } = useAuth();
   const { trades, isLoading } = useTrades();
@@ -70,86 +78,111 @@ export function DashboardPage(): JSX.Element {
 
   if (isLoading) {
     return (
-      <p className="font-mono text-xs uppercase tracking-wider text-muted">
+      <p className="font-mono text-xs uppercase tracking-wider text-text-muted">
         Loading…
       </p>
     );
   }
 
+  const totalIsPositive = stats.totalPnl >= 0;
+  const streak = stats.currentStreak;
+
   return (
-    <div className="mx-auto flex max-w-3xl flex-col gap-6">
+    <div className="mx-auto flex max-w-3xl flex-col gap-12">
+      {/* Hero — the one number this whole page exists to answer. Everything
+          else on the page supports or explains this. */}
       <div>
-        <h1 className="text-3xl font-bold tracking-tight text-text">
+        <p className="text-sm text-text-muted">
           {greeting}
           {displayName ? `, ${displayName}` : ""}.
-        </h1>
-        <p className="mt-1 font-mono text-sm">
-          <span
-            className={stats.todayPnl >= 0 ? "text-green" : "text-stamp"}
-          >
-            {formatSignedDollars(stats.todayPnl)}
-          </span>{" "}
-          <span className="text-muted">today</span>
+        </p>
+        <p
+          className={`mt-2 font-mono text-5xl font-bold tracking-tight sm:text-6xl ${
+            totalIsPositive ? "text-signal-green" : "text-signal-red"
+          }`}
+        >
+          {formatSignedDollars(stats.totalPnl)}
+        </p>
+        <p className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-text-muted">
+          <span>
+            <span
+              className={
+                stats.todayPnl >= 0 ? "text-signal-green" : "text-signal-red"
+              }
+            >
+              {formatSignedDollars(stats.todayPnl)}
+            </span>{" "}
+            today
+          </span>
+          {streak.type ? (
+            <>
+              <span className="text-line-strong">·</span>
+              <span>
+                <span
+                  className={
+                    streak.type === "win" ? "text-signal-green" : "text-signal-red"
+                  }
+                >
+                  {streak.count}
+                  {streak.type === "win" ? "W" : "L"}
+                </span>{" "}
+                current streak
+              </span>
+            </>
+          ) : null}
         </p>
       </div>
 
-      <WeekStrip dailyPnl={stats.dailyPnl} />
-
-      <EquityCurveChart points={stats.equityCurve} />
-
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-        <StatCard
-          label="Total P&L"
-          value={formatSignedDollars(stats.totalPnl)}
-          tone={stats.totalPnl >= 0 ? "positive" : "negative"}
-        />
-        <StatCard label="Win rate" value={formatPercent(stats.winRate)} />
-        <StatCard
-          label="Profit factor"
-          value={formatRatio(stats.profitFactor)}
-        />
-        <StatCard label="Avg R" value={formatRatio(stats.avgR)} />
+      <div className="flex flex-col gap-3">
+        <SectionLabel>Equity curve</SectionLabel>
+        <EquityCurveChart points={stats.equityCurve} />
       </div>
 
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-        <StatCard
-          label="Current streak"
-          value={
-            stats.currentStreak.type
-              ? `${stats.currentStreak.count}${
-                  stats.currentStreak.type === "win" ? "W" : "L"
-                }`
-              : "—"
-          }
-          tone={
-            stats.currentStreak.type === "win"
-              ? "positive"
-              : stats.currentStreak.type === "loss"
-                ? "negative"
-                : "neutral"
-          }
-        />
-        <StatCard
-          label="Flagged"
-          value={String(stats.flaggedCount)}
-          tone={stats.flaggedCount > 0 ? "negative" : "neutral"}
-        />
-        <NotableTradeCard
-          label="Largest gain"
-          trade={stats.largestGain}
-          tone="positive"
-        />
-        <NotableTradeCard
-          label="Largest loss"
-          trade={stats.largestLoss}
-          tone="negative"
-        />
+      <div className="flex flex-col gap-3">
+        <SectionLabel>This week</SectionLabel>
+        <WeekStrip dailyPnl={stats.dailyPnl} />
       </div>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <BreakdownTable title="By pair" groups={stats.byPair} />
-        <BreakdownTable title="By session" groups={stats.bySession} />
-        <BreakdownTable title="By tag" groups={stats.byTag} />
+      <div className="flex flex-col gap-3">
+        <SectionLabel>Performance</SectionLabel>
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+          <StatCard label="Win rate" value={formatPercent(stats.winRate)} />
+          <StatCard
+            label="Profit factor"
+            value={formatRatio(stats.profitFactor)}
+          />
+          <StatCard label="Avg R" value={formatRatio(stats.avgR)} />
+          <StatCard
+            label="Flagged"
+            value={String(stats.flaggedCount)}
+            tone={stats.flaggedCount > 0 ? "negative" : "neutral"}
+          />
+        </div>
+      </div>
+
+      <div className="flex flex-col gap-3">
+        <SectionLabel>Notable trades</SectionLabel>
+        <div className="grid grid-cols-2 gap-4">
+          <NotableTradeCard
+            label="Largest gain"
+            trade={stats.largestGain}
+            tone="positive"
+          />
+          <NotableTradeCard
+            label="Largest loss"
+            trade={stats.largestLoss}
+            tone="negative"
+          />
+        </div>
+      </div>
+
+      <div className="flex flex-col gap-3">
+        <SectionLabel>Breakdown</SectionLabel>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+          <BreakdownTable title="By pair" groups={stats.byPair} />
+          <BreakdownTable title="By session" groups={stats.bySession} />
+          <BreakdownTable title="By tag" groups={stats.byTag} />
+        </div>
       </div>
     </div>
   );
