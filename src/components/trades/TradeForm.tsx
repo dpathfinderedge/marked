@@ -267,7 +267,7 @@ export function TradeForm({ onSubmit }: TradeFormProps): JSX.Element {
   return (
     <form
       onSubmit={handleSubmit}
-      className="flex flex-col gap-4 rounded-xl border border-rule bg-surface p-6"
+      className="flex flex-col gap-4 rounded-xl border border-line bg-bg-1 p-6"
     >
       <div className="grid grid-cols-2 gap-4">
         <Input
@@ -382,25 +382,25 @@ export function TradeForm({ onSubmit }: TradeFormProps): JSX.Element {
         onChange={(e) => setRisk(e.target.value)}
       />
 
-      <div className="rounded-lg border border-rule bg-paper px-4 py-3">
+      <div className="rounded-lg border border-line bg-bg-0 px-4 py-3">
         {needsManualEntry ? (
           <div className="flex flex-col gap-2">
-            <p className="font-mono text-xs text-stamp">
+            <p className="font-mono text-xs text-signal-red">
               {(preview as { crossPairError: string }).crossPairError}
             </p>
             <button
               type="button"
               onClick={() => void handleLookupRate()}
               disabled={isFetchingRate}
-              className="self-start font-mono text-xs uppercase tracking-wider text-ink underline underline-offset-4 disabled:opacity-50"
+              className="self-start font-mono text-xs uppercase tracking-wider text-text underline underline-offset-4 disabled:opacity-50"
             >
               {isFetchingRate ? "Looking up rate…" : "Look up live rate"}
             </button>
             {rateInfo ? (
-              <p className="font-mono text-xs text-muted">{rateInfo}</p>
+              <p className="font-mono text-xs text-text-muted">{rateInfo}</p>
             ) : null}
             {rateError ? (
-              <p className="font-mono text-xs text-stamp">{rateError}</p>
+              <p className="font-mono text-xs text-signal-red">{rateError}</p>
             ) : null}
             <Input
               label="Manual P&L ($)"
@@ -413,8 +413,8 @@ export function TradeForm({ onSubmit }: TradeFormProps): JSX.Element {
           </div>
         ) : (
           <div className="flex items-center justify-between font-mono text-sm">
-            <span className="text-muted">P&L preview</span>
-            <span className={computedPnl !== null && computedPnl < 0 ? "text-stamp" : "text-green"}>
+            <span className="text-text-muted">P&L preview</span>
+            <span className={computedPnl !== null && computedPnl < 0 ? "text-signal-red" : "text-signal-green"}>
               {computedPnl !== null ? computedPnl.toFixed(2) : "—"}
             </span>
           </div>
@@ -422,7 +422,7 @@ export function TradeForm({ onSubmit }: TradeFormProps): JSX.Element {
       </div>
 
       <div className="flex flex-col gap-1.5">
-        <label className="font-mono text-xs uppercase tracking-wider text-muted">
+        <label className="font-mono text-xs uppercase tracking-wider text-text-muted">
           Screenshots (optional)
         </label>
         <input
@@ -430,10 +430,10 @@ export function TradeForm({ onSubmit }: TradeFormProps): JSX.Element {
           accept="image/*"
           multiple
           onChange={handleScreenshotsChange}
-          className="font-sans text-sm text-ink file:mr-4 file:rounded-lg file:border file:border-rule file:bg-paper file:px-3 file:py-2 file:font-sans file:text-sm file:text-ink"
+          className="font-sans text-sm text-text file:mr-4 file:rounded-lg file:border file:border-line file:bg-bg-0 file:px-3 file:py-2 file:font-sans file:text-sm file:text-text"
         />
         {screenshots.length > 0 ? (
-          <p className="font-mono text-xs text-muted">
+          <p className="font-mono text-xs text-text-muted">
             {screenshots.length} file{screenshots.length === 1 ? "" : "s"}{" "}
             selected
           </p>
@@ -443,20 +443,20 @@ export function TradeForm({ onSubmit }: TradeFormProps): JSX.Element {
       <div className="flex flex-col gap-1.5">
         <label
           htmlFor="notes"
-          className="font-mono text-xs uppercase tracking-wider text-muted"
+          className="font-mono text-xs uppercase tracking-wider text-text-muted"
         >
           Notes
         </label>
         <textarea
           id="notes"
           rows={3}
-          className="rounded-lg border border-rule bg-paper px-3 py-2 font-sans text-sm text-ink outline-none transition-colors focus:border-stamp"
+          className="rounded-lg border border-line bg-bg-0 px-3 py-2 font-sans text-sm text-text outline-none transition-colors focus:border-signal-red"
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
         />
       </div>
 
-      {error ? <p className="font-mono text-xs text-stamp">{error}</p> : null}
+      {error ? <p className="font-mono text-xs text-signal-red">{error}</p> : null}
 
       <Button type="submit" isLoading={isSubmitting} disabled={!isOnline}>
         {isOnline ? "Log trade" : "Offline"}

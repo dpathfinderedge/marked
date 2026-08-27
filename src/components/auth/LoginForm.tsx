@@ -52,7 +52,7 @@ export function LoginForm({ onSwitchToSignUp }: LoginFormProps): JSX.Element {
       <button
         type="button"
         onClick={onSwitchToSignUp}
-        className="font-mono text-xs uppercase tracking-wider text-muted underline underline-offset-4"
+        className="font-mono text-xs uppercase tracking-wider text-text-muted underline underline-offset-4"
       >
         Need an account? Sign up
       </button>

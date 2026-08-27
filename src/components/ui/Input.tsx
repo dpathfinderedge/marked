@@ -13,18 +13,18 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
       <div className="flex flex-col gap-1.5">
         <label
           htmlFor={inputId}
-          className="font-mono text-xs uppercase tracking-wider text-muted"
+          className="text-xs font-medium uppercase tracking-widest text-text-faint"
         >
           {label}
         </label>
         <input
           ref={ref}
           id={inputId}
-          className="rounded-lg border border-rule bg-paper px-3 py-2 font-sans text-sm text-ink outline-none transition-colors focus:border-stamp"
+          className="rounded-lg border border-line bg-bg-0 px-3 py-2 text-sm text-text outline-none transition-colors focus:border-line-strong"
           {...rest}
         />
         {error ? (
-          <p className="font-mono text-xs text-stamp">{error}</p>
+          <p className="text-xs text-signal-red">{error}</p>
         ) : null}
       </div>
     );

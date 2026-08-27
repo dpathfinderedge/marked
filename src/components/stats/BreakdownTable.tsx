@@ -15,23 +15,23 @@ export function BreakdownTable({
   groups,
 }: BreakdownTableProps): JSX.Element {
   return (
-    <div className="rounded-xl border border-rule bg-surface">
-      <h3 className="border-b border-rule px-4 py-3 font-mono text-xs uppercase tracking-wider text-muted">
+    <div className="rounded-xl border border-line bg-bg-1">
+      <h3 className="border-b border-line px-4 py-3 font-mono text-xs uppercase tracking-wider text-text-muted">
         {title}
       </h3>
       {groups.length === 0 ? (
-        <p className="px-4 py-3 font-sans text-sm text-muted">
+        <p className="px-4 py-3 font-sans text-sm text-text-muted">
           Nothing to show yet.
         </p>
       ) : (
         groups.map((group) => (
           <div
             key={group.key}
-            className="flex items-center justify-between border-b border-rule px-4 py-2.5 font-mono text-sm last:border-b-0"
+            className="flex items-center justify-between border-b border-line px-4 py-2.5 font-mono text-sm last:border-b-0"
           >
             <div className="flex flex-col">
-              <span className="text-ink">{group.key}</span>
-              <span className="text-xs text-muted">
+              <span className="text-text">{group.key}</span>
+              <span className="text-xs text-text-muted">
                 {group.trades} trade{group.trades === 1 ? "" : "s"}
                 {group.winRate !== null
                   ? ` · ${(group.winRate * 100).toFixed(0)}% win`
@@ -39,7 +39,7 @@ export function BreakdownTable({
               </span>
             </div>
             <span
-              className={group.totalPnl >= 0 ? "text-green" : "text-stamp"}
+              className={group.totalPnl >= 0 ? "text-signal-green" : "text-signal-red"}
             >
               {formatPnl(group.totalPnl)}
             </span>

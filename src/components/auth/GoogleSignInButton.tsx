@@ -47,12 +47,12 @@ export function GoogleSignInButton(): JSX.Element {
         type="button"
         onClick={() => void handleClick()}
         disabled={isRedirecting}
-        className="flex items-center justify-center gap-3 rounded-lg border border-rule bg-paper px-4 py-2 font-sans text-sm font-medium text-ink transition-colors hover:bg-surface disabled:cursor-not-allowed disabled:opacity-50"
+        className="flex items-center justify-center gap-3 rounded-lg border border-line bg-bg-0 px-4 py-2 font-sans text-sm font-medium text-text transition-colors hover:bg-bg-2 disabled:cursor-not-allowed disabled:opacity-50"
       >
         <GoogleLogo />
         {isRedirecting ? "Redirecting…" : "Continue with Google"}
       </button>
-      {error ? <p className="font-mono text-xs text-stamp">{error}</p> : null}
+      {error ? <p className="font-mono text-xs text-signal-red">{error}</p> : null}
     </div>
   );
 }

@@ -21,8 +21,8 @@ export function InstallPrompt(): JSX.Element | null {
   }
 
   return (
-    <div className="flex items-center justify-between gap-3 border-b border-rule bg-surface px-4 py-2.5">
-      <p className="font-sans text-xs text-ink">
+    <div className="flex items-center justify-between gap-3 border-b border-line bg-bg-1 px-4 py-2.5">
+      <p className="font-sans text-xs text-text">
         {showIosHint
           ? 'Install Marked: tap Share, then "Add to Home Screen."'
           : "Install Marked for quicker, offline-ready access."}
@@ -39,7 +39,7 @@ export function InstallPrompt(): JSX.Element | null {
         <button
           type="button"
           onClick={() => setDismissed(true)}
-          className="font-mono text-xs text-muted underline underline-offset-4"
+          className="font-mono text-xs text-text-muted underline underline-offset-4"
         >
           Dismiss
         </button>

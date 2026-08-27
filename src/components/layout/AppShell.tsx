@@ -1,6 +1,15 @@
-import type { ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { NavLink } from "react-router-dom";
-import { LayoutDashboard, NotebookPen, Settings, Sun, Moon } from "lucide-react";
+import {
+  LayoutDashboard,
+  NotebookPen,
+  Settings,
+  Sun,
+  Moon,
+  PanelLeftClose,
+  PanelLeftOpen,
+  LogOut,
+} from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useTheme } from "@/hooks/useTheme";
 import { Stamp } from "@/components/ui/Stamp";
@@ -10,48 +19,111 @@ interface AppShellProps {
   children: ReactNode;
 }
 
-const navLinkClass = ({ isActive }: { isActive: boolean }): string =>
-  `flex h-10 w-10 items-center justify-center rounded-lg transition-colors ${
-    isActive ? "bg-stamp/10 text-stamp" : "text-muted hover:text-ink"
-  }`;
+const NAV_ITEMS = [
+  { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { to: "/trades", label: "Trades", icon: NotebookPen },
+  { to: "/settings", label: "Settings", icon: Settings },
+];
+
+const SIDEBAR_STORAGE_KEY = "marked-sidebar-collapsed";
+
+function getInitialCollapsed(): boolean {
+  if (typeof window === "undefined") return false;
+  return window.localStorage.getItem(SIDEBAR_STORAGE_KEY) === "true";
+}
 
 export function AppShell({ children }: AppShellProps): JSX.Element {
   const { user, signOut } = useAuth();
   const { theme, toggleTheme } = useTheme();
+  const [isCollapsed, setIsCollapsed] = useState(getInitialCollapsed);
+
+  useEffect(() => {
+    window.localStorage.setItem(SIDEBAR_STORAGE_KEY, String(isCollapsed));
+  }, [isCollapsed]);
+
+  const navLinkClass = (isActive: boolean): string =>
+    `flex items-center gap-3 rounded-lg px-2.5 py-2 text-sm font-medium transition-colors ${
+      isActive
+        ? "bg-signal-red/10 text-signal-red"
+        : "text-text-muted hover:bg-bg-2 hover:text-text"
+    } ${isCollapsed ? "justify-center" : ""}`;
+
+  const utilityButtonClass =
+    "flex items-center gap-3 rounded-lg px-2.5 py-2 text-sm font-medium text-text-muted transition-colors hover:bg-bg-2 hover:text-text";
 
   return (
     <div className="flex min-h-screen">
-      <nav className="flex w-16 flex-col items-center justify-between border-r border-rule bg-surface py-6">
-        <div className="flex flex-col items-center gap-6">
-          <Stamp size={28} className="text-stamp" />
-          <div className="flex flex-col gap-2">
-            <NavLink to="/dashboard" className={navLinkClass} title="Dashboard">
-              <LayoutDashboard size={18} />
-            </NavLink>
-            <NavLink to="/trades" className={navLinkClass} title="Trades">
-              <NotebookPen size={18} />
-            </NavLink>
-            <NavLink to="/settings" className={navLinkClass} title="Settings">
-              <Settings size={18} />
-            </NavLink>
+      <aside
+        className={`flex shrink-0 flex-col justify-between border-r border-line bg-bg-1 py-5 transition-[width] duration-200 ${
+          isCollapsed ? "w-16 items-center px-2" : "w-56 px-3"
+        }`}
+      >
+        <div className={`flex flex-col gap-6 ${isCollapsed ? "items-center" : ""}`}>
+          <div className={`flex items-center gap-2.5 ${isCollapsed ? "" : "px-2"}`}>
+            <Stamp size={24} className="shrink-0 text-signal-red" />
+            {!isCollapsed ? (
+              <span className="text-[15px] font-semibold tracking-tight text-text">
+                Marked
+              </span>
+            ) : null}
           </div>
+
+          <nav className="flex flex-col gap-1">
+            {NAV_ITEMS.map(({ to, label, icon: Icon }) => (
+              <NavLink
+                key={to}
+                to={to}
+                className={({ isActive }) => navLinkClass(isActive)}
+                title={isCollapsed ? label : undefined}
+              >
+                <Icon size={18} className="shrink-0" />
+                {!isCollapsed ? <span>{label}</span> : null}
+              </NavLink>
+            ))}
+          </nav>
         </div>
 
-        <button
-          type="button"
-          onClick={toggleTheme}
-          className="flex h-10 w-10 items-center justify-center rounded-lg text-muted transition-colors hover:text-ink"
-          title={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
-        >
-          {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
-        </button>
-      </nav>
+        <div className={`flex flex-col gap-1 ${isCollapsed ? "items-center" : ""}`}>
+          <button
+            type="button"
+            onClick={toggleTheme}
+            title={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+            className={`${utilityButtonClass} ${isCollapsed ? "justify-center" : ""}`}
+          >
+            {theme === "dark" ? (
+              <Sun size={18} className="shrink-0" />
+            ) : (
+              <Moon size={18} className="shrink-0" />
+            )}
+            {!isCollapsed ? (
+              <span>{theme === "dark" ? "Light mode" : "Dark mode"}</span>
+            ) : null}
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setIsCollapsed((current) => !current)}
+            title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+            className={`${utilityButtonClass} ${isCollapsed ? "justify-center" : ""}`}
+          >
+            {isCollapsed ? (
+              <PanelLeftOpen size={18} className="shrink-0" />
+            ) : (
+              <PanelLeftClose size={18} className="shrink-0" />
+            )}
+            {!isCollapsed ? <span>Collapse</span> : null}
+          </button>
+        </div>
+      </aside>
 
       <div className="flex flex-1 flex-col">
-        <header className="flex items-center justify-between border-b border-rule px-6 py-4">
-          <span className="font-mono text-xs text-muted">{user?.email}</span>
+        <header className="flex items-center justify-between border-b border-line px-6 py-4">
+          <span className="font-mono text-xs text-text-muted">{user?.email}</span>
           <Button variant="secondary" onClick={() => void signOut()}>
-            Sign out
+            <span className="flex items-center gap-1.5">
+              <LogOut size={14} />
+              Sign out
+            </span>
           </Button>
         </header>
 
