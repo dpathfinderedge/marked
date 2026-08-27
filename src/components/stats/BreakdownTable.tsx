@@ -16,7 +16,7 @@ export function BreakdownTable({
 }: BreakdownTableProps): JSX.Element {
   return (
     <div className="rounded-xl border border-line bg-bg-1">
-      <h3 className="border-b border-line px-4 py-3 font-mono text-xs uppercase tracking-wider text-text-muted">
+      <h3 className="border-b border-line px-4 py-3 text-sm font-medium text-text">
         {title}
       </h3>
       {groups.length === 0 ? (
