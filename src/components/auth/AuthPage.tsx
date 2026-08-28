@@ -10,18 +10,18 @@ export function AuthPage(): JSX.Element {
   return (
     <div className="flex min-h-screen items-center justify-center px-4">
       <div className="w-full max-w-sm">
-        <div className="mb-8 flex items-center gap-3">
-          <Stamp size={30} className="text-ink" />
+        <div className="mb-8 flex items-baseline gap-3">
+          <Stamp size={30} className="text-text" />
           <h1 className="text-3xl font-bold tracking-tight text-text">Marked</h1>
         </div>
 
-        <div className="rounded-xl border border-rule bg-surface p-6">
+        <div className="rounded-xl border border-line bg-bg-1 p-7 shadow-sm">
           <GoogleSignInButton />
 
           <div className="my-5 flex items-center gap-3">
-            <div className="h-px flex-1 bg-rule" />
-            <span className="font-mono text-xs text-muted">or</span>
-            <div className="h-px flex-1 bg-rule" />
+            <div className="h-px flex-1 bg-line" />
+            <span className="font-mono text-xs text-text-muted">or</span>
+            <div className="h-px flex-1 bg-line" />
           </div>
 
           {mode === "login" ? (

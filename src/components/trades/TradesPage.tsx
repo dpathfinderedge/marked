@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import { Link } from "react-router-dom";
+import { Upload } from "lucide-react";
 import { useTrades } from "@/hooks/useTrades";
 import { useSettings } from "@/hooks/useSettings";
 import { useAttachments } from "@/hooks/useAttachments";
@@ -7,6 +8,14 @@ import { detectConsecutiveLossFlags } from "@/lib/calculations";
 import { TradeForm } from "@/components/trades/TradeForm";
 import { TradeList } from "@/components/trades/TradeList";
 import type { NewTradeInput } from "@/utils/tradeMappers";
+
+function SectionLabel({ children }: { children: string }): JSX.Element {
+  return (
+    <p className="text-xs font-medium uppercase tracking-widest text-text-faint">
+      {children}
+    </p>
+  );
+}
 
 export function TradesPage(): JSX.Element {
   const { trades, isLoading, error, addTrade } = useTrades();
@@ -44,26 +53,36 @@ export function TradesPage(): JSX.Element {
   };
 
   return (
-    <div className="mx-auto flex max-w-2xl flex-col gap-6">
+    <div className="mx-auto flex max-w-3xl flex-col gap-10">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold tracking-tight text-text">Trades</h1>
         <Link
           to="/trades/import"
-          className="font-mono text-xs uppercase tracking-wider text-muted underline underline-offset-4"
+          className="flex items-center gap-1.5 rounded-lg border border-line px-3 py-1.5 text-sm font-medium text-text-muted transition-colors hover:bg-bg-2 hover:text-text"
         >
+          <Upload size={14} />
           Import CSV
         </Link>
       </div>
 
-      <TradeForm onSubmit={handleAddTrade} />
+      <div className="flex flex-col gap-3">
+        <SectionLabel>New trade</SectionLabel>
+        <TradeForm onSubmit={handleAddTrade} />
+        {error ? <p className="text-xs text-signal-red">{error}</p> : null}
+      </div>
 
-      {error ? <p className="font-mono text-xs text-stamp">{error}</p> : null}
-
-      <TradeList
-        trades={trades}
-        isLoading={isLoading}
-        flaggedTradeIds={flaggedTradeIds}
-      />
+      <div className="flex flex-col gap-3">
+        <SectionLabel>
+          {isLoading
+            ? "Trades"
+            : `${trades.length} trade${trades.length === 1 ? "" : "s"}`}
+        </SectionLabel>
+        <TradeList
+          trades={trades}
+          isLoading={isLoading}
+          flaggedTradeIds={flaggedTradeIds}
+        />
+      </div>
     </div>
   );
 }

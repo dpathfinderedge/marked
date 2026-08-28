@@ -46,7 +46,7 @@ export function TradeList({
 
         return (
           <div key={trade.id} className="border-b border-line last:border-b-0">
-            <div className="flex items-center justify-between px-4 py-3">
+            <div className="flex items-center justify-between px-4 py-3 transition-colors hover:bg-bg-2">
               <div className="flex flex-col gap-0.5">
                 <span className="flex items-center gap-1.5 font-mono text-sm font-medium text-text">
                   {trade.pair}

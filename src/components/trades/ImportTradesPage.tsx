@@ -12,6 +12,14 @@ function isValidRow(
   return row.trade !== null;
 }
 
+function SectionLabel({ children }: { children: string }): JSX.Element {
+  return (
+    <p className="text-xs font-medium uppercase tracking-widest text-text-faint">
+      {children}
+    </p>
+  );
+}
+
 export function ImportTradesPage(): JSX.Element {
   const { addTrades } = useTrades();
   const [rows, setRows] = useState<CsvImportRow[]>([]);
@@ -57,26 +65,26 @@ export function ImportTradesPage(): JSX.Element {
   };
 
   return (
-    <div className="mx-auto flex max-w-3xl flex-col gap-6">
+    <div className="mx-auto flex max-w-3xl flex-col gap-10">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold tracking-tight text-text">
           Import trades
         </h1>
         <Link
           to="/trades"
-          className="font-mono text-xs uppercase tracking-wider text-muted underline underline-offset-4"
+          className="text-xs font-medium uppercase tracking-widest text-text-muted underline underline-offset-4 transition-colors hover:text-text"
         >
           Back to trades
         </Link>
       </div>
 
-      <div className="rounded-xl border border-rule bg-surface p-6">
-        <p className="font-sans text-sm text-muted">
+      <div className="rounded-xl border border-line bg-bg-1 p-6">
+        <p className="font-sans text-sm text-text-muted">
           Import trades from a CSV file. Not sure of the format?{" "}
           <button
             type="button"
             onClick={downloadCsvTemplate}
-            className="text-ink underline underline-offset-4"
+            className="text-text underline underline-offset-4"
           >
             Download the template
           </button>{" "}
@@ -90,27 +98,26 @@ export function ImportTradesPage(): JSX.Element {
             type="file"
             accept=".csv"
             onChange={(e) => void handleFileChange(e)}
-            className="font-sans text-sm text-ink file:mr-4 file:rounded-lg file:border file:border-rule file:bg-paper file:px-3 file:py-2 file:font-sans file:text-sm file:text-ink"
+            className="font-sans text-sm text-text file:mr-4 file:rounded-lg file:border file:border-line file:bg-bg-0 file:px-3 file:py-2 file:font-sans file:text-sm file:text-text"
           />
         </div>
 
         {importedCount !== null ? (
-          <p className="mt-4 font-mono text-xs text-green">
+          <p className="mt-4 font-mono text-xs text-signal-green">
             Imported {importedCount} trade{importedCount === 1 ? "" : "s"}.
           </p>
         ) : null}
         {importError ? (
-          <p className="mt-4 font-mono text-xs text-stamp">{importError}</p>
+          <p className="mt-4 font-mono text-xs text-signal-red">{importError}</p>
         ) : null}
       </div>
 
       {fileName && rows.length > 0 ? (
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-3">
           <div className="flex items-center justify-between">
-            <p className="font-mono text-xs text-muted">
-              {fileName} · {validRows.length} valid · {errorCount} error
-              {errorCount === 1 ? "" : "s"}
-            </p>
+            <SectionLabel>
+              {`${fileName} · ${validRows.length} valid · ${errorCount} error${errorCount === 1 ? "" : "s"}`}
+            </SectionLabel>
             <Button
               onClick={() => void handleImport()}
               isLoading={isImporting}
@@ -121,21 +128,21 @@ export function ImportTradesPage(): JSX.Element {
             </Button>
           </div>
 
-          <div className="overflow-hidden rounded-xl border border-rule bg-surface">
+          <div className="overflow-hidden rounded-xl border border-line bg-bg-1">
             {rows.map((row) => (
               <div
                 key={row.rowNumber}
-                className="flex items-center justify-between border-b border-rule px-4 py-2.5 font-mono text-xs last:border-b-0"
+                className="flex items-center justify-between border-b border-line px-4 py-2.5 font-mono text-xs last:border-b-0"
               >
-                <span className="text-muted">Row {row.rowNumber}</span>
+                <span className="text-text-muted">Row {row.rowNumber}</span>
                 {row.trade ? (
                   <span className="flex items-center gap-3">
-                    <span className="text-ink">
+                    <span className="text-text">
                       {row.trade.pair} · {row.trade.date}
                     </span>
                     <span
                       className={
-                        row.trade.pnl >= 0 ? "text-green" : "text-stamp"
+                        row.trade.pnl >= 0 ? "text-signal-green" : "text-signal-red"
                       }
                     >
                       {row.trade.pnl >= 0 ? "+" : "−"}
@@ -143,7 +150,7 @@ export function ImportTradesPage(): JSX.Element {
                     </span>
                   </span>
                 ) : (
-                  <span className="text-stamp">{row.error}</span>
+                  <span className="text-signal-red">{row.error}</span>
                 )}
               </div>
             ))}
