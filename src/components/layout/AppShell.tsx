@@ -13,7 +13,7 @@ import {
 import { useAuth } from "@/hooks/useAuth";
 import { useTheme } from "@/hooks/useTheme";
 import { Stamp } from "@/components/ui/Stamp";
-import { Button } from "@/components/ui/Button";
+import { getDisplayName } from "@/utils/greeting";
 import { MobileTopBar } from "@/components/layout/MobileTopBar";
 import { MobileTabBar } from "@/components/layout/MobileTabBar";
 
@@ -34,14 +34,21 @@ function getInitialCollapsed(): boolean {
   return window.localStorage.getItem(SIDEBAR_STORAGE_KEY) === "true";
 }
 
+function getInitial(name: string): string {
+  return name.trim().slice(0, 1).toUpperCase() || "?";
+}
+
 export function AppShell({ children }: AppShellProps): JSX.Element {
   const { user, signOut } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const [isCollapsed, setIsCollapsed] = useState(getInitialCollapsed);
+  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
 
   useEffect(() => {
     window.localStorage.setItem(SIDEBAR_STORAGE_KEY, String(isCollapsed));
   }, [isCollapsed]);
+
+  const displayName = getDisplayName(user);
 
   const navLinkClass = (isActive: boolean): string =>
     `flex items-center gap-3 rounded-lg px-2.5 py-2 text-sm font-medium transition-colors ${
@@ -56,10 +63,23 @@ export function AppShell({ children }: AppShellProps): JSX.Element {
   return (
     <div className="flex min-h-screen flex-col sm:flex-row">
       <aside
-        className={`hidden shrink-0 flex-col justify-between border-r border-line bg-bg-1 py-5 transition-[width] duration-200 sm:flex ${
+        className={`sticky top-0 hidden h-screen shrink-0 flex-col justify-between border-r border-line bg-bg-1 py-5 transition-[width] duration-200 sm:flex ${
           isCollapsed ? "w-16 items-center px-2" : "w-56 px-3"
         }`}
       >
+        <button
+          type="button"
+          onClick={() => setIsCollapsed((current) => !current)}
+          title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+          className="absolute -right-3 top-6 flex h-6 w-6 items-center justify-center rounded-full border border-line bg-bg-1 text-text-muted shadow-sm transition-colors hover:text-text"
+        >
+          {isCollapsed ? (
+            <PanelLeftOpen size={13} />
+          ) : (
+            <PanelLeftClose size={13} />
+          )}
+        </button>
+
         <div className={`flex flex-col gap-6 ${isCollapsed ? "items-center" : ""}`}>
           <div className={`flex items-center gap-2.5 ${isCollapsed ? "" : "px-2"}`}>
             <Stamp size={24} className="shrink-0 text-signal-red" />
@@ -102,37 +122,49 @@ export function AppShell({ children }: AppShellProps): JSX.Element {
             ) : null}
           </button>
 
-          <button
-            type="button"
-            onClick={() => setIsCollapsed((current) => !current)}
-            title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
-            className={`${utilityButtonClass} ${isCollapsed ? "justify-center" : ""}`}
-          >
-            {isCollapsed ? (
-              <PanelLeftOpen size={18} className="shrink-0" />
-            ) : (
-              <PanelLeftClose size={18} className="shrink-0" />
-            )}
-            {!isCollapsed ? <span>Collapse</span> : null}
-          </button>
+          <div className="relative">
+            <button
+              type="button"
+              onClick={() => setIsProfileMenuOpen((current) => !current)}
+              aria-expanded={isProfileMenuOpen}
+              className={`${utilityButtonClass} ${isCollapsed ? "justify-center" : ""}`}
+            >
+              <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-signal-red text-[11px] font-semibold text-white">
+                {getInitial(displayName)}
+              </span>
+              {!isCollapsed ? (
+                <span className="truncate text-text">{displayName}</span>
+              ) : null}
+            </button>
+
+            {isProfileMenuOpen ? (
+              <>
+                <div
+                  className="fixed inset-0 z-40"
+                  onClick={() => setIsProfileMenuOpen(false)}
+                />
+                <div className="absolute bottom-11 left-0 z-50 w-56 rounded-xl border border-line bg-bg-1 p-2 shadow-lg">
+                  <p className="truncate px-2 py-1.5 font-mono text-xs text-text-muted">
+                    {user?.email}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => void signOut()}
+                    className="flex w-full items-center gap-2.5 rounded-lg px-2 py-2 text-left text-sm text-text-muted transition-colors hover:bg-bg-2 hover:text-text"
+                  >
+                    <LogOut size={16} />
+                    Sign out
+                  </button>
+                </div>
+              </>
+            ) : null}
+          </div>
         </div>
       </aside>
 
       <MobileTopBar />
 
-      <div className="flex flex-1 flex-col">
-        <header className="hidden items-center justify-between border-b border-line px-6 py-4 sm:flex">
-          <span className="font-mono text-xs text-text-muted">{user?.email}</span>
-          <Button variant="secondary" onClick={() => void signOut()}>
-            <span className="flex items-center gap-1.5">
-              <LogOut size={14} />
-              Sign out
-            </span>
-          </Button>
-        </header>
-
-        <main className="flex-1 p-6 pb-24 sm:pb-6">{children}</main>
-      </div>
+      <main className="flex-1 p-6 pb-24 sm:pb-6">{children}</main>
 
       <MobileTabBar />
     </div>
