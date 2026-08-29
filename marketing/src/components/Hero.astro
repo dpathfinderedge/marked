@@ -1,5 +1,7 @@
 ---
+import { Image } from "astro:assets";
 import { APP_URL } from "../lib/constants";
+import dashboardScreenshot from "../assets/dashboard-screenshot.jpg";
 ---
 
 <section class="mx-auto max-w-6xl px-6 pb-24 pt-20 sm:pb-32 sm:pt-28">
@@ -18,7 +20,7 @@ import { APP_URL } from "../lib/constants";
       losing streaks before they become a habit.
     </p>
     <div class="mt-9 flex flex-wrap items-center justify-center gap-4">
-      <a      
+      <a
         href={APP_URL}
         class="rounded-lg bg-signal-red px-6 py-3 text-[14px] font-semibold text-white transition-opacity hover:opacity-90"
       >
@@ -33,50 +35,14 @@ import { APP_URL } from "../lib/constants";
     </div>
   </div>
 
-  <div class="reveal relative mx-auto mt-16 max-w-3xl rounded-2xl border border-line bg-bg-1 p-6 shadow-[0_1px_0_0_rgba(255,255,255,0.04)_inset,0_20px_60px_-20px_rgba(0,0,0,0.6)] sm:p-10">
-    <svg viewBox="0 0 400 180" class="h-auto w-full" preserveAspectRatio="none" aria-hidden="true">
-      <polyline
-        points="0,150 40,132 80,140 120,98 160,118 180,158 200,172"
-        fill="none"
-        stroke="rgb(226 88 75)"
-        stroke-width="2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      ></polyline>
-      <polyline
-        points="200,172 220,148 260,108 300,68 340,48 400,26"
-        fill="none"
-        stroke="rgb(63 174 114)"
-        stroke-width="2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      ></polyline>
-    </svg>
-
-    <div class="pointer-events-none absolute" style="left: 47%; top: 76%;">
-      <div class="flex -translate-x-1/2 -translate-y-1/2 flex-col items-center gap-2">
-        <svg
-          width="30"
-          height="30"
-          viewBox="0 0 36 36"
-          fill="none"
-          style="transform: rotate(-9deg)"
-          aria-hidden="true"
-        >
-          <circle cx="18" cy="18" r="15.5" stroke="rgb(226 88 75)" stroke-width="2.5" />
-          <circle cx="18" cy="18" r="11" stroke="rgb(226 88 75)" stroke-width="1" opacity="0.5" />
-          <path
-            d="M12 19L16 23L25 12"
-            stroke="rgb(226 88 75)"
-            stroke-width="2.5"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          ></path>
-        </svg>
-        <span class="whitespace-nowrap rounded-md border border-line bg-bg-2 px-2 py-1 font-mono text-[10px] text-text-muted">
-          Flagged · 2 losses in a row
-        </span>
-      </div>
-    </div>
+  <div class="reveal mx-auto mt-16 max-w-4xl overflow-hidden rounded-2xl border border-line bg-bg-1 shadow-[0_1px_0_0_rgba(255,255,255,0.04)_inset,0_20px_60px_-20px_rgba(0,0,0,0.6)]">
+    <Image
+      src={dashboardScreenshot}
+      alt="Marked dashboard showing total P&L, an equity curve, and this week's trades"
+      width={1350}
+      height={648}
+      loading="eager"
+      class="w-full h-auto"
+    />
   </div>
 </section>
