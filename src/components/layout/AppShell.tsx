@@ -1,5 +1,5 @@
 import { useEffect, useState, type ReactNode } from "react";
-import { NavLink } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import {
   LayoutDashboard,
   NotebookPen,
@@ -8,6 +8,7 @@ import {
   Moon,
   PanelLeftClose,
   PanelLeftOpen,
+  User,
   LogOut,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
@@ -147,6 +148,14 @@ export function AppShell({ children }: AppShellProps): JSX.Element {
                   <p className="truncate px-2 py-1.5 font-mono text-xs text-text-muted">
                     {user?.email}
                   </p>
+                  <Link
+                    to="/profile"
+                    onClick={() => setIsProfileMenuOpen(false)}
+                    className="flex w-full items-center gap-2.5 rounded-lg px-2 py-2 text-left text-sm text-text-muted transition-colors hover:bg-bg-2 hover:text-text"
+                  >
+                    <User size={16} />
+                    Profile
+                  </Link>
                   <button
                     type="button"
                     onClick={() => void signOut()}
