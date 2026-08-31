@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { MoreVertical, Sun, Moon, LogOut } from "lucide-react";
+import { Link } from "react-router-dom";
+import { MoreVertical, Sun, Moon, User, LogOut } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useTheme } from "@/hooks/useTheme";
 import { Stamp } from "@/components/ui/Stamp";
@@ -38,6 +39,14 @@ export function MobileTopBar(): JSX.Element {
             <p className="truncate px-2 py-1.5 font-mono text-xs text-text-muted">
               {user?.email}
             </p>
+            <Link
+              to="/profile"
+              onClick={() => setIsMenuOpen(false)}
+              className="flex w-full items-center gap-2.5 rounded-lg px-2 py-2 text-left text-sm text-text-muted transition-colors hover:bg-bg-2 hover:text-text"
+            >
+              <User size={16} />
+              Profile
+            </Link>
             <button
               type="button"
               onClick={() => {
