@@ -8,13 +8,14 @@ export interface AuthContextValue {
   signUp: (
     email: string,
     password: string,
+    name: string,
   ) => Promise<{ error: AuthError | null }>;
   signIn: (
     email: string,
     password: string,
   ) => Promise<{ error: AuthError | null }>;
   signInWithGoogle: () => Promise<{ error: AuthError | null }>;
-  signOut: () => Promise<void>;
+  signOut: () => Promise<{ error: AuthError | null }>;
 }
 
 export const AuthContext = createContext<AuthContextValue | undefined>(

@@ -1,6 +1,7 @@
 import { useState, type ChangeEvent } from "react";
 import { Link } from "react-router-dom";
 import { useTrades } from "@/hooks/useTrades";
+import { useToast } from "@/hooks/useToast";
 import { Button } from "@/components/ui/Button";
 import { parseTradesCsv, type CsvImportRow } from "@/lib/csv/parseTradesCsv";
 import { downloadCsvTemplate } from "@/lib/csv/csvTemplate";
@@ -22,6 +23,7 @@ function SectionLabel({ children }: { children: string }): JSX.Element {
 
 export function ImportTradesPage(): JSX.Element {
   const { addTrades } = useTrades();
+  const { showToast } = useToast();
   const [rows, setRows] = useState<CsvImportRow[]>([]);
   const [fileName, setFileName] = useState<string | null>(null);
   const [isImporting, setIsImporting] = useState(false);
@@ -56,10 +58,12 @@ export function ImportTradesPage(): JSX.Element {
 
     if (error) {
       setImportError(error);
+      showToast(error, "error");
       return;
     }
 
     setImportedCount(count);
+    showToast(`Imported ${count} trade${count === 1 ? "" : "s"}.`);
     setRows([]);
     setFileName(null);
   };
@@ -101,15 +105,6 @@ export function ImportTradesPage(): JSX.Element {
             className="font-sans text-sm text-text file:mr-4 file:rounded-lg file:border file:border-line file:bg-bg-0 file:px-3 file:py-2 file:font-sans file:text-sm file:text-text"
           />
         </div>
-
-        {importedCount !== null ? (
-          <p className="mt-4 font-mono text-xs text-signal-green">
-            Imported {importedCount} trade{importedCount === 1 ? "" : "s"}.
-          </p>
-        ) : null}
-        {importError ? (
-          <p className="mt-4 font-mono text-xs text-signal-red">{importError}</p>
-        ) : null}
       </div>
 
       {fileName && rows.length > 0 ? (

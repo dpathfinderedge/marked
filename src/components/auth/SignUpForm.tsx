@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { Input } from "@/components/ui/Input";
+import { PasswordInput } from "@/components/ui/PasswordInput";
 import { Button } from "@/components/ui/Button";
 
 interface SignUpFormProps {
@@ -11,6 +12,7 @@ export function SignUpForm({
   onSwitchToLogin,
 }: SignUpFormProps): JSX.Element {
   const { signUp } = useAuth();
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -22,6 +24,10 @@ export function SignUpForm({
     event.preventDefault();
     setError(null);
 
+    if (!name.trim()) {
+      setError("Enter your name.");
+      return;
+    }
     if (password !== confirmPassword) {
       setError("Passwords don't match.");
       return;
@@ -32,7 +38,7 @@ export function SignUpForm({
     }
 
     setIsSubmitting(true);
-    const { error: signUpError } = await signUp(email, password);
+    const { error: signUpError } = await signUp(email, password, name.trim());
     setIsSubmitting(false);
 
     if (signUpError) {
@@ -64,6 +70,13 @@ export function SignUpForm({
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
       <Input
+        label="Name"
+        autoComplete="name"
+        required
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+      />
+      <Input
         label="Email"
         type="email"
         autoComplete="email"
@@ -71,17 +84,15 @@ export function SignUpForm({
         value={email}
         onChange={(e) => setEmail(e.target.value)}
       />
-      <Input
+      <PasswordInput
         label="Password"
-        type="password"
         autoComplete="new-password"
         required
         value={password}
         onChange={(e) => setPassword(e.target.value)}
       />
-      <Input
+      <PasswordInput
         label="Confirm password"
-        type="password"
         autoComplete="new-password"
         required
         value={confirmPassword}

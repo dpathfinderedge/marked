@@ -1,5 +1,5 @@
 import { useEffect, useState, type ReactNode } from "react";
-import type { Session } from "@supabase/supabase-js";
+import type { Session, AuthError } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase";
 import { AuthContext, type AuthContextValue } from "@/context/auth-context";
 
@@ -27,8 +27,12 @@ export function AuthProvider({
     return () => subscription.unsubscribe();
   }, []);
 
-  const signUp: AuthContextValue["signUp"] = async (email, password) => {
-    const { error } = await supabase.auth.signUp({ email, password });
+  const signUp: AuthContextValue["signUp"] = async (email, password, name) => {
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: { data: { full_name: name } },
+    });
     return { error };
   };
 
@@ -50,8 +54,9 @@ export function AuthProvider({
     return { error };
   };
 
-  const signOut = async (): Promise<void> => {
-    await supabase.auth.signOut();
+  const signOut = async (): Promise<{ error: AuthError | null }> => {
+    const { error } = await supabase.auth.signOut();
+    return { error };
   };
 
   const value: AuthContextValue = {

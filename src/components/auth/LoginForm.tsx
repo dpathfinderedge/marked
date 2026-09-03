@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { Input } from "@/components/ui/Input";
+import { PasswordInput } from "@/components/ui/PasswordInput";
 import { Button } from "@/components/ui/Button";
 
 interface LoginFormProps {
@@ -37,9 +38,8 @@ export function LoginForm({ onSwitchToSignUp }: LoginFormProps): JSX.Element {
         value={email}
         onChange={(e) => setEmail(e.target.value)}
       />
-      <Input
+      <PasswordInput
         label="Password"
-        type="password"
         autoComplete="current-password"
         required
         value={password}

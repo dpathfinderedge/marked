@@ -1,5 +1,5 @@
 import { useEffect, useState, type ReactNode } from "react";
-import { Link, NavLink } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import {
   LayoutDashboard,
   NotebookPen,
@@ -8,13 +8,13 @@ import {
   Moon,
   PanelLeftClose,
   PanelLeftOpen,
-  User,
   LogOut,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useTheme } from "@/hooks/useTheme";
+import { useToast } from "@/hooks/useToast";
 import { Stamp } from "@/components/ui/Stamp";
-import { getDisplayName } from "@/utils/greeting";
+import { getDisplayName, getAvatarUrl } from "@/utils/greeting";
 import { MobileTopBar } from "@/components/layout/MobileTopBar";
 import { MobileTabBar } from "@/components/layout/MobileTabBar";
 
@@ -42,14 +42,15 @@ function getInitial(name: string): string {
 export function AppShell({ children }: AppShellProps): JSX.Element {
   const { user, signOut } = useAuth();
   const { theme, toggleTheme } = useTheme();
+  const { showToast } = useToast();
   const [isCollapsed, setIsCollapsed] = useState(getInitialCollapsed);
-  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
 
   useEffect(() => {
     window.localStorage.setItem(SIDEBAR_STORAGE_KEY, String(isCollapsed));
   }, [isCollapsed]);
 
   const displayName = getDisplayName(user);
+  const avatarUrl = getAvatarUrl(user);
 
   const navLinkClass = (isActive: boolean): string =>
     `flex items-center gap-3 rounded-lg px-2.5 py-2 text-sm font-medium transition-colors ${
@@ -60,6 +61,11 @@ export function AppShell({ children }: AppShellProps): JSX.Element {
 
   const utilityButtonClass =
     "flex items-center gap-3 rounded-lg px-2.5 py-2 text-sm font-medium text-text-muted transition-colors hover:bg-bg-2 hover:text-text";
+
+  const handleSignOut = async (): Promise<void> => {
+    const { error } = await signOut();
+    if (error) showToast(error.message, "error");
+  };
 
   return (
     <div className="flex min-h-screen flex-col sm:flex-row">
@@ -123,51 +129,36 @@ export function AppShell({ children }: AppShellProps): JSX.Element {
             ) : null}
           </button>
 
-          <div className="relative">
-            <button
-              type="button"
-              onClick={() => setIsProfileMenuOpen((current) => !current)}
-              aria-expanded={isProfileMenuOpen}
-              className={`${utilityButtonClass} ${isCollapsed ? "justify-center" : ""}`}
-            >
+          <NavLink
+            to="/profile"
+            className={({ isActive }) => navLinkClass(isActive)}
+            title={isCollapsed ? "Profile" : undefined}
+          >
+            {avatarUrl ? (
+              <img
+                src={avatarUrl}
+                alt=""
+                className="h-6 w-6 shrink-0 rounded-full object-cover"
+              />
+            ) : (
               <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-signal-red text-[11px] font-semibold text-white">
                 {getInitial(displayName)}
               </span>
-              {!isCollapsed ? (
-                <span className="truncate text-text">{displayName}</span>
-              ) : null}
-            </button>
-
-            {isProfileMenuOpen ? (
-              <>
-                <div
-                  className="fixed inset-0 z-40"
-                  onClick={() => setIsProfileMenuOpen(false)}
-                />
-                <div className="absolute bottom-11 left-0 z-50 w-56 rounded-xl border border-line bg-bg-1 p-2 shadow-lg">
-                  <p className="truncate px-2 py-1.5 font-mono text-xs text-text-muted">
-                    {user?.email}
-                  </p>
-                  <Link
-                    to="/profile"
-                    onClick={() => setIsProfileMenuOpen(false)}
-                    className="flex w-full items-center gap-2.5 rounded-lg px-2 py-2 text-left text-sm text-text-muted transition-colors hover:bg-bg-2 hover:text-text"
-                  >
-                    <User size={16} />
-                    Profile
-                  </Link>
-                  <button
-                    type="button"
-                    onClick={() => void signOut()}
-                    className="flex w-full items-center gap-2.5 rounded-lg px-2 py-2 text-left text-sm text-text-muted transition-colors hover:bg-bg-2 hover:text-text"
-                  >
-                    <LogOut size={16} />
-                    Sign out
-                  </button>
-                </div>
-              </>
+            )}
+            {!isCollapsed ? (
+              <span className="truncate">{displayName}</span>
             ) : null}
-          </div>
+          </NavLink>
+
+          <button
+            type="button"
+            onClick={() => void handleSignOut()}
+            title={isCollapsed ? "Sign out" : undefined}
+            className={`${utilityButtonClass} ${isCollapsed ? "justify-center" : ""}`}
+          >
+            <LogOut size={18} className="shrink-0" />
+            {!isCollapsed ? <span>Sign out</span> : null}
+          </button>
         </div>
       </aside>
 

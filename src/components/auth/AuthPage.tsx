@@ -10,7 +10,7 @@ export function AuthPage(): JSX.Element {
   return (
     <div className="flex min-h-screen items-center justify-center px-4">
       <div className="w-full max-w-sm">
-        <div className="mb-8 flex items-baseline gap-3">
+        <div className="mb-8 flex items-center gap-3">
           <Stamp size={30} className="text-text" />
           <h1 className="text-3xl font-bold tracking-tight text-text">Marked</h1>
         </div>

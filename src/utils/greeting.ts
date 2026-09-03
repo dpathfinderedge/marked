@@ -25,3 +25,14 @@ export function getDisplayName(user: User | null): string {
 
   return "";
 }
+
+export function getAvatarUrl(user: User | null): string | null {
+  if (!user) return null;
+
+  const metadata = user.user_metadata as
+    | { avatar_url?: unknown; picture?: unknown }
+    | undefined;
+  const url = metadata?.avatar_url ?? metadata?.picture;
+
+  return typeof url === "string" && url.trim() ? url : null;
+}

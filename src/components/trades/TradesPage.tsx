@@ -4,6 +4,7 @@ import { Upload } from "lucide-react";
 import { useTrades } from "@/hooks/useTrades";
 import { useSettings } from "@/hooks/useSettings";
 import { useAttachments } from "@/hooks/useAttachments";
+import { useToast } from "@/hooks/useToast";
 import { detectConsecutiveLossFlags } from "@/lib/calculations";
 import { TradeForm } from "@/components/trades/TradeForm";
 import { TradeList } from "@/components/trades/TradeList";
@@ -21,6 +22,7 @@ export function TradesPage(): JSX.Element {
   const { trades, isLoading, error, addTrade } = useTrades();
   const { threshold } = useSettings();
   const { uploadAttachments } = useAttachments();
+  const { showToast } = useToast();
 
   const flaggedTradeIds = useMemo(
     () => detectConsecutiveLossFlags(trades, threshold),
@@ -34,7 +36,9 @@ export function TradesPage(): JSX.Element {
     const { error: addError, trade } = await addTrade(input);
 
     if (addError || !trade) {
-      return { error: addError ?? "Something went wrong saving the trade." };
+      const message = addError ?? "Something went wrong saving the trade.";
+      showToast(message, "error");
+      return { error: message };
     }
 
     if (files.length > 0) {
@@ -43,12 +47,13 @@ export function TradesPage(): JSX.Element {
         files,
       );
       if (uploadError) {
-        return {
-          error: `Trade saved, but attachment upload failed: ${uploadError}`,
-        };
+        const message = `Trade saved, but attachment upload failed: ${uploadError}`;
+        showToast(message, "error");
+        return { error: message };
       }
     }
 
+    showToast("Trade logged.");
     return { error: null };
   };
 

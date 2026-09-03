@@ -48,7 +48,7 @@ function SectionLabel({ children }: { children: string }): JSX.Element {
 
 export function DashboardPage(): JSX.Element {
   const { user } = useAuth();
-  const { trades, isLoading } = useTrades();
+  const { trades, isLoading, error: tradesError } = useTrades();
   const { threshold } = useSettings();
 
   const stats = useMemo(() => {
@@ -89,13 +89,16 @@ export function DashboardPage(): JSX.Element {
 
   return (
     <div className="mx-auto flex max-w-3xl flex-col gap-12">
-      {/* Hero — the one number this whole page exists to answer. Everything
-          else on the page supports or explains this. */}
       <div>
         <p className="text-sm text-text-muted">
           {greeting}
           {displayName ? `, ${displayName}` : ""}.
         </p>
+        {tradesError ? (
+          <p className="mt-1 text-xs text-signal-red">
+            Couldn't load your trades: {tradesError}
+          </p>
+        ) : null}
         <p
           className={`mt-2 font-mono text-5xl font-bold tracking-tight sm:text-6xl ${
             totalIsPositive ? "text-signal-green" : "text-signal-red"
