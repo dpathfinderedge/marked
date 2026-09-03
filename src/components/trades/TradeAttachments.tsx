@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useAttachments, type Attachment } from "@/hooks/useAttachments";
+import { useToast } from "@/hooks/useToast";
 
 interface TradeAttachmentsProps {
   tradeId: string;
@@ -7,6 +8,7 @@ interface TradeAttachmentsProps {
 
 export function TradeAttachments({ tradeId }: TradeAttachmentsProps): JSX.Element {
   const { listAttachments, deleteAttachment } = useAttachments();
+  const { showToast } = useToast();
   const [attachments, setAttachments] = useState<Attachment[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -36,9 +38,12 @@ export function TradeAttachments({ tradeId }: TradeAttachmentsProps): JSX.Elemen
       attachment.id,
       attachment.storagePath,
     );
-    if (!deleteError) {
-      setAttachments((prev) => prev.filter((a) => a.id !== attachment.id));
+    if (deleteError) {
+      showToast(deleteError, "error");
+      return;
     }
+    setAttachments((prev) => prev.filter((a) => a.id !== attachment.id));
+    showToast("Screenshot removed.");
   };
 
   if (isLoading) {
@@ -75,7 +80,7 @@ export function TradeAttachments({ tradeId }: TradeAttachmentsProps): JSX.Elemen
           <button
             type="button"
             onClick={() => void handleDelete(attachment)}
-            className="absolute -right-1.5 -top-1.5 hidden h-5 w-5 items-center justify-center rounded-full bg-signal-red text-paper group-hover:flex"
+            className="absolute -right-1.5 -top-1.5 hidden h-5 w-5 items-center justify-center rounded-full bg-signal-red text-white group-hover:flex"
             title="Remove"
           >
             ×

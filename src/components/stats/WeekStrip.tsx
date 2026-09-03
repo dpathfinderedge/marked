@@ -21,7 +21,7 @@ export function WeekStrip({ dailyPnl }: WeekStripProps): JSX.Element {
 
         const toneClass = hasTrades
           ? (pnl ?? 0) >= 0
-            ? "bg-green/10"
+            ? "bg-signal-green/10"
             : "bg-signal-red/10"
           : "bg-bg-1";
 
