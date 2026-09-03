@@ -2,6 +2,7 @@ import { lazy, Suspense } from "react";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { AuthProvider } from "@/context/AuthContext";
 import { ThemeProvider } from "@/context/ThemeContext";
+import { ToastProvider } from "@/context/ToastContext";
 import { useAuth } from "@/hooks/useAuth";
 import { AuthPage } from "@/components/auth/AuthPage";
 import { AppShell } from "@/components/layout/AppShell";
@@ -79,12 +80,14 @@ function AppContent(): JSX.Element {
 function App(): JSX.Element {
   return (
     <ThemeProvider>
-      <AuthProvider>
-        <OfflineBanner />
-        <UpdatePrompt />
-        <InstallPrompt />
-        <AppContent />
-      </AuthProvider>
+      <ToastProvider>
+        <AuthProvider>
+          <OfflineBanner />
+          <UpdatePrompt />
+          <InstallPrompt />
+          <AppContent />
+        </AuthProvider>
+      </ToastProvider>
     </ThemeProvider>
   );
 }
