@@ -27,8 +27,6 @@ export function ImportTradesPage(): JSX.Element {
   const [rows, setRows] = useState<CsvImportRow[]>([]);
   const [fileName, setFileName] = useState<string | null>(null);
   const [isImporting, setIsImporting] = useState(false);
-  const [importError, setImportError] = useState<string | null>(null);
-  const [importedCount, setImportedCount] = useState<number | null>(null);
 
   const handleFileChange = async (
     event: ChangeEvent<HTMLInputElement>,
@@ -37,8 +35,6 @@ export function ImportTradesPage(): JSX.Element {
     if (!file) return;
 
     setFileName(file.name);
-    setImportedCount(null);
-    setImportError(null);
 
     const text = await file.text();
     const result = parseTradesCsv(text);
@@ -50,19 +46,16 @@ export function ImportTradesPage(): JSX.Element {
 
   const handleImport = async (): Promise<void> => {
     setIsImporting(true);
-    setImportError(null);
 
     const { error, count } = await addTrades(validRows.map((r) => r.trade));
 
     setIsImporting(false);
 
     if (error) {
-      setImportError(error);
       showToast(error, "error");
       return;
     }
 
-    setImportedCount(count);
     showToast(`Imported ${count} trade${count === 1 ? "" : "s"}.`);
     setRows([]);
     setFileName(null);
