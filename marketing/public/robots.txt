@@ -1,2 +1,4 @@
 User-agent: *
 Allow: /
+
+Sitemap: https://maarked.vercel.app/sitemap-index.xml
