@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/react";
 import { useEffect, useState, type ReactNode } from "react";
 import type { Session, AuthError } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase";
@@ -26,6 +27,14 @@ export function AuthProvider({
 
     return () => subscription.unsubscribe();
   }, []);
+
+  useEffect(() => {
+    if (session?.user) {
+      Sentry.setUser({ id: session.user.id, email: session.user.email });
+    } else {
+      Sentry.setUser(null);
+    }
+  }, [session]);
 
   const signUp: AuthContextValue["signUp"] = async (email, password, name) => {
     const { error } = await supabase.auth.signUp({
