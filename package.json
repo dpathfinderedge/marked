@@ -21,7 +21,8 @@
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^7.18.3",
-    "recharts": "^2.12.7"
+    "recharts": "^2.12.7",
+    "@sentry/react": "^8.55.2"
   },
   "devDependencies": {
     "@eslint/js": "^9.10.0",
