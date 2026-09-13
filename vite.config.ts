@@ -1,9 +1,13 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import { VitePWA } from "vite-plugin-pwa";
+import { sentryVitePlugin } from "@sentry/vite-plugin";
 import path from "node:path";
 
 export default defineConfig({
+  build: {
+    sourcemap: true,
+  },
   plugins: [
     react(),
     VitePWA({
@@ -52,6 +56,12 @@ export default defineConfig({
       devOptions: {
         enabled: true,
         type: "module",
+      },
+    }),
+    sentryVitePlugin({
+      disable: !process.env.SENTRY_AUTH_TOKEN,
+      sourcemaps: {
+        filesToDeleteAfterUpload: ["**/*.map"],
       },
     }),
   ],

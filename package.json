@@ -26,6 +26,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.10.0",
+    "@sentry/vite-plugin": "^2.22.6",
     "@types/node": "^22.5.4",
     "@types/papaparse": "^5.3.14",
     "@types/react": "^18.3.5",
