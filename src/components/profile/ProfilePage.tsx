@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/Input";
 import { PasswordInput } from "@/components/ui/PasswordInput";
 import { Button } from "@/components/ui/Button";
 
-const MAX_AVATAR_SIZE_BYTES = 5 * 1024 * 1024; // 5MB
+const MAX_AVATAR_SIZE_BYTES = 5 * 1024 * 1024;
 
 function getInitial(name: string): string {
   return name.trim().slice(0, 1).toUpperCase() || "?";
