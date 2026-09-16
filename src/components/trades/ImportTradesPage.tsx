@@ -3,7 +3,11 @@ import { Link } from "react-router-dom";
 import { useTrades } from "@/hooks/useTrades";
 import { useToast } from "@/hooks/useToast";
 import { Button } from "@/components/ui/Button";
-import { parseTradesCsv, type CsvImportRow } from "@/lib/csv/parseTradesCsv";
+import {
+  parseTradesCsv,
+  resolveCrossPairRates,
+  type CsvImportRow,
+} from "@/lib/csv/parseTradesCsv";
 import { downloadCsvTemplate } from "@/lib/csv/csvTemplate";
 import type { NewTradeInput } from "@/utils/tradeMappers";
 
@@ -27,6 +31,9 @@ export function ImportTradesPage(): JSX.Element {
   const [rows, setRows] = useState<CsvImportRow[]>([]);
   const [fileName, setFileName] = useState<string | null>(null);
   const [isImporting, setIsImporting] = useState(false);
+  const [isLookingUpRates, setIsLookingUpRates] = useState(false);
+  const [importError, setImportError] = useState<string | null>(null);
+  const [importedCount, setImportedCount] = useState<number | null>(null);
 
   const handleFileChange = async (
     event: ChangeEvent<HTMLInputElement>,
@@ -35,6 +42,8 @@ export function ImportTradesPage(): JSX.Element {
     if (!file) return;
 
     setFileName(file.name);
+    setImportedCount(null);
+    setImportError(null);
 
     const text = await file.text();
     const result = parseTradesCsv(text);
@@ -43,19 +52,47 @@ export function ImportTradesPage(): JSX.Element {
 
   const validRows = rows.filter(isValidRow);
   const errorCount = rows.length - validRows.length;
+  const pendingCrossPairCount = rows.filter((r) => r.pendingCrossPair).length;
+
+  const handleLookupRates = async (): Promise<void> => {
+    setIsLookingUpRates(true);
+    const updatedRows = await resolveCrossPairRates(rows);
+    setIsLookingUpRates(false);
+    setRows(updatedRows);
+
+    const stillPending = updatedRows.filter(
+      (r) => r.pendingCrossPair && r.error,
+    ).length;
+    const resolved = pendingCrossPairCount - stillPending;
+
+    if (resolved > 0) {
+      showToast(
+        `Priced ${resolved} cross-pair row${resolved === 1 ? "" : "s"} via live rates.`,
+      );
+    }
+    if (stillPending > 0) {
+      showToast(
+        `Couldn't fetch a rate for ${stillPending} row${stillPending === 1 ? "" : "s"}.`,
+        "error",
+      );
+    }
+  };
 
   const handleImport = async (): Promise<void> => {
     setIsImporting(true);
+    setImportError(null);
 
     const { error, count } = await addTrades(validRows.map((r) => r.trade));
 
     setIsImporting(false);
 
     if (error) {
+      setImportError(error);
       showToast(error, "error");
       return;
     }
 
+    setImportedCount(count);
     showToast(`Imported ${count} trade${count === 1 ? "" : "s"}.`);
     setRows([]);
     setFileName(null);
@@ -85,9 +122,9 @@ export function ImportTradesPage(): JSX.Element {
           >
             Download the template
           </button>{" "}
-          — P&L is calculated the same way as manual entry, including the
-          cross-pair fallback (add a <code>manualPnl</code> value for those
-          rows).
+          — P&L is calculated the same way as manual entry, including a live
+          rate lookup for cross pairs (or add a <code>manualPnl</code> value
+          yourself).
         </p>
 
         <div className="mt-4">
@@ -98,6 +135,15 @@ export function ImportTradesPage(): JSX.Element {
             className="font-sans text-sm text-text file:mr-4 file:rounded-lg file:border file:border-line file:bg-bg-0 file:px-3 file:py-2 file:font-sans file:text-sm file:text-text"
           />
         </div>
+
+        {importedCount !== null ? (
+          <p className="mt-4 font-mono text-xs text-signal-green">
+            Imported {importedCount} trade{importedCount === 1 ? "" : "s"}.
+          </p>
+        ) : null}
+        {importError ? (
+          <p className="mt-4 font-mono text-xs text-signal-red">{importError}</p>
+        ) : null}
       </div>
 
       {fileName && rows.length > 0 ? (
@@ -115,6 +161,19 @@ export function ImportTradesPage(): JSX.Element {
               {validRows.length === 1 ? "" : "s"}
             </Button>
           </div>
+
+          {pendingCrossPairCount > 0 ? (
+            <button
+              type="button"
+              onClick={() => void handleLookupRates()}
+              disabled={isLookingUpRates}
+              className="self-start text-xs font-medium text-text-muted underline underline-offset-4 transition-colors hover:text-text disabled:opacity-50"
+            >
+              {isLookingUpRates
+                ? "Looking up rates…"
+                : `Look up live rates for ${pendingCrossPairCount} cross-pair row${pendingCrossPairCount === 1 ? "" : "s"}`}
+            </button>
+          ) : null}
 
           <div className="overflow-hidden rounded-xl border border-line bg-bg-1">
             {rows.map((row) => (

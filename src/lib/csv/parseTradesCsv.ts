@@ -1,10 +1,12 @@
 import Papa from "papaparse";
 import {
   calculateForexPnl,
+  calculateCrossPairPnl,
   calculateCryptoPnl,
   calculateRMultiple,
   ForexCrossPairError,
 } from "@/lib/calculations";
+import { fetchFxRate, FxRateError } from "@/lib/fx/fetchFxRate";
 import type { NewTradeInput } from "@/utils/tradeMappers";
 import type {
   ContractSize,
@@ -13,10 +15,26 @@ import type {
   Session,
 } from "@/types/trade";
 
+export interface PendingCrossPairRow {
+  date: string;
+  pair: string;
+  direction: Direction;
+  session: Session;
+  tag: string;
+  risk: number | null;
+  notes: string;
+  entryPrice: number;
+  exitPrice: number;
+  lots: number;
+  contractSize: ContractSize;
+  customContractUnits?: number;
+}
+
 export interface CsvImportRow {
   rowNumber: number;
   trade: NewTradeInput | null;
   error: string | null;
+  pendingCrossPair?: PendingCrossPairRow;
 }
 
 const VALID_MARKETS: Market[] = ["forex", "crypto"];
@@ -165,7 +183,21 @@ function validateRow(
           return {
             rowNumber,
             trade: null,
-            error: `${pair} is a cross pair — add a manualPnl value for this row.`,
+            error: `${pair} is a cross pair — add a manualPnl value, or use "Look up live rates" below.`,
+            pendingCrossPair: {
+              date,
+              pair,
+              direction,
+              session,
+              tag,
+              risk,
+              notes,
+              entryPrice,
+              exitPrice,
+              lots,
+              contractSize: contractSizeRaw,
+              customContractUnits,
+            },
           };
         }
         pnl = manualPnl;
@@ -219,4 +251,80 @@ export function parseTradesCsv(csvText: string): ParseTradesCsvResult {
     validCount: rows.filter((r) => r.trade !== null).length,
     errorCount: rows.filter((r) => r.error !== null).length,
   };
+}
+
+export async function resolveCrossPairRates(
+  rows: CsvImportRow[],
+): Promise<CsvImportRow[]> {
+  const quoteCurrencies = Array.from(
+    new Set(
+      rows
+        .filter((r) => r.pendingCrossPair)
+        .map((r) => r.pendingCrossPair!.pair.toUpperCase().slice(3, 6)),
+    ),
+  );
+
+  if (quoteCurrencies.length === 0) return rows;
+
+  const rateEntries = await Promise.all(
+    quoteCurrencies.map(async (currency) => {
+      try {
+        const { rate } = await fetchFxRate(currency, "USD");
+        return [currency, rate] as const;
+      } catch (err) {
+        const message =
+          err instanceof FxRateError ? err.message : "Couldn't fetch a rate.";
+        return [currency, message] as const;
+      }
+    }),
+  );
+  const rateResults = new Map<string, number | string>(rateEntries);
+
+  return rows.map((row) => {
+    if (!row.pendingCrossPair) return row;
+
+    const input = row.pendingCrossPair;
+    const quoteCurrency = input.pair.toUpperCase().slice(3, 6);
+    const result = rateResults.get(quoteCurrency);
+
+    if (typeof result !== "number") {
+      return {
+        ...row,
+        error:
+          typeof result === "string"
+            ? `${quoteCurrency}USD: ${result}`
+            : `Couldn't fetch a rate for ${quoteCurrency}USD.`,
+      };
+    }
+
+    const { pnl, pips } = calculateCrossPairPnl({
+      pair: input.pair,
+      direction: input.direction,
+      entryPrice: input.entryPrice,
+      exitPrice: input.exitPrice,
+      lots: input.lots,
+      contractSize: input.contractSize,
+      customContractUnits: input.customContractUnits,
+      quoteToUsdRate: result,
+    });
+
+    return {
+      rowNumber: row.rowNumber,
+      trade: {
+        date: input.date,
+        market: "forex",
+        pair: input.pair.toUpperCase(),
+        direction: input.direction,
+        session: input.session,
+        tag: input.tag,
+        risk: input.risk,
+        pnl,
+        pips,
+        rMultiple: calculateRMultiple(pnl, input.risk),
+        notes: input.notes,
+        calcMode: "manual",
+      },
+      error: null,
+    };
+  });
 }
