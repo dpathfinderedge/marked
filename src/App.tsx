@@ -37,6 +37,12 @@ const ProfilePage = lazy(() =>
   })),
 );
 
+const BillingPage = lazy(() =>
+  import("@/components/billing/BillingPage").then((m) => ({
+    default: m.BillingPage,
+  })),
+);
+
 function LoadingScreen(): JSX.Element {
   return (
     <div className="flex min-h-screen items-center justify-center">
@@ -69,6 +75,7 @@ function AppContent(): JSX.Element {
             <Route path="/trades/import" element={<ImportTradesPage />} />
             <Route path="/settings" element={<SettingsPage />} />
             <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/billing" element={<BillingPage />} />
             <Route path="*" element={<Navigate to="/dashboard" replace />} />
           </Routes>
         </Suspense>

@@ -61,9 +61,6 @@ create policy "Users can update their own settings"
   using (auth.uid() = user_id);
 
 
-  -- One row per uploaded screenshot; a trade can have multiple. The actual
--- file bytes live in Storage — this just tracks which file belongs to
--- which trade/user.
 create table if not exists public.trade_attachments (
   id uuid primary key default gen_random_uuid(),
   trade_id uuid not null references public.trades (id) on delete cascade,
@@ -141,3 +138,23 @@ create policy "Users can delete their own avatar"
     bucket_id = 'avatars'
     and (storage.foldername(name))[1] = auth.uid()::text
   );
+
+
+create table if not exists public.subscriptions (
+  user_id uuid primary key references auth.users (id) on delete cascade,
+  status text not null default 'free' check (status in ('free', 'active', 'past_due', 'cancelled')),
+  paystack_customer_code text,
+  paystack_subscription_code text,
+  plan_code text,
+  current_period_end timestamptz,
+  updated_at timestamptz not null default now()
+);
+
+create index if not exists subscriptions_paystack_customer_code_idx
+  on public.subscriptions (paystack_customer_code);
+
+alter table public.subscriptions enable row level security;
+
+create policy "Users can view their own subscription"
+  on public.subscriptions for select
+  using (auth.uid() = user_id);
