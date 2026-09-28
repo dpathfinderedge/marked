@@ -2,6 +2,8 @@ import { useState, type ChangeEvent } from "react";
 import { Link } from "react-router-dom";
 import { useTrades } from "@/hooks/useTrades";
 import { useToast } from "@/hooks/useToast";
+import { useSubscription } from "@/hooks/useSubscription";
+import { UpgradePrompt } from "@/components/billing/UpgradePrompt";
 import { Button } from "@/components/ui/Button";
 import {
   parseTradesCsv,
@@ -28,6 +30,7 @@ function SectionLabel({ children }: { children: string }): JSX.Element {
 export function ImportTradesPage(): JSX.Element {
   const { addTrades } = useTrades();
   const { showToast } = useToast();
+  const { isPro } = useSubscription();
   const [rows, setRows] = useState<CsvImportRow[]>([]);
   const [fileName, setFileName] = useState<string | null>(null);
   const [isImporting, setIsImporting] = useState(false);
@@ -112,98 +115,104 @@ export function ImportTradesPage(): JSX.Element {
         </Link>
       </div>
 
-      <div className="rounded-xl border border-line bg-bg-1 p-6">
-        <p className="font-sans text-sm text-text-muted">
-          Import trades from a CSV file. Not sure of the format?{" "}
-          <button
-            type="button"
-            onClick={downloadCsvTemplate}
-            className="text-text underline underline-offset-4"
-          >
-            Download the template
-          </button>{" "}
-          — P&L is calculated the same way as manual entry, including a live
-          rate lookup for cross pairs (or add a <code>manualPnl</code> value
-          yourself).
-        </p>
-
-        <div className="mt-4">
-          <input
-            type="file"
-            accept=".csv"
-            onChange={(e) => void handleFileChange(e)}
-            className="font-sans text-sm text-text file:mr-4 file:rounded-lg file:border file:border-line file:bg-bg-0 file:px-3 file:py-2 file:font-sans file:text-sm file:text-text"
-          />
-        </div>
-
-        {importedCount !== null ? (
-          <p className="mt-4 font-mono text-xs text-signal-green">
-            Imported {importedCount} trade{importedCount === 1 ? "" : "s"}.
-          </p>
-        ) : null}
-        {importError ? (
-          <p className="mt-4 font-mono text-xs text-signal-red">{importError}</p>
-        ) : null}
-      </div>
-
-      {fileName && rows.length > 0 ? (
-        <div className="flex flex-col gap-3">
-          <div className="flex items-center justify-between">
-            <SectionLabel>
-              {`${fileName} · ${validRows.length} valid · ${errorCount} error${errorCount === 1 ? "" : "s"}`}
-            </SectionLabel>
-            <Button
-              onClick={() => void handleImport()}
-              isLoading={isImporting}
-              disabled={validRows.length === 0}
-            >
-              Import {validRows.length} trade
-              {validRows.length === 1 ? "" : "s"}
-            </Button>
-          </div>
-
-          {pendingCrossPairCount > 0 ? (
-            <button
-              type="button"
-              onClick={() => void handleLookupRates()}
-              disabled={isLookingUpRates}
-              className="self-start text-xs font-medium text-text-muted underline underline-offset-4 transition-colors hover:text-text disabled:opacity-50"
-            >
-              {isLookingUpRates
-                ? "Looking up rates…"
-                : `Look up live rates for ${pendingCrossPairCount} cross-pair row${pendingCrossPairCount === 1 ? "" : "s"}`}
-            </button>
-          ) : null}
-
-          <div className="overflow-hidden rounded-xl border border-line bg-bg-1">
-            {rows.map((row) => (
-              <div
-                key={row.rowNumber}
-                className="flex items-center justify-between border-b border-line px-4 py-2.5 font-mono text-xs last:border-b-0"
+      {!isPro ? (
+        <UpgradePrompt feature="CSV import" />
+      ) : (
+        <>
+          <div className="rounded-xl border border-line bg-bg-1 p-6">
+            <p className="font-sans text-sm text-text-muted">
+              Import trades from a CSV file. Not sure of the format?{" "}
+              <button
+                type="button"
+                onClick={downloadCsvTemplate}
+                className="text-text underline underline-offset-4"
               >
-                <span className="text-text-muted">Row {row.rowNumber}</span>
-                {row.trade ? (
-                  <span className="flex items-center gap-3">
-                    <span className="text-text">
-                      {row.trade.pair} · {row.trade.date}
-                    </span>
-                    <span
-                      className={
-                        row.trade.pnl >= 0 ? "text-signal-green" : "text-signal-red"
-                      }
-                    >
-                      {row.trade.pnl >= 0 ? "+" : "−"}
-                      {Math.abs(row.trade.pnl).toFixed(2)}
-                    </span>
-                  </span>
-                ) : (
-                  <span className="text-signal-red">{row.error}</span>
-                )}
-              </div>
-            ))}
+                Download the template
+              </button>{" "}
+              — P&L is calculated the same way as manual entry, including a live
+              rate lookup for cross pairs (or add a <code>manualPnl</code> value
+              yourself).
+            </p>
+
+            <div className="mt-4">
+              <input
+                type="file"
+                accept=".csv"
+                onChange={(e) => void handleFileChange(e)}
+                className="font-sans text-sm text-text file:mr-4 file:rounded-lg file:border file:border-line file:bg-bg-0 file:px-3 file:py-2 file:font-sans file:text-sm file:text-text"
+              />
+            </div>
+
+            {importedCount !== null ? (
+              <p className="mt-4 font-mono text-xs text-signal-green">
+                Imported {importedCount} trade{importedCount === 1 ? "" : "s"}.
+              </p>
+            ) : null}
+            {importError ? (
+              <p className="mt-4 font-mono text-xs text-signal-red">{importError}</p>
+            ) : null}
           </div>
-        </div>
-      ) : null}
+
+          {fileName && rows.length > 0 ? (
+            <div className="flex flex-col gap-3">
+              <div className="flex items-center justify-between">
+                <SectionLabel>
+                  {`${fileName} · ${validRows.length} valid · ${errorCount} error${errorCount === 1 ? "" : "s"}`}
+                </SectionLabel>
+                <Button
+                  onClick={() => void handleImport()}
+                  isLoading={isImporting}
+                  disabled={validRows.length === 0}
+                >
+                  Import {validRows.length} trade
+                  {validRows.length === 1 ? "" : "s"}
+                </Button>
+              </div>
+
+              {pendingCrossPairCount > 0 ? (
+                <button
+                  type="button"
+                  onClick={() => void handleLookupRates()}
+                  disabled={isLookingUpRates}
+                  className="self-start text-xs font-medium text-text-muted underline underline-offset-4 transition-colors hover:text-text disabled:opacity-50"
+                >
+                  {isLookingUpRates
+                    ? "Looking up rates…"
+                    : `Look up live rates for ${pendingCrossPairCount} cross-pair row${pendingCrossPairCount === 1 ? "" : "s"}`}
+                </button>
+              ) : null}
+
+              <div className="overflow-hidden rounded-xl border border-line bg-bg-1">
+                {rows.map((row) => (
+                  <div
+                    key={row.rowNumber}
+                    className="flex items-center justify-between border-b border-line px-4 py-2.5 font-mono text-xs last:border-b-0"
+                  >
+                    <span className="text-text-muted">Row {row.rowNumber}</span>
+                    {row.trade ? (
+                      <span className="flex items-center gap-3">
+                        <span className="text-text">
+                          {row.trade.pair} · {row.trade.date}
+                        </span>
+                        <span
+                          className={
+                            row.trade.pnl >= 0 ? "text-signal-green" : "text-signal-red"
+                          }
+                        >
+                          {row.trade.pnl >= 0 ? "+" : "−"}
+                          {Math.abs(row.trade.pnl).toFixed(2)}
+                        </span>
+                      </span>
+                    ) : (
+                      <span className="text-signal-red">{row.error}</span>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : null}
+       </>
+      )}
     </div>
   );
 }

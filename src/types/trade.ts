@@ -12,6 +12,7 @@ export interface Trade {
   id: string;
   userId: string;
   date: string; 
+  createdAt: string;
   pair: string; 
   market: Market;
   direction: Direction;

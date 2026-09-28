@@ -98,6 +98,20 @@ export interface Database {
         Relationships: [];
       };
     };
+    subscriptions: {
+      Row: {
+        user_id: string;
+        status: "free" | "active" | "past_due" | "cancelled";
+        paystack_customer_code: string | null;
+        paystack_subscription_code: string | null;
+        plan_code: string | null;
+        current_period_end: string | null;
+        updated_at: string;
+      };
+      Insert: never;
+      Update: never;
+      Relationships: [];
+    };
     Views: Record<string, never>;
     Functions: Record<string, never>;
   };

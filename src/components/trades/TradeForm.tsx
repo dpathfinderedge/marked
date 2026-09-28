@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useState, type ChangeEvent, type FormEvent } from "react";
 import { useOnlineStatus } from "@/hooks/useOnlineStatus";
+import { useSubscription } from "@/hooks/useSubscription";
+import { UpgradePrompt } from "@/components/billing/UpgradePrompt";
 import { toIsoDate } from "@/utils/dates";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
@@ -55,6 +57,7 @@ const CONTRACT_SIZE_OPTIONS = [
 
 export function TradeForm({ onSubmit }: TradeFormProps): JSX.Element {
   const isOnline = useOnlineStatus();
+  const { isPro } = useSubscription();
   const [date, setDate] = useState(toIsoDate(new Date()));
   const [market, setMarket] = useState<Market>("forex");
   const [pair, setPair] = useState("");
@@ -388,14 +391,18 @@ export function TradeForm({ onSubmit }: TradeFormProps): JSX.Element {
             <p className="font-mono text-xs text-signal-red">
               {(preview as { crossPairError: string }).crossPairError}
             </p>
-            <button
-              type="button"
-              onClick={() => void handleLookupRate()}
-              disabled={isFetchingRate}
-              className="self-start font-mono text-xs uppercase tracking-wider text-text underline underline-offset-4 disabled:opacity-50"
-            >
-              {isFetchingRate ? "Looking up rate…" : "Look up live rate"}
-            </button>
+            {isPro ? (
+              <button
+                type="button"
+                onClick={() => void handleLookupRate()}
+                disabled={isFetchingRate}
+                className="self-start font-mono text-xs uppercase tracking-wider text-ink underline underline-offset-4 disabled:opacity-50"
+              >
+                {isFetchingRate ? "Looking up rate…" : "Look up live rate"}
+              </button>
+            ) : (
+              <UpgradePrompt feature="Live rate lookup" />
+            )}
             {rateInfo ? (
               <p className="font-mono text-xs text-text-muted">{rateInfo}</p>
             ) : null}
@@ -425,19 +432,25 @@ export function TradeForm({ onSubmit }: TradeFormProps): JSX.Element {
         <label className="font-mono text-xs uppercase tracking-wider text-text-muted">
           Screenshots (optional)
         </label>
-        <input
-          type="file"
-          accept="image/*"
-          multiple
-          onChange={handleScreenshotsChange}
-          className="font-sans text-sm text-text file:mr-4 file:rounded-lg file:border file:border-line file:bg-bg-0 file:px-3 file:py-2 file:font-sans file:text-sm file:text-text"
-        />
-        {screenshots.length > 0 ? (
-          <p className="font-mono text-xs text-text-muted">
-            {screenshots.length} file{screenshots.length === 1 ? "" : "s"}{" "}
-            selected
-          </p>
-        ) : null}
+        {isPro ? (
+          <>
+            <input
+              type="file"
+              accept="image/*"
+              multiple
+              onChange={handleScreenshotsChange}
+              className="font-sans text-sm text-ink file:mr-4 file:rounded-lg file:border file:border-rule file:bg-paper file:px-3 file:py-2 file:font-sans file:text-sm file:text-ink"
+            />
+            {screenshots.length > 0 ? (
+              <p className="font-mono text-xs text-muted">
+                {screenshots.length} file{screenshots.length === 1 ? "" : "s"}{" "}
+                selected
+              </p>
+            ) : null}
+          </>
+        ) : (
+          <UpgradePrompt feature="Screenshot attachments" />
+        )}
       </div>
 
       <div className="flex flex-col gap-1.5">

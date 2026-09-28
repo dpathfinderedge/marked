@@ -5,7 +5,10 @@ import { useTrades } from "@/hooks/useTrades";
 import { useSettings } from "@/hooks/useSettings";
 import { useAttachments } from "@/hooks/useAttachments";
 import { useToast } from "@/hooks/useToast";
+import { useSubscription } from "@/hooks/useSubscription";
 import { detectConsecutiveLossFlags } from "@/lib/calculations";
+import { countTradesThisMonth, FREE_TRADE_LIMIT } from "@/lib/calculations";
+import { UpgradePrompt } from "@/components/billing/UpgradePrompt";
 import { TradeForm } from "@/components/trades/TradeForm";
 import { TradeList } from "@/components/trades/TradeList";
 import type { NewTradeInput } from "@/utils/tradeMappers";
@@ -23,6 +26,9 @@ export function TradesPage(): JSX.Element {
   const { threshold } = useSettings();
   const { uploadAttachments } = useAttachments();
   const { showToast } = useToast();
+  const { isPro } = useSubscription();
+  const tradesThisMonth = countTradesThisMonth(trades);
+  const isAtFreeLimit = !isPro && tradesThisMonth >= FREE_TRADE_LIMIT;
 
   const flaggedTradeIds = useMemo(
     () => detectConsecutiveLossFlags(trades, threshold),
@@ -33,6 +39,12 @@ export function TradesPage(): JSX.Element {
     input: NewTradeInput,
     files: File[],
   ): Promise<{ error: string | null }> => {
+    if (isAtFreeLimit) {
+      const message = `You've hit the free plan's ${FREE_TRADE_LIMIT} trades/month limit.`;
+      showToast(message, "error");
+      return { error: message };
+    }
+
     const { error: addError, trade } = await addTrade(input);
 
     if (addError || !trade) {
@@ -72,7 +84,11 @@ export function TradesPage(): JSX.Element {
 
       <div className="flex flex-col gap-3">
         <SectionLabel>New trade</SectionLabel>
-        <TradeForm onSubmit={handleAddTrade} />
+        {isAtFreeLimit ? (
+          <UpgradePrompt feature={`Logging more than ${FREE_TRADE_LIMIT} trades/month`} />
+        ) : (
+          <TradeForm onSubmit={handleAddTrade} />
+        )}
         {error ? <p className="text-xs text-signal-red">{error}</p> : null}
       </div>
 

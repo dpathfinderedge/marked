@@ -9,6 +9,7 @@ export function rowToTrade(row: TradeRow): Trade {
     id: row.id,
     userId: row.user_id,
     date: row.date,
+    createdAt: row.created_at,
     pair: row.pair,
     market: row.market,
     direction: row.direction,
@@ -23,7 +24,7 @@ export function rowToTrade(row: TradeRow): Trade {
   };
 }
 
-export type NewTradeInput = Omit<Trade, "id" | "userId">;
+export type NewTradeInput = Omit<Trade, "id" | "userId" | "createdAt">;
 
 export function newTradeToRow(input: NewTradeInput, userId: string): TradeInsert {
   return {
