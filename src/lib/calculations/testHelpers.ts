@@ -8,6 +8,7 @@ export function makeTrade(overrides: Partial<Trade> = {}): Trade {
     id: `trade-${counter}`,
     userId: "user-1",
     date: "2026-01-01",
+    createdAt: "2026-01-01T00:00:00.000Z",
     pair: "EURUSD",
     market: "forex",
     direction: "long",
