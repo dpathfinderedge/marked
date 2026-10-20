@@ -1,13 +1,43 @@
+import { useState } from "react";
 import { useSubscription } from "@/hooks/useSubscription";
 import { useCheckout } from "@/hooks/useCheckout";
 import { useToast } from "@/hooks/useToast";
 import { Button } from "@/components/ui/Button";
 
+const ACTIVATION_POLL_INTERVAL_MS = 2000;
+const ACTIVATION_POLL_MAX_ATTEMPTS = 15;
+
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 export function BillingPage(): JSX.Element {
-  const { status, isPro, currentPeriodEnd, isLoading } = useSubscription();
+  const { status, isPro, currentPeriodEnd, isLoading, refetch } =
+    useSubscription();
   const { showToast } = useToast();
+  const [isActivating, setIsActivating] = useState(false);
+
+  const waitForActivation = async (): Promise<void> => {
+    setIsActivating(true);
+
+    for (let attempt = 0; attempt < ACTIVATION_POLL_MAX_ATTEMPTS; attempt++) {
+      const nextStatus = await refetch();
+      if (nextStatus === "active") {
+        setIsActivating(false);
+        showToast("You're on Pro. Thanks for upgrading!");
+        return;
+      }
+      await sleep(ACTIVATION_POLL_INTERVAL_MS);
+    }
+
+    setIsActivating(false);
+    showToast(
+      "Payment received. Your plan is still updating and will show here shortly.",
+    );
+  };
+
   const { startCheckout } = useCheckout(() => {
-    showToast("Payment received — activating your Pro plan…");
+    void waitForActivation();
   });
 
   if (isLoading) {
@@ -40,6 +70,12 @@ export function BillingPage(): JSX.Element {
           </p>
         ) : null}
 
+        {isActivating ? (
+          <p className="mt-4 text-sm text-text-muted" role="status">
+            Payment received. Activating your Pro plan…
+          </p>
+        ) : null}
+
         {!isPro ? (
           <>
             <ul className="mt-4 flex flex-col gap-1.5 text-sm text-text-muted">
@@ -48,7 +84,11 @@ export function BillingPage(): JSX.Element {
               <li>Screenshot attachments</li>
               <li>Live FX rate lookup for cross pairs</li>
             </ul>
-            <Button onClick={startCheckout} className="mt-6">
+            <Button
+              onClick={startCheckout}
+              disabled={isActivating}
+              className="mt-6"
+            >
               Upgrade — ₦12,000/month
             </Button>
           </>
