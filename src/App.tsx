@@ -1,6 +1,7 @@
 import { lazy, Suspense } from "react";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { AuthProvider } from "@/context/AuthContext";
+import { SubscriptionProvider } from "@/context/SubscriptionContext";
 import { ThemeProvider } from "@/context/ThemeContext";
 import { ToastProvider } from "@/context/ToastContext";
 import { useAuth } from "@/hooks/useAuth";
@@ -89,10 +90,12 @@ function App(): JSX.Element {
     <ThemeProvider>
       <ToastProvider>
         <AuthProvider>
-          <OfflineBanner />
-          <UpdatePrompt />
-          <InstallPrompt />
-          <AppContent />
+          <SubscriptionProvider>
+            <OfflineBanner />
+            <UpdatePrompt />
+            <InstallPrompt />
+            <AppContent />
+          </SubscriptionProvider>
         </AuthProvider>
       </ToastProvider>
     </ThemeProvider>

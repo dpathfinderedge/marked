@@ -9,6 +9,7 @@ import {
   PanelLeftClose,
   PanelLeftOpen,
   LogOut,
+  CreditCard
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useTheme } from "@/hooks/useTheme";
@@ -17,6 +18,7 @@ import { Stamp } from "@/components/ui/Stamp";
 import { getDisplayName, getAvatarUrl } from "@/utils/greeting";
 import { MobileTopBar } from "@/components/layout/MobileTopBar";
 import { MobileTabBar } from "@/components/layout/MobileTabBar";
+import { PlanBadge } from "@/components/billing/PlanBadge";
 
 interface AppShellProps {
   children: ReactNode;
@@ -128,6 +130,20 @@ export function AppShell({ children }: AppShellProps): JSX.Element {
               <span>{theme === "dark" ? "Light mode" : "Dark mode"}</span>
             ) : null}
           </button>
+
+          <NavLink
+            to="/billing"
+            className={({ isActive }) => navLinkClass(isActive)}
+            title={isCollapsed ? "Billing" : undefined}
+          >
+            <CreditCard size={18} className="shrink-0" />
+            {!isCollapsed ? (
+              <>
+                <span>Billing</span>
+                <PlanBadge className="ml-auto" />
+              </>
+            ) : null}
+          </NavLink>
 
           <NavLink
             to="/profile"

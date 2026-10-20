@@ -1,12 +1,15 @@
 import { useState, type ChangeEvent, type FormEvent } from "react";
+import { Link } from "react-router-dom";
 import type { User } from "@supabase/supabase-js";
 import { useAuth } from "@/hooks/useAuth";
 import { useProfile } from "@/hooks/useProfile";
 import { useToast } from "@/hooks/useToast";
+import { useSubscription } from "@/hooks/useSubscription";
 import { getDisplayName, getAvatarUrl } from "@/utils/greeting";
 import { Input } from "@/components/ui/Input";
 import { PasswordInput } from "@/components/ui/PasswordInput";
 import { Button } from "@/components/ui/Button";
+import { PlanBadge } from "@/components/billing/PlanBadge";
 
 const MAX_AVATAR_SIZE_BYTES = 5 * 1024 * 1024;
 
@@ -22,9 +25,9 @@ function hasPasswordAuth(user: User | null): boolean {
 
 export function ProfilePage(): JSX.Element {
   const { user } = useAuth();
-  const { updateDisplayName, updatePassword, uploadAvatar, deleteAccount } =
-    useProfile();
+  const { updateDisplayName, updatePassword, uploadAvatar, deleteAccount } = useProfile();
   const { showToast } = useToast();
+  const { isPro } = useSubscription();
 
   const [name, setName] = useState(getDisplayName(user));
   const [isSavingName, setIsSavingName] = useState(false);
@@ -174,6 +177,26 @@ export function ProfilePage(): JSX.Element {
             {user?.email}
           </span>
         </div>
+      </div>
+
+      <div className="flex items-center justify-between gap-4 rounded-xl border border-line bg-bg-1 p-6">
+        <div>
+          <div className="flex items-center gap-2">
+            <h2 className="text-sm font-medium text-text">Plan &amp; billing</h2>
+            <PlanBadge />
+          </div>
+          <p className="mt-1 text-sm text-text-muted">
+            {isPro
+              ? "Manage your subscription and payment details."
+              : "Upgrade for unlimited trades, CSV import, screenshots and live FX rates."}
+          </p>
+        </div>
+        <Link
+          to="/billing"
+          className="shrink-0 rounded-lg border border-line px-3 py-2 text-sm font-semibold text-text transition-colors hover:bg-bg-2"
+        >
+          {isPro ? "Manage" : "Upgrade"}
+        </Link>
       </div>
 
       <form
