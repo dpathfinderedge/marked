@@ -7,6 +7,7 @@ import {
   type ReactNode,
 } from "react";
 import { supabase } from "@/lib/supabase";
+import { hasProAccess } from "@/lib/calculations";
 import { useAuth } from "@/hooks/useAuth";
 import {
   SubscriptionContext,
@@ -24,6 +25,7 @@ export function SubscriptionProvider({
 
   const [status, setStatus] = useState<SubscriptionStatus>("free");
   const [currentPeriodEnd, setCurrentPeriodEnd] = useState<string | null>(null);
+  const [cancelAtPeriodEnd, setCancelAtPeriodEnd] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
   const statusRef = useRef<SubscriptionStatus>("free");
@@ -36,13 +38,14 @@ export function SubscriptionProvider({
       statusRef.current = "free";
       setStatus("free");
       setCurrentPeriodEnd(null);
+      setCancelAtPeriodEnd(false);
       setIsLoading(false);
       return "free";
     }
 
     const { data, error } = await supabase
       .from("subscriptions")
-      .select("status, current_period_end")
+      .select("status, current_period_end, cancel_at_period_end")
       .eq("user_id", userId)
       .maybeSingle();
 
@@ -57,6 +60,7 @@ export function SubscriptionProvider({
     statusRef.current = nextStatus;
     setStatus(nextStatus);
     setCurrentPeriodEnd(data?.current_period_end ?? null);
+    setCancelAtPeriodEnd(data?.cancel_at_period_end ?? false);
     setIsLoading(false);
     return nextStatus;
   }, [userId]);
@@ -69,12 +73,13 @@ export function SubscriptionProvider({
   const value = useMemo<SubscriptionContextValue>(
     () => ({
       status,
-      isPro: status === "active",
+      isPro: hasProAccess({ status, cancelAtPeriodEnd, currentPeriodEnd }),
+      cancelAtPeriodEnd,
       currentPeriodEnd,
       isLoading,
       refetch,
     }),
-    [status, currentPeriodEnd, isLoading, refetch],
+    [status, cancelAtPeriodEnd, currentPeriodEnd, isLoading, refetch],
   );
 
   return (

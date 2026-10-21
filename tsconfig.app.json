@@ -30,5 +30,6 @@
       "@/context/*": ["src/context/*"]
     }
   },
-  "include": ["src"]
+  "include": ["src", "supabase/functions/paystack-webhook"],
+  "exclude": ["supabase/functions/paystack-webhook/index.ts"]
 }

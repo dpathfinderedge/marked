@@ -158,3 +158,39 @@ alter table public.subscriptions enable row level security;
 create policy "Users can view their own subscription"
   on public.subscriptions for select
   using (auth.uid() = user_id);
+
+
+alter table public.subscriptions
+  add column if not exists cancel_at_period_end boolean not null default false;
+
+create table if not exists public.webhook_events (
+  id text primary key,
+  provider text not null default 'paystack',
+  event text not null,
+  payload jsonb not null,
+  status text not null default 'processing'
+    check (status in ('processing', 'processed', 'ignored', 'failed')),
+  note text,
+  attempts integer not null default 1,
+  received_at timestamptz not null default now(),
+  processed_at timestamptz
+);
+
+create index if not exists webhook_events_received_at_idx
+  on public.webhook_events (received_at);
+
+alter table public.webhook_events enable row level security;
+
+create or replace function public.get_user_id_by_email(p_email text)
+returns uuid
+language sql
+stable
+security definer
+set search_path = ''
+as $$
+  select id from auth.users where lower(email) = lower(p_email) limit 1;
+$$;
+
+revoke all on function public.get_user_id_by_email(text)
+  from public, anon, authenticated;
+grant execute on function public.get_user_id_by_email(text) to service_role;

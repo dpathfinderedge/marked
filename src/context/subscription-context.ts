@@ -5,6 +5,7 @@ export type SubscriptionStatus = "free" | "active" | "past_due" | "cancelled";
 export interface SubscriptionContextValue {
   status: SubscriptionStatus;
   isPro: boolean;
+  cancelAtPeriodEnd: boolean;
   currentPeriodEnd: string | null;
   isLoading: boolean;
   refetch: () => Promise<SubscriptionStatus>;
