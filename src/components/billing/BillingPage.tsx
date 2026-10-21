@@ -12,8 +12,14 @@ function sleep(ms: number): Promise<void> {
 }
 
 export function BillingPage(): JSX.Element {
-  const { status, isPro, currentPeriodEnd, isLoading, refetch } =
-    useSubscription();
+  const {
+    status,
+    isPro,
+    cancelAtPeriodEnd,
+    currentPeriodEnd,
+    isLoading,
+    refetch,
+  } = useSubscription();
   const { showToast } = useToast();
   const [isActivating, setIsActivating] = useState(false);
 
@@ -48,6 +54,20 @@ export function BillingPage(): JSX.Element {
     );
   }
 
+  const periodEndLabel = currentPeriodEnd
+    ? new Date(currentPeriodEnd).toLocaleDateString()
+    : null;
+  const isEnding = isPro && (cancelAtPeriodEnd || status === "cancelled");
+
+  let planNote: string | null = null;
+  if (isEnding) {
+    planNote = periodEndLabel
+      ? `Pro access ends on ${periodEndLabel}. You won't be charged again.`
+      : "Your subscription won't renew.";
+  } else if (isPro && periodEndLabel) {
+    planNote = `Renews ${periodEndLabel}`;
+  }
+
   return (
     <div className="mx-auto flex max-w-md flex-col gap-8">
       <h1 className="text-2xl font-bold tracking-tight text-text">Billing</h1>
@@ -59,10 +79,8 @@ export function BillingPage(): JSX.Element {
         <p className="mt-1 text-xl font-bold text-text">
           {isPro ? "Pro" : "Free"}
         </p>
-        {isPro && currentPeriodEnd ? (
-          <p className="mt-1 text-sm text-text-muted">
-            Renews {new Date(currentPeriodEnd).toLocaleDateString()}
-          </p>
+        {planNote ? (
+          <p className="mt-1 text-sm text-text-muted">{planNote}</p>
         ) : null}
         {status === "past_due" ? (
           <p className="mt-2 text-sm text-signal-red">
@@ -94,7 +112,9 @@ export function BillingPage(): JSX.Element {
           </>
         ) : (
           <p className="mt-4 text-sm text-text-muted">
-            To cancel or update your payment method, contact support for now.
+            {isEnding
+              ? "You can subscribe again once your Pro access ends."
+              : "To cancel or update your payment method, contact support for now."}
           </p>
         )}
       </div>

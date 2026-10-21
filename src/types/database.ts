@@ -105,6 +105,7 @@ export interface Database {
           paystack_subscription_code: string | null;
           plan_code: string | null;
           current_period_end: string | null;
+          cancel_at_period_end: boolean;
           updated_at: string;
         };
         Insert: never;
