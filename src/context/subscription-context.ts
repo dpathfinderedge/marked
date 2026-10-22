@@ -6,6 +6,7 @@ export interface SubscriptionContextValue {
   status: SubscriptionStatus;
   isPro: boolean;
   cancelAtPeriodEnd: boolean;
+  planCode: string | null;
   currentPeriodEnd: string | null;
   isLoading: boolean;
   refetch: () => Promise<SubscriptionStatus>;

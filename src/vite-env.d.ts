@@ -8,6 +8,7 @@ interface ImportMetaEnv {
   readonly VITE_SENTRY_DSN?: string;
   readonly VITE_PAYSTACK_PUBLIC_KEY: string;
   readonly VITE_PAYSTACK_PLAN_CODE: string;
+  readonly VITE_PAYSTACK_PLAN_CODE_ANNUAL?: string;
 }
 
 interface ImportMeta {

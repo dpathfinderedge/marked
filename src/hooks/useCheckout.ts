@@ -1,26 +1,31 @@
 import PaystackPop from "@paystack/inline-js";
 import { useAuth } from "@/hooks/useAuth";
-
-const PLAN_AMOUNT_KOBO = 1_200_000; // ₦12,000
+import { PLAN_CODES } from "@/lib/billing/planCodes";
+import { priceNgn, toKobo, type BillingInterval } from "@/lib/billing/plans";
 
 interface UseCheckoutResult {
-  startCheckout: () => void;
+  startCheckout: (interval: BillingInterval) => void;
 }
 
 export function useCheckout(onSuccess: () => void): UseCheckoutResult {
   const { user } = useAuth();
 
-  const startCheckout = (): void => {
-    if (!user?.email) return;
+  const startCheckout = (interval: BillingInterval): void => {
+    const plan = PLAN_CODES[interval];
+    if (!user?.email || !plan) return;
 
     const paystack = new PaystackPop();
     paystack.newTransaction({
       key: import.meta.env.VITE_PAYSTACK_PUBLIC_KEY,
       email: user.email,
-      amount: PLAN_AMOUNT_KOBO,
+      amount: toKobo(priceNgn(interval)),
       currency: "NGN",
-      plan: import.meta.env.VITE_PAYSTACK_PLAN_CODE,
-      metadata: { user_id: user.id, custom_fields: [] },
+      plan,
+      metadata: {
+        user_id: user.id,
+        billing_interval: interval,
+        custom_fields: [],
+      },
       onSuccess,
       onCancel: () => {},
     });
