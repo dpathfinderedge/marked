@@ -26,6 +26,7 @@ export function SubscriptionProvider({
   const [status, setStatus] = useState<SubscriptionStatus>("free");
   const [currentPeriodEnd, setCurrentPeriodEnd] = useState<string | null>(null);
   const [cancelAtPeriodEnd, setCancelAtPeriodEnd] = useState(false);
+  const [planCode, setPlanCode] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   const statusRef = useRef<SubscriptionStatus>("free");
@@ -39,13 +40,14 @@ export function SubscriptionProvider({
       setStatus("free");
       setCurrentPeriodEnd(null);
       setCancelAtPeriodEnd(false);
+      setPlanCode(null);
       setIsLoading(false);
       return "free";
     }
 
     const { data, error } = await supabase
       .from("subscriptions")
-      .select("status, current_period_end, cancel_at_period_end")
+      .select("status, current_period_end, cancel_at_period_end, plan_code")
       .eq("user_id", userId)
       .maybeSingle();
 
@@ -61,6 +63,7 @@ export function SubscriptionProvider({
     setStatus(nextStatus);
     setCurrentPeriodEnd(data?.current_period_end ?? null);
     setCancelAtPeriodEnd(data?.cancel_at_period_end ?? false);
+    setPlanCode(data?.plan_code ?? null);
     setIsLoading(false);
     return nextStatus;
   }, [userId]);
@@ -75,11 +78,12 @@ export function SubscriptionProvider({
       status,
       isPro: hasProAccess({ status, cancelAtPeriodEnd, currentPeriodEnd }),
       cancelAtPeriodEnd,
+      planCode,
       currentPeriodEnd,
       isLoading,
       refetch,
     }),
-    [status, cancelAtPeriodEnd, currentPeriodEnd, isLoading, refetch],
+    [status, cancelAtPeriodEnd, planCode, currentPeriodEnd, isLoading, refetch],
   );
 
   return (
