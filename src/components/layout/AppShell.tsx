@@ -19,6 +19,7 @@ import { getDisplayName, getAvatarUrl } from "@/utils/greeting";
 import { MobileTopBar } from "@/components/layout/MobileTopBar";
 import { MobileTabBar } from "@/components/layout/MobileTabBar";
 import { PlanBadge } from "@/components/billing/PlanBadge";
+import { PastDueBanner } from "@/components/billing/PastDueBanner";
 
 interface AppShellProps {
   children: ReactNode;
@@ -180,7 +181,10 @@ export function AppShell({ children }: AppShellProps): JSX.Element {
 
       <MobileTopBar />
 
-      <main className="flex-1 p-6 pb-24 sm:pb-6">{children}</main>
+      <main className="flex-1 p-6 pb-24 sm:pb-6">
+        <PastDueBanner />
+        {children}
+      </main>
 
       <MobileTabBar />
     </div>

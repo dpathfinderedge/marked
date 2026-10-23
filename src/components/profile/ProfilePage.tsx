@@ -264,6 +264,9 @@ export function ProfilePage(): JSX.Element {
           <p className="mt-1 text-sm text-text-muted">
             Permanently delete your account and all trades, attachments, and
             settings. This can't be undone.
+            {isPro
+              ? " Your Pro subscription will be cancelled first, so you won't be charged again."
+              : ""}
           </p>
         </div>
 

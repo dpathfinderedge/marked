@@ -1,4 +1,5 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { stopRenewal } from "../_shared/paystack.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -40,7 +41,39 @@ Deno.serve(async (req: Request) => {
     return jsonResponse({ error: "Not authenticated." }, 401);
   }
 
-  const adminClient = createClient(supabaseUrl, serviceRoleKey); 
+  const adminClient = createClient(supabaseUrl, serviceRoleKey);
+
+  const { data: subscription, error: subscriptionError } = await adminClient
+    .from("subscriptions")
+    .select("paystack_subscription_code")
+    .eq("user_id", user.id)
+    .maybeSingle();
+
+  if (subscriptionError) {
+    console.error("Could not read subscription", subscriptionError.message);
+    return jsonResponse(
+      { error: "We couldn't check your subscription, so your account was not deleted. Please try again." },
+      500,
+    );
+  }
+
+  const subscriptionCode = subscription?.paystack_subscription_code ?? null;
+  if (subscriptionCode) {
+    const paystackSecret = Deno.env.get("PAYSTACK_SECRET_KEY") ?? "";
+    try {
+      if (!paystackSecret) throw new Error("PAYSTACK_SECRET_KEY is not configured");
+      await stopRenewal({ secret: paystackSecret, fetch }, subscriptionCode);
+    } catch (error) {
+      console.error(
+        "Could not stop the Paystack subscription before deleting the account",
+        error instanceof Error ? error.message : error,
+      );
+      return jsonResponse(
+        { error: "We couldn't cancel your subscription, so your account was not deleted and you haven't been charged anything new. Please try again, or contact support." },
+        502,
+      );
+    }
+  } 
 
   for (const bucket of ["trade-attachments", "avatars"]) {
     const { data: files } = await adminClient.storage

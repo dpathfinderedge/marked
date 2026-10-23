@@ -1,5 +1,6 @@
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/lib/supabase";
+import { getFunctionErrorMessage } from "@/lib/functionError";
 
 const AVATAR_BUCKET = "avatars";
 
@@ -74,7 +75,7 @@ export function useProfile(): UseProfileResult {
 
   const deleteAccount = async (): Promise<{ error: string | null }> => {
     const { error } = await supabase.functions.invoke("delete-account");
-    if (error) return { error: error.message };
+    if (error) return { error: await getFunctionErrorMessage(error) };
 
     await signOut();
     return { error: null };

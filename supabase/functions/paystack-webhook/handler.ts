@@ -11,6 +11,7 @@ import {
   type ExistingSubscription,
   type SubscriptionRow,
 } from "./logic.ts";
+import { stopRenewal } from "../_shared/paystack.ts";
 
 export type EventOutcomeStatus = "processed" | "ignored" | "failed";
 
@@ -147,6 +148,18 @@ async function processEvent(
     };
   }
 
+  let replaced = "";
+  const previousCode = existing?.paystack_subscription_code;
+  const isHealthy =
+    parsed.mapped.status === "active" && !parsed.mapped.cancelAtPeriodEnd;
+  if (previousCode && previousCode !== code && isHealthy) {
+    const result = await stopRenewal(
+      { secret, fetch: deps.fetch, baseUrl: deps.paystackApiBase },
+      previousCode,
+    );
+    replaced = `; replaced ${previousCode} (${result})`;
+  }
+
   const row = buildSubscriptionRow({
     userId,
     subscriptionCode: code,
@@ -159,7 +172,7 @@ async function processEvent(
 
   return {
     status: "processed",
-    note: `${eventName} -> ${row.status}${row.cancel_at_period_end ? " (cancelling)" : ""}`,
+    note: `${eventName} -> ${row.status}${row.cancel_at_period_end ? " (cancelling)" : ""}${replaced}`,
   };
 }
 
