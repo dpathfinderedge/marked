@@ -23,7 +23,7 @@ import {
 } from "@/lib/billing/plans";
 
 type Panel = "cancel" | "switch" | null;
-type Busy = "cancel" | "resume" | "card" | "switch" | null;
+type Busy = "cancel" | "card" | "switch" | null;
 
 const dangerButton =
   "rounded-lg border border-signal-red/40 px-4 py-2 text-sm font-semibold text-signal-red transition-colors hover:bg-signal-red/10 disabled:cursor-not-allowed disabled:opacity-50";
@@ -33,7 +33,7 @@ export function ManageSubscription(): JSX.Element {
   const { showToast } = useToast();
   const { status, cancelAtPeriodEnd, planCode, currentPeriodEnd, refetch } =
     useSubscription();
-  const { loadDetails, cancel, resume, getCardUpdateLink } =
+  const { loadDetails, cancel, getCardUpdateLink } =
     useManageSubscription();
 
   const [details, setDetails] = useState<SubscriptionDetails | null>(null);
@@ -65,7 +65,17 @@ export function ManageSubscription(): JSX.Element {
 
   useEffect(() => {
     void fetchDetails();
+    // Reload when the subscription changes (cancel, plan switch).
   }, [fetchDetails, status, cancelAtPeriodEnd, planCode]);
+
+  // After updating the card in Paystack's tab, reload when the user comes back.
+  useEffect(() => {
+    const onFocus = (): void => {
+      void fetchDetails();
+    };
+    window.addEventListener("focus", onFocus);
+    return () => window.removeEventListener("focus", onFocus);
+  }, [fetchDetails]);
 
   const { startCheckout } = useCheckout(() => {
     void (async () => {
@@ -101,29 +111,24 @@ export function ManageSubscription(): JSX.Element {
     );
   };
 
-  const handleResume = async (): Promise<void> => {
-    setBusy("resume");
-    const { error } = await resume();
-    if (error) {
-      setBusy(null);
-      showToast(error, "error");
-      return;
-    }
-    await refetch();
-    setBusy(null);
-    showToast("Your subscription will renew as normal.");
-  };
-
   const handleUpdateCard = async (): Promise<void> => {
     setBusy("card");
+    const tab = window.open("", "_blank");
+    if (tab) tab.opener = null;
+
     const { data: link, error } = await getCardUpdateLink();
     if (error || !link) {
+      tab?.close();
       setBusy(null);
       showToast(error ?? "We couldn't open the card page.", "error");
       return;
     }
-  
-    window.location.assign(link);
+    if (tab) {
+      tab.location.href = link;
+    } else {
+      window.location.assign(link);
+    }
+    setBusy(null);
   };
 
   const card = details?.card ?? null;
@@ -174,6 +179,8 @@ export function ManageSubscription(): JSX.Element {
               ? `You'll keep Pro until ${endLabel}. After that your account moves to the Free plan.`
               : "You'll keep Pro until the end of your current period, then move to the Free plan."}{" "}
             You won't be charged again, and your trades stay in your account.
+            This can't be undone: to carry on after it ends, you'll subscribe
+            again.
           </p>
           <div className="flex items-center gap-3">
             <button
@@ -235,37 +242,25 @@ export function ManageSubscription(): JSX.Element {
         </p>
       ) : null}
 
-      {panel === null && busy !== "switch" ? (
+      {panel === null && busy !== "switch" && !isEnding ? (
         <div className="flex flex-wrap items-center gap-3">
-          {isEnding ? (
+          {canSwitchToYearly ? (
             <Button
-              onClick={() => void handleResume()}
-              isLoading={busy === "resume"}
+              variant="secondary"
+              onClick={() => setPanel("switch")}
               disabled={busy !== null}
             >
-              Resume subscription
+              Switch to yearly — save {formatNaira(ANNUAL_SAVINGS_NGN)}
             </Button>
-          ) : (
-            <>
-              {canSwitchToYearly ? (
-                <Button
-                  variant="secondary"
-                  onClick={() => setPanel("switch")}
-                  disabled={busy !== null}
-                >
-                  Switch to yearly — save {formatNaira(ANNUAL_SAVINGS_NGN)}
-                </Button>
-              ) : null}
-              <button
-                type="button"
-                onClick={() => setPanel("cancel")}
-                disabled={busy !== null}
-                className={dangerButton}
-              >
-                Cancel subscription
-              </button>
-            </>
-          )}
+          ) : null}
+          <button
+            type="button"
+            onClick={() => setPanel("cancel")}
+            disabled={busy !== null}
+            className={dangerButton}
+          >
+            Cancel subscription
+          </button>
         </div>
       ) : null}
 

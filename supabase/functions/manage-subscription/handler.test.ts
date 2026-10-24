@@ -12,7 +12,6 @@ const NOW = new Date("2026-10-20T10:00:00.000Z");
 interface FakeState {
   status: string;
   lag?: boolean;
-  enableFails?: boolean;
   transactionsFail?: boolean;
 }
 
@@ -52,16 +51,6 @@ function setup(
     }
     if (u.pathname === "/subscription/disable") {
       if (!state.lag) state.status = "non-renewing";
-      return ok({});
-    }
-    if (u.pathname === "/subscription/enable") {
-      if (state.enableFails) {
-        return new Response(
-          JSON.stringify({ status: false, message: "Cannot enable" }),
-          { status: 400 },
-        );
-      }
-      if (!state.lag) state.status = "active";
       return ok({});
     }
     if (u.pathname === "/subscription/SUB_1/manage/link") {
@@ -143,7 +132,7 @@ describe("request checks", () => {
 
   it("rejects unknown actions without calling Paystack", async () => {
     const { call, requests } = setup();
-    for (const body of [{ action: "refund" }, {}, null, { action: 5 }]) {
+    for (const body of [{ action: "refund" }, { action: "resume" }, {}, null, { action: 5 }]) {
       expect((await call(body)).response.status).toBe(400);
     }
     expect(requests).toHaveLength(0);
@@ -252,37 +241,6 @@ describe("cancel", () => {
     expect(json?.code).toBe("provider_error");
     expect(String(json?.error)).not.toMatch(/mystery|Paystack answered/);
     expect(upserts).toHaveLength(0);
-  });
-});
-
-describe("resume", () => {
-  it("re-enables a subscription that was set to end", async () => {
-    const { call, requests, upserts } = setup({ state: { status: "non-renewing" } });
-    const { response, json } = await call({ action: "resume" });
-    expect(response.status).toBe(200);
-    expect(json).toMatchObject({ ok: true, status: "active", cancelAtPeriodEnd: false });
-    expect(requests.some((r) => r.path === "/subscription/enable")).toBe(true);
-    expect(upserts[0]?.cancel_at_period_end).toBe(false);
-  });
-
-  it("does nothing, successfully, if it was never cancelling", async () => {
-    const { call, requests } = setup();
-    const { response } = await call({ action: "resume" });
-    expect(response.status).toBe(200);
-    expect(requests.some((r) => r.path === "/subscription/enable")).toBe(false);
-  });
-
-  it("explains clearly if Paystack refuses to resume", async () => {
-    const { call, upserts } = setup({ state: { status: "non-renewing", enableFails: true } });
-    const { response, json } = await call({ action: "resume" });
-    expect(response.status).toBe(409);
-    expect(json?.code).toBe("resume_unavailable");
-    expect(upserts).toHaveLength(0);
-  });
-
-  it("refuses to resume something that already ended", async () => {
-    const { call } = setup({ state: { status: "cancelled" } });
-    expect((await call({ action: "resume" })).response.status).toBe(409);
   });
 });
 

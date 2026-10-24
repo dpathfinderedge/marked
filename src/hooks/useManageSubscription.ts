@@ -6,7 +6,7 @@ import {
   type SubscriptionDetails,
 } from "@/lib/billing/manage";
 
-type ManageAction = "details" | "cancel" | "resume" | "manage-link";
+type ManageAction = "details" | "cancel" | "manage-link";
 
 interface Result<T> {
   data: T | null;
@@ -57,11 +57,6 @@ export function useManageSubscription() {
     return { error };
   }, []);
 
-  const resume = useCallback(async (): Promise<{ error: string | null }> => {
-    const { error } = await invoke("resume");
-    return { error };
-  }, []);
-
   const getCardUpdateLink = useCallback(async (): Promise<Result<string>> => {
     const { data, error } = await invoke("manage-link");
     if (error) return { data: null, error };
@@ -74,5 +69,5 @@ export function useManageSubscription() {
       : { data: null, error: "We couldn't get your card update link." };
   }, []);
 
-  return { loadDetails, cancel, resume, getCardUpdateLink };
+  return { loadDetails, cancel, getCardUpdateLink };
 }

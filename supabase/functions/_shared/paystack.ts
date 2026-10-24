@@ -134,17 +134,6 @@ export async function disableSubscription(
   });
 }
 
-export async function enableSubscription(
-  deps: PaystackDeps,
-  code: string,
-  emailToken: string,
-): Promise<void> {
-  await call(deps, "POST", "/subscription/enable", {
-    code,
-    token: emailToken,
-  });
-}
-
 export async function getManageLink(
   deps: PaystackDeps,
   code: string,
@@ -181,10 +170,13 @@ function transactionPlanCode(transaction: Record<string, unknown>): string | nul
   return null;
 }
 
+export const KNOWN_PRICES_KOBO: readonly number[] = [1_200_000, 9_360_000];
+
 export function parsePayments(
   data: unknown,
   allowedPlans: string[],
   limit: number,
+  knownAmounts: readonly number[] = KNOWN_PRICES_KOBO,
 ): PaymentRecord[] {
   if (!Array.isArray(data)) return [];
 
@@ -192,11 +184,14 @@ export function parsePayments(
   for (const item of data) {
     if (!isRecord(item)) continue;
     if (item.status !== "success") continue;
-
-    const plan = transactionPlanCode(item);
-    if (!plan || !allowedPlans.includes(plan)) continue;
     if (typeof item.reference !== "string") continue;
     if (typeof item.amount !== "number") continue;
+
+    const plan = transactionPlanCode(item);
+    const isOurs = plan
+      ? allowedPlans.includes(plan)
+      : knownAmounts.includes(item.amount);
+    if (!isOurs) continue;
 
     const paidAt =
       typeof item.paid_at === "string" && !Number.isNaN(Date.parse(item.paid_at))
@@ -226,7 +221,17 @@ export async function listPayments(
     perPage: "50",
   });
   const body = await call(deps, "GET", `/transaction?${query.toString()}`);
-  return parsePayments(body.data, allowedPlans, limit);
+  const payments = parsePayments(body.data, allowedPlans, limit);
+
+  if (payments.length === 0 && Array.isArray(body.data) && body.data.length > 0) {
+    // Helps diagnose a filter that is too strict, without logging personal data.
+    const first = isRecord(body.data[0]) ? body.data[0] : {};
+    console.log(
+      `Payment history: Paystack returned ${body.data.length} transactions, none matched. ` +
+        `First has plan=${JSON.stringify(first.plan)} plan_object=${JSON.stringify(first.plan_object)} amount=${String(first.amount)}`,
+    );
+  }
+  return payments;
 }
 
 export type StopRenewalResult = "stopped" | "already_stopped" | "finished";

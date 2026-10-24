@@ -1,7 +1,6 @@
 import {
   PaystackError,
   disableSubscription,
-  enableSubscription,
   fetchSubscription,
   getManageLink,
   listPayments,
@@ -17,12 +16,11 @@ import {
   type SubscriptionRow,
 } from "../paystack-webhook/logic.ts";
 
-export type ManageAction = "details" | "cancel" | "resume" | "manage-link";
+export type ManageAction = "details" | "cancel" | "manage-link";
 
 const ACTIONS: readonly ManageAction[] = [
   "details",
   "cancel",
-  "resume",
   "manage-link",
 ];
 
@@ -225,37 +223,6 @@ export async function handleManage(
         }
         const fresh = await fetchSubscription(paystack, code);
         const result = await syncFrom(fresh, true);
-        return json(
-          { ok: true, status: result.status, cancelAtPeriodEnd: result.cancelAtPeriodEnd },
-          200,
-        );
-      }
-
-      case "resume": {
-        if (mapped.status === "cancelled") {
-          return fail(
-            409,
-            "This subscription has already ended. You can subscribe again.",
-            "subscription_ended",
-          );
-        }
-        if (mapped.cancelAtPeriodEnd) {
-          if (!current.emailToken) {
-            throw new PaystackError("Paystack returned no email token", 502);
-          }
-          try {
-            await enableSubscription(paystack, code, current.emailToken);
-          } catch (error) {
-            console.error("Paystack refused to resume a subscription", error);
-            return fail(
-              409,
-              "Paystack couldn't resume this subscription. Your Pro access continues until the end of the period, and you can subscribe again after that.",
-              "resume_unavailable",
-            );
-          }
-        }
-        const fresh = await fetchSubscription(paystack, code);
-        const result = await syncFrom(fresh, false);
         return json(
           { ok: true, status: result.status, cancelAtPeriodEnd: result.cancelAtPeriodEnd },
           200,

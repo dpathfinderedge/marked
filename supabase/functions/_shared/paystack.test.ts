@@ -183,7 +183,7 @@ describe("parsePayments", () => {
       ["PLN_m", "PLN_y"],
       10,
     );
-    expect(result.map((p) => p.reference)).toEqual(["a", "b", "f"]);
+    expect(result.map((p) => p.reference)).toEqual(["a", "b", "e", "f"]);
     expect(result[0]).toEqual({
       reference: "a",
       amount: 1_200_000,
@@ -206,5 +206,18 @@ describe("parsePayments", () => {
   it("keeps a payment with an unreadable date but no date", () => {
     const [payment] = parsePayments([txn({ paid_at: "garbage" })], ["PLN_m"], 3);
     expect(payment?.paidAt).toBeNull();
+  });
+
+  it("accepts a charge with no plan when it costs exactly one of our prices", () => {
+    const rows = [
+      txn({ reference: "monthly", plan: {}, amount: 1_200_000 }),
+      txn({ reference: "yearly", plan: null, plan_object: {}, amount: 9_360_000 }),
+      txn({ reference: "other-amount", plan: {}, amount: 500_000 }),
+      txn({ reference: "other-product", plan: { plan_code: "PLN_nope" }, amount: 1_200_000 }),
+    ];
+    expect(parsePayments(rows, ["PLN_m"], 10).map((p) => p.reference)).toEqual([
+      "monthly",
+      "yearly",
+    ]);
   });
 });
