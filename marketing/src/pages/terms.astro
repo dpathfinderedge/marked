@@ -1,0 +1,114 @@
+---
+import LegalLayout from "../layouts/LegalLayout.astro";
+import { SUPPORT_EMAIL } from "../lib/constants";
+---
+
+<LegalLayout
+  title="Terms of service"
+  description="The rules for using Marked, including subscriptions, cancellation and what Marked is and isn't."
+>
+  <p>
+    These terms apply when you use Marked, a trade journal for forex and crypto
+    traders. By creating an account or using the service, you agree to them.
+  </p>
+
+  <h2>What Marked is, and isn't</h2>
+  <p>
+    Marked helps you record trades and understand your own results. It is a
+    journaling and analytics tool. It is <strong>not</strong> financial,
+    investment or tax advice, and it doesn't tell you what to trade. Trading
+    forex and crypto carries a real risk of loss, and decisions you make are
+    yours. The figures Marked shows depend on what you enter, and live exchange
+    rates come from a third party, so check anything important yourself.
+  </p>
+
+  <h2>Your account</h2>
+  <p>
+    Keep your sign-in details safe and give us accurate information. You're
+    responsible for what happens under your account. You must be at least 18.
+  </p>
+
+  <h2>Your data</h2>
+  <p>
+    Your journal belongs to you. You give us permission to store and process it
+    only so we can provide Marked to you. How we handle it is described in the{" "}
+    <a href="/privacy">privacy policy</a>.
+  </p>
+
+  <h2>Plans and payment</h2>
+  <ul>
+    <li>
+      There is a Free plan and a paid Pro plan. What each includes is shown on
+      the <a href="/#pricing">pricing section</a>.
+    </li>
+    <li>
+      Pro is billed in advance, in Nigerian naira, through Paystack, monthly or
+      yearly depending on the plan you choose.
+    </li>
+    <li>
+      Pro renews automatically at the end of each period until you cancel. We
+      charge the card you provided.
+    </li>
+    <li>
+      You can cancel at any time from the Billing page. You keep Pro until the
+      end of the period you've paid for and you won't be charged again.
+    </li>
+    <li>
+      If we change a price, we'll tell you before it applies to you, and you can
+      cancel before it does.
+    </li>
+    <li>
+      If a payment fails, Pro is paused until it succeeds or you subscribe
+      again. Your data stays in your account.
+    </li>
+    <li>Refunds are covered in the <a href="/refunds">refund policy</a>.</li>
+  </ul>
+
+  <h2>Using Marked fairly</h2>
+  <p>
+    Don't misuse the service: no breaking the law, probing for security holes,
+    overloading it, trying to reach other people's data, or reselling access.
+    We may suspend an account that does.
+  </p>
+
+  <h2>Availability</h2>
+  <p>
+    We work to keep Marked running and your data safe, but we can't promise it
+    will never be interrupted or free of errors. Keep your own copy of anything
+    you can't afford to lose.
+  </p>
+
+  <h2>Limits on our responsibility</h2>
+  <p>
+    To the extent the law allows, Marked is provided "as is", and we aren't
+    liable for trading losses or for indirect or consequential losses. Where we
+    are liable, it is limited to what you paid us in the 12 months before the
+    problem. Nothing here limits rights you have by law that can't be limited.
+  </p>
+
+  <h2>Ending your account</h2>
+  <p>
+    You can delete your account whenever you like from your profile. We may end
+    or suspend an account that breaks these terms.
+  </p>
+
+  <h2>Changes</h2>
+  <p>
+    We may update these terms. If a change matters, we'll tell you in the app or
+    by email before it takes effect. Carrying on after that means you accept it.
+  </p>
+
+  <h2>Governing law</h2>
+  <p>These terms are governed by the laws of the Federal Republic of Nigeria.</p>
+
+  {
+    SUPPORT_EMAIL ? (
+      <>
+        <h2>Contact</h2>
+        <p>
+          Questions? Email <a href={`mailto:${SUPPORT_EMAIL}`}>{SUPPORT_EMAIL}</a>.
+        </p>
+      </>
+    ) : null
+  }
+</LegalLayout>

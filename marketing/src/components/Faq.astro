@@ -1,0 +1,91 @@
+---
+import { FREE_TRADE_LIMIT } from "../lib/pricing";
+
+const items = [
+  {
+    q: "Can I try Marked before paying?",
+    a: `Yes. The Free plan has no time limit and doesn't ask for a card. You can log up to ${FREE_TRADE_LIMIT} trades a month and use the analytics, equity curve and consecutive-loss flag.`,
+  },
+  {
+    q: `What happens when I reach ${FREE_TRADE_LIMIT} trades in a month?`,
+    a: "You can still open, review and analyse everything you've logged. Adding more trades waits until the next month, or you can upgrade to Pro to log without a limit.",
+  },
+  {
+    q: "How do I pay?",
+    a: "Pro is billed in Nigerian naira, by card, through Paystack. Your card details go to Paystack, not to us.",
+  },
+  {
+    q: "Can I cancel anytime?",
+    a: "Yes. Cancel from the Billing page in the app. You keep Pro until the end of the period you've already paid for, and you won't be charged again.",
+  },
+  {
+    q: "Can I switch from monthly to yearly?",
+    a: "Yes, from the Billing page. The yearly plan starts straight away and your monthly plan stops, so you're never billed twice. Days left on the current month aren't refunded.",
+  },
+  {
+    q: "Do you offer refunds?",
+    a: "Refunds are handled case by case, for example a duplicate charge or a charge after you cancelled. The details are in our refund policy.",
+    link: { href: "/refunds", label: "Read the refund policy" },
+  },
+  {
+    q: "Is my trading data private?",
+    a: "Your journal belongs to your account. You can delete your account, and everything in it, from your profile at any time. Deleting a Pro account also cancels your subscription first.",
+    link: { href: "/privacy", label: "Read the privacy policy" },
+  },
+];
+
+const structuredData = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: items.map((item) => ({
+    "@type": "Question",
+    name: item.q,
+    acceptedAnswer: { "@type": "Answer", text: item.a },
+  })),
+};
+---
+
+<section id="faq" class="border-t border-line py-24 sm:py-32">
+  <div class="mx-auto max-w-3xl px-6">
+    <div class="reveal">
+      <p class="text-[11px] font-semibold uppercase tracking-widest text-signal-red">FAQ</p>
+      <h2 class="mt-3 text-[28px] font-bold leading-tight tracking-tight text-text sm:text-[34px]">
+        Questions, answered.
+      </h2>
+    </div>
+
+    <div class="reveal mt-10 divide-y divide-line border-y border-line">
+      {
+        items.map((item) => (
+          <details class="group py-5">
+            <summary class="flex cursor-pointer list-none items-center justify-between gap-4 text-[15px] font-medium text-text [&::-webkit-details-marker]:hidden">
+              {item.q}
+              <svg
+                class="h-4 w-4 shrink-0 text-text-faint transition-transform group-open:rotate-45"
+                viewBox="0 0 16 16"
+                fill="none"
+                aria-hidden="true"
+              >
+                <path d="M8 3V13M3 8H13" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+              </svg>
+            </summary>
+            <p class="mt-3 text-[14px] leading-relaxed text-text-muted">
+              {item.a}
+              {item.link ? (
+                <>
+                  {" "}
+                  <a href={item.link.href} class="text-signal-red underline underline-offset-4">
+                    {item.link.label}
+                  </a>
+                  .
+                </>
+              ) : null}
+            </p>
+          </details>
+        ))
+      }
+    </div>
+  </div>
+
+  <script type="application/ld+json" set:html={JSON.stringify(structuredData)} is:inline />
+</section>

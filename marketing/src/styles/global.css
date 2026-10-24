@@ -44,3 +44,20 @@ body {
     transition: none;
   }
 }
+
+.legal h2 {
+  @apply mt-10 text-[18px] font-semibold tracking-tight text-text;
+}
+.legal p,
+.legal li {
+  @apply text-[14px] leading-relaxed text-text-muted;
+}
+.legal p {
+  @apply mt-3;
+}
+.legal ul {
+  @apply mt-3 list-disc space-y-1.5 pl-5;
+}
+.legal a {
+  @apply text-signal-red underline underline-offset-4;
+}

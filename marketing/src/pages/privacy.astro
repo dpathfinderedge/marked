@@ -1,0 +1,97 @@
+---
+import LegalLayout from "../layouts/LegalLayout.astro";
+import { SUPPORT_EMAIL } from "../lib/constants";
+---
+
+<LegalLayout
+  title="Privacy policy"
+  description="What Marked collects, why, who helps us run it, and how you can delete your data."
+>
+  <p>
+    Marked is a trade journal for forex and crypto traders. This page explains
+    what we collect when you use it, why, and what control you have.
+  </p>
+
+  <h2>What we collect</h2>
+  <ul>
+    <li>
+      <strong>Account details:</strong> your email address, your name, and a
+      profile picture if you add one or sign in with Google.
+    </li>
+    <li>
+      <strong>Your journal:</strong> the trades, notes, tags and screenshots you
+      add. This is the core of the service and it belongs to you.
+    </li>
+    <li>
+      <strong>Billing details:</strong> your plan, subscription status, billing
+      dates and the reference numbers Paystack gives us. Your card details go to
+      Paystack and are never stored by us.
+    </li>
+    <li>
+      <strong>Technical data:</strong> error reports and basic diagnostics that
+      help us find and fix problems.
+    </li>
+  </ul>
+
+  <h2>How we use it</h2>
+  <p>
+    To run your account, show your journal and analytics, take payment for Pro,
+    keep the service secure, and fix bugs. We don't sell your data and we don't
+    show ads.
+  </p>
+
+  <h2>Who helps us run Marked</h2>
+  <p>We use a few providers to deliver the service. Each only gets what it needs:</p>
+  <ul>
+    <li><strong>Supabase</strong> for the database, sign-in and file storage.</li>
+    <li><strong>Vercel</strong> for hosting this website and the app.</li>
+    <li><strong>Paystack</strong> for payments and subscriptions.</li>
+    <li><strong>Sentry</strong> for error monitoring.</li>
+    <li>
+      <strong>Frankfurter</strong> for live exchange rates. When you look up a
+      rate, only the two currency codes are sent.
+    </li>
+    <li>
+      <strong>Google</strong> if you choose to sign in with Google, and to serve
+      the fonts on this website (which means Google sees your IP address when the
+      page loads).
+    </li>
+  </ul>
+
+  <h2>Keeping and deleting your data</h2>
+  <p>
+    We keep your data while your account is open. You can delete your account at
+    any time from your profile in the app. That removes your journal, your
+    uploaded screenshots and your profile picture. If you have a Pro
+    subscription, it is cancelled first so you aren't charged again.
+    Paystack keeps its own payment records under its own policies.
+  </p>
+
+  <h2>Your rights</h2>
+  <p>
+    You can see and correct your details in the app, export or delete your
+    journal, and delete your account. If data protection law where you live,
+    including the Nigeria Data Protection Act 2023, gives you further rights,
+    such as asking what we hold about you, you can ask us to honour them.
+  </p>
+
+  <h2>Children</h2>
+  <p>Marked is not meant for anyone under 18, and we don't knowingly collect their data.</p>
+
+  <h2>Changes</h2>
+  <p>
+    If we change this policy in a way that matters, we'll update the date above
+    and tell you in the app or by email.
+  </p>
+
+  {
+    SUPPORT_EMAIL ? (
+      <>
+        <h2>Contact</h2>
+        <p>
+          Questions about your data? Email <a href={`mailto:${SUPPORT_EMAIL}`}>{SUPPORT_EMAIL}</a>.
+        </p>
+      </>
+    ) : null
+  }
+</LegalLayout>
