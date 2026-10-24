@@ -1,0 +1,56 @@
+---
+import LegalLayout from "../layouts/LegalLayout.astro";
+import { SUPPORT_EMAIL } from "../lib/constants";
+---
+
+<LegalLayout
+  title="Refund policy"
+  description="When Marked Pro payments can be refunded, and how cancelling works."
+>
+  <p>
+    You can try Marked on the Free plan with no card and no time limit, and you
+    can cancel Pro whenever you like. Because of that, Pro payments are
+    generally not refundable once a billing period has started.
+  </p>
+
+  <h2>Cancelling</h2>
+  <p>
+    Cancel from the Billing page in the app. Cancelling stops future charges.
+    You keep Pro until the end of the period you've already paid for. We don't
+    give part refunds for unused time in that period.
+  </p>
+
+  <h2>When we will refund</h2>
+  <p>We review these case by case and refund to the original payment method:</p>
+  <ul>
+    <li>You were charged twice for the same period.</li>
+    <li>You were charged after you had cancelled.</li>
+    <li>A fault on our side stopped you using Pro for the period you paid for.</li>
+  </ul>
+  <p>
+    Please ask within 14 days of the charge so we can check it properly. Refunds
+    can take several working days to reach your account, depending on your bank.
+  </p>
+
+  <h2>Switching from monthly to yearly</h2>
+  <p>
+    When you switch to yearly, the yearly plan starts straight away and your
+    monthly plan stops so you aren't billed twice. Days left on the current
+    month aren't refunded.
+  </p>
+
+  <h2>Your legal rights</h2>
+  <p>Nothing here limits any rights you have under the law.</p>
+
+  {
+    SUPPORT_EMAIL ? (
+      <>
+        <h2>How to ask</h2>
+        <p>
+          Email <a href={`mailto:${SUPPORT_EMAIL}`}>{SUPPORT_EMAIL}</a> from the address on your
+          account, with the date and amount of the charge.
+        </p>
+      </>
+    ) : null
+  }
+</LegalLayout>

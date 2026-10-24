@@ -1,5 +1,6 @@
 ---
 import "../styles/global.css";
+import { ANNUAL_PRICE_NGN, MONTHLY_PRICE_NGN } from "../lib/pricing";
 
 export interface Props {
   title?: string;
@@ -22,11 +23,26 @@ const structuredData = {
   operatingSystem: "Web",
   description,
   url: Astro.site?.toString(),
-  offers: {
-    "@type": "Offer",
-    price: "0",
-    priceCurrency: "USD",
-  },
+  offers: [
+    {
+      "@type": "Offer",
+      name: "Free",
+      price: "0",
+      priceCurrency: "NGN",
+    },
+    {
+      "@type": "Offer",
+      name: "Pro (monthly)",
+      price: String(MONTHLY_PRICE_NGN),
+      priceCurrency: "NGN",
+    },
+    {
+      "@type": "Offer",
+      name: "Pro (yearly)",
+      price: String(ANNUAL_PRICE_NGN),
+      priceCurrency: "NGN",
+    },
+  ],
 };
 ---
 

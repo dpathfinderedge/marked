@@ -1,0 +1,229 @@
+---
+import { APP_URL } from "../lib/constants";
+import {
+  ANNUAL_DISCOUNT_PERCENT,
+  ANNUAL_PER_MONTH_NGN,
+  ANNUAL_PRICE_NGN,
+  ANNUAL_SAVINGS_NGN,
+  FREE_TRADE_LIMIT,
+  MONTHLY_PRICE_NGN,
+  formatNaira,
+} from "../lib/pricing";
+
+const freeFeatures = [
+  `Log up to ${FREE_TRADE_LIMIT} trades a month`,
+  "Real forex and crypto P&L math",
+  "Win rate, profit factor, avg R and equity curve",
+  "Breakdowns by pair, session and setup",
+  "Consecutive-loss flag",
+  "Installable app, works offline-aware",
+];
+
+const proFeatures = [
+  "Unlimited trades",
+  "CSV bulk import",
+  "Screenshot attachments on every trade",
+  "Live FX rate lookup for cross pairs",
+];
+
+const comparison: { feature: string; free: boolean | string; pro: boolean | string }[] = [
+  { feature: "Trades per month", free: String(FREE_TRADE_LIMIT), pro: "Unlimited" },
+  { feature: "P&L, win rate, profit factor, equity curve", free: true, pro: true },
+  { feature: "Breakdowns by pair, session and setup", free: true, pro: true },
+  { feature: "Consecutive-loss flag", free: true, pro: true },
+  { feature: "Installable app", free: true, pro: true },
+  { feature: "CSV bulk import", free: false, pro: true },
+  { feature: "Screenshot attachments", free: false, pro: true },
+  { feature: "Live FX rate lookup for cross pairs", free: false, pro: true },
+];
+---
+
+<section id="pricing" class="border-t border-line py-24 sm:py-32">
+  <div class="mx-auto max-w-6xl px-6">
+    <div class="reveal text-center">
+      <p class="text-[11px] font-semibold uppercase tracking-widest text-signal-red">
+        Pricing
+      </p>
+      <h2 class="mx-auto mt-3 max-w-lg text-[28px] font-bold leading-tight tracking-tight text-text sm:text-[34px]">
+        Start free. Upgrade when you outgrow it.
+      </h2>
+      <p class="mx-auto mt-3 max-w-md text-[14px] text-text-muted">
+        No trial clock and no card to start. The Free plan is the way to try Marked.
+      </p>
+
+      <div
+        id="interval-toggle"
+        role="group"
+        aria-label="Billing interval"
+        class="mt-8 inline-flex rounded-lg bg-bg-1 p-1"
+      >
+        <button
+          type="button"
+          data-interval="monthly"
+          aria-pressed="true"
+          class="interval-button flex items-center gap-2 rounded-md border border-transparent px-4 py-1.5 text-[13px] font-medium text-text-muted transition-colors"
+        >
+          Monthly
+        </button>
+        <button
+          type="button"
+          data-interval="annual"
+          aria-pressed="false"
+          class="interval-button flex items-center gap-2 rounded-md border border-transparent px-4 py-1.5 text-[13px] font-medium text-text-muted transition-colors"
+        >
+          Yearly
+          <span class="rounded-full bg-signal-green/15 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-signal-green">
+            Save {ANNUAL_DISCOUNT_PERCENT}%
+          </span>
+        </button>
+      </div>
+    </div>
+
+    <div class="mx-auto mt-12 grid max-w-3xl gap-4 sm:grid-cols-2">
+      <div class="reveal flex flex-col rounded-xl border border-line bg-bg-1 p-6">
+        <h3 class="text-[15px] font-semibold text-text">Free</h3>
+        <p class="mt-4 text-[34px] font-bold tracking-tight text-text">
+          {formatNaira(0)}
+          <span class="text-[14px] font-medium text-text-muted">/forever</span>
+        </p>
+        <p class="mt-1 text-[13px] text-text-muted">No card required.</p>
+        <ul class="mt-6 flex flex-1 flex-col gap-2.5 text-[14px] text-text-muted">
+          {
+            freeFeatures.map((item) => (
+              <li class="flex gap-2.5">
+                <svg class="mt-0.5 h-4 w-4 shrink-0 text-text-faint" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                  <path d="M3.5 8.5L6.5 11.5L12.5 4.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+                <span>{item}</span>
+              </li>
+            ))
+          }
+        </ul>
+        <a
+          href={APP_URL}
+          class="mt-8 rounded-lg border border-line-strong px-5 py-2.5 text-center text-[14px] font-semibold text-text transition-colors hover:bg-bg-2"
+        >
+          Start free
+        </a>
+      </div>
+
+      <div
+        class="reveal flex flex-col rounded-xl border border-signal-red/50 bg-bg-1 p-6"
+        style="transition-delay: 70ms"
+      >
+        <h3 class="text-[15px] font-semibold text-text">Pro</h3>
+        <p class="mt-4 text-[34px] font-bold tracking-tight text-text">
+          <span data-monthly={formatNaira(MONTHLY_PRICE_NGN)} data-annual={formatNaira(ANNUAL_PRICE_NGN)}>
+            {formatNaira(MONTHLY_PRICE_NGN)}
+          </span>
+          <span class="text-[14px] font-medium text-text-muted" data-monthly="/month" data-annual="/year">/month</span>
+        </p>
+        <p
+          class="mt-1 text-[13px] text-text-muted"
+          data-monthly="Billed monthly. Cancel anytime."
+          data-annual={`${formatNaira(ANNUAL_PER_MONTH_NGN)}/month, billed yearly. You save ${formatNaira(ANNUAL_SAVINGS_NGN)}.`}
+        >
+          Billed monthly. Cancel anytime.
+        </p>
+        <p class="mt-6 text-[13px] font-medium text-text">Everything in Free, plus:</p>
+        <ul class="mt-3 flex flex-1 flex-col gap-2.5 text-[14px] text-text-muted">
+          {
+            proFeatures.map((item) => (
+              <li class="flex gap-2.5">
+                <svg class="mt-0.5 h-4 w-4 shrink-0 text-signal-red" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                  <path d="M3.5 8.5L6.5 11.5L12.5 4.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+                <span>{item}</span>
+              </li>
+            ))
+          }
+        </ul>
+        <a
+          href={APP_URL}
+          class="mt-8 rounded-lg bg-signal-red px-5 py-2.5 text-center text-[14px] font-semibold text-white transition-opacity hover:opacity-90"
+        >
+          Get Pro
+        </a>
+      </div>
+    </div>
+
+    <p class="mx-auto mt-6 max-w-xl text-center text-[12px] leading-relaxed text-text-faint">
+      Prices are in Nigerian naira (₦). Pro is paid by card through Paystack and
+      renews until you cancel. Sign up free, then upgrade from the Billing page
+      in the app. See the <a href="/refunds" class="underline underline-offset-4 hover:text-text-muted">refund policy</a>.
+    </p>
+
+    <div class="reveal mx-auto mt-16 max-w-3xl">
+      <h3 class="text-[15px] font-semibold text-text">Compare plans</h3>
+      <div class="mt-4 overflow-hidden rounded-xl border border-line">
+        <table class="w-full border-collapse text-left text-[13px]">
+          <caption class="sr-only">Free and Pro plan features compared</caption>
+          <thead class="bg-bg-1 text-text">
+            <tr>
+              <th scope="col" class="px-4 py-3 font-medium">Feature</th>
+              <th scope="col" class="w-20 px-3 py-3 text-center font-medium sm:w-28">Free</th>
+              <th scope="col" class="w-20 px-3 py-3 text-center font-medium sm:w-28">Pro</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-line text-text-muted">
+            {
+              comparison.map((row) => (
+                <tr>
+                  <th scope="row" class="px-4 py-3 font-normal">{row.feature}</th>
+                  {[row.free, row.pro].map((value) => (
+                    <td class="px-3 py-3 text-center">
+                      {typeof value === "string" ? (
+                        <span class="text-text">{value}</span>
+                      ) : value ? (
+                        <>
+                          <svg class="mx-auto h-4 w-4 text-signal-green" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                            <path d="M3.5 8.5L6.5 11.5L12.5 4.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                          </svg>
+                          <span class="sr-only">Included</span>
+                        </>
+                      ) : (
+                        <>
+                          <span aria-hidden="true" class="text-text-faint">—</span>
+                          <span class="sr-only">Not included</span>
+                        </>
+                      )}
+                    </td>
+                  ))}
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .interval-button[aria-pressed="true"] {
+    background-color: rgb(var(--bg-2));
+    border-color: rgb(var(--line));
+    color: rgb(var(--text));
+  }
+</style>
+
+<script>
+  const toggle = document.getElementById("interval-toggle");
+  const buttons = toggle?.querySelectorAll<HTMLButtonElement>("[data-interval]");
+
+  function setInterval(interval: string): void {
+    buttons?.forEach((button) => {
+      button.setAttribute("aria-pressed", String(button.dataset.interval === interval));
+    });
+    document
+      .querySelectorAll<HTMLElement>("#pricing [data-monthly]")
+      .forEach((el) => {
+        const text = interval === "annual" ? el.dataset.annual : el.dataset.monthly;
+        if (text !== undefined) el.textContent = text;
+      });
+  }
+
+  buttons?.forEach((button) => {
+    button.addEventListener("click", () => setInterval(button.dataset.interval ?? "monthly"));
+  });
+</script>
