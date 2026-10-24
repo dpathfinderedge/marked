@@ -1,7 +1,8 @@
 ---
 import { Image } from "astro:assets";
 import { APP_URL } from "../lib/constants";
-import dashboardScreenshot from "../assets/dashboard-screenshot.jpg";
+import dashboardDesktop from "../assets/hero-dashboard.webp";
+import dashboardMobile from "../assets/hero-dashboard-mobile.webp";
 ---
 
 <section class="mx-auto max-w-6xl px-6 pb-24 pt-20 sm:pb-32 sm:pt-28">
@@ -35,14 +36,83 @@ import dashboardScreenshot from "../assets/dashboard-screenshot.jpg";
     </div>
   </div>
 
-  <div class="reveal mx-auto mt-16 max-w-4xl overflow-hidden rounded-2xl border border-line bg-bg-1 shadow-[0_1px_0_0_rgba(255,255,255,0.04)_inset,0_20px_60px_-20px_rgba(0,0,0,0.6)]">
-    <Image
-      src={dashboardScreenshot}
-      alt="Marked dashboard showing total P&L, an equity curve, and this week's trades"
-      width={1350}
-      height={648}
-      loading="eager"
-      class="w-full h-auto"
-    />
+  <div class="showcase reveal relative mx-auto mt-16 max-w-5xl sm:mt-20">
+    <div class="showcase-glow" aria-hidden="true"></div>
+
+    <div class="showcase-stage relative">
+      <!-- Desktop: browser window -->
+      <div class="browser hidden overflow-hidden rounded-xl border border-line bg-bg-1 md:block">
+        <div class="flex items-center gap-3 border-b border-line bg-bg-0/70 px-4 py-3">
+          <div class="flex gap-1.5" aria-hidden="true">
+            <span class="h-2.5 w-2.5 rounded-full bg-text-faint/40"></span>
+            <span class="h-2.5 w-2.5 rounded-full bg-text-faint/40"></span>
+            <span class="h-2.5 w-2.5 rounded-full bg-text-faint/40"></span>
+          </div>
+          <div class="mx-auto flex w-full max-w-sm items-center justify-center gap-1.5 rounded-md bg-bg-0 px-3 py-1 text-[11px] text-text-faint">
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
+              <rect x="1.5" y="4.5" width="7" height="4.5" rx="1" stroke="currentColor" />
+              <path d="M3 4.5V3a2 2 0 0 1 4 0v1.5" stroke="currentColor" />
+            </svg>
+            app-marked.vercel.app/dashboard
+          </div>
+          <div class="w-[42px]" aria-hidden="true"></div>
+        </div>
+        <Image
+          src={dashboardDesktop}
+          alt="Marked dashboard showing total P&L, an equity curve, this week's results and performance stats"
+          width={1100}
+          height={760}
+          widths={[800, 1100, 1600]}
+          sizes="(min-width: 1024px) 1024px, 100vw"
+          loading="eager"
+          class="block h-auto w-full"
+        />
+      </div>
+
+      <!-- Phone: alone on small screens, overlapping the browser on wide ones -->
+      <div class="phone mx-auto w-[230px] md:absolute md:bottom-0 md:right-[3%] md:mx-0 md:w-[22%] md:min-w-[190px]">
+        <div class="overflow-hidden rounded-[2rem] border-[5px] border-[#1c1c20] bg-bg-0 shadow-[0_0_0_1px_rgba(255,255,255,0.08),0_30px_60px_-15px_rgba(0,0,0,0.8)]">
+          <Image
+            src={dashboardMobile}
+            alt="Marked dashboard on a phone"
+            width={780}
+            height={1688}
+            widths={[390, 780]}
+            sizes="(min-width: 768px) 22vw, 230px"
+            loading="eager"
+            class="block h-auto w-full"
+          />
+        </div>
+      </div>
+    </div>
   </div>
 </section>
+
+<style>
+  .showcase-glow {
+    position: absolute;
+    inset: -8% -4% 10%;
+    background:
+      radial-gradient(45% 55% at 30% 40%, rgba(60, 179, 113, 0.16), transparent 70%),
+      radial-gradient(40% 50% at 75% 55%, rgba(229, 83, 66, 0.14), transparent 70%);
+    filter: blur(40px);
+    pointer-events: none;
+  }
+  .browser {
+    box-shadow:
+      0 1px 0 0 rgba(255, 255, 255, 0.05) inset,
+      0 40px 80px -30px rgba(0, 0, 0, 0.8);
+  }
+  /* Fade the bottom edge into the page so the product looks like it continues. */
+  .showcase-stage {
+    -webkit-mask-image: linear-gradient(to bottom, #000 78%, transparent 100%);
+    mask-image: linear-gradient(to bottom, #000 78%, transparent 100%);
+  }
+  @media (min-width: 768px) {
+    .showcase-stage {
+      padding-bottom: 1.5rem;
+      -webkit-mask-image: linear-gradient(to bottom, #000 85%, transparent 100%);
+      mask-image: linear-gradient(to bottom, #000 85%, transparent 100%);
+    }
+  }
+</style>
