@@ -141,6 +141,62 @@ function setup(
   return { ...fake, paystack, deps };
 }
 
+function setupWithOldSubscription(
+  options: {
+    oldStatus?: string;
+    oldMissing?: boolean;
+    disableFails?: boolean;
+  } = {},
+) {
+  const fake = createFakeStore({
+    subscriptions: {
+      [USER_ID]: { status: "active", paystack_subscription_code: "SUB_old" },
+    },
+  });
+  const requests: { method: string; path: string; body?: unknown }[] = [];
+
+  const paystack = vi.fn(async (url: string | URL | Request, init?: RequestInit) => {
+    const u = new URL(String(url));
+    const method = init?.method ?? "GET";
+    requests.push({
+      method,
+      path: u.pathname,
+      body: init?.body ? JSON.parse(String(init.body)) : undefined,
+    });
+    const ok = (data: unknown) =>
+      new Response(JSON.stringify({ status: true, data }), { status: 200 });
+
+    if (u.pathname === "/subscription/SUB_abc") return ok(paystackSubscription());
+    if (u.pathname === "/subscription/SUB_old") {
+      if (options.oldMissing) {
+        return new Response(JSON.stringify({ status: false, message: "not found" }), { status: 404 });
+      }
+      return ok(
+        paystackSubscription({
+          subscription_code: "SUB_old",
+          status: options.oldStatus ?? "active",
+          email_token: "tok_old",
+        }),
+      );
+    }
+    if (u.pathname === "/subscription/disable") {
+      return options.disableFails
+        ? new Response(JSON.stringify({ status: false, message: "no" }), { status: 400 })
+        : ok({});
+    }
+    return new Response("{}", { status: 404 });
+  });
+
+  const deps: WebhookDeps = {
+    env: (name) =>
+      ({ PAYSTACK_SECRET_KEY: SECRET, PAYSTACK_PLAN_CODES: "PLN_monthly,PLN_annual" })[name],
+    store: fake.store,
+    fetch: paystack as unknown as typeof fetch,
+    now: () => NOW,
+  };
+  return { ...fake, deps, requests };
+}
+
 const createEvent = {
   event: "subscription.create",
   data: { subscription_code: "SUB_abc" },
@@ -288,11 +344,7 @@ describe("subscription lifecycle", () => {
   });
 
   it("lets a new subscription replace an old, ended one", async () => {
-    const { deps, upserts } = setup({
-      storeOptions: {
-        subscriptions: { [USER_ID]: { status: "cancelled", paystack_subscription_code: "SUB_old" } },
-      },
-    });
+    const { deps, upserts } = setupWithOldSubscription({ oldStatus: "cancelled" });
     await handleWebhook(webhookRequest(createEvent), deps);
     expect(upserts[0]).toMatchObject({ status: "active", paystack_subscription_code: "SUB_abc" });
   });
@@ -442,5 +494,89 @@ describe("stored payloads", () => {
     expect(stored).not.toContain("SIG_x");
     expect(stored).not.toContain("0800");
     expect(stored).toContain("CUS_1");
+  });
+});
+
+describe("replacing a previous subscription", () => {
+  const disableCalls = (requests: { path: string; body?: unknown }[]) =>
+    requests.filter((r) => r.path === "/subscription/disable");
+
+  it("stops the old running subscription so nobody is billed twice", async () => {
+    const { deps, upserts, requests, events } = setupWithOldSubscription();
+    await handleWebhook(webhookRequest(createEvent), deps);
+
+    expect(disableCalls(requests)).toHaveLength(1);
+    expect(disableCalls(requests)[0]?.body).toEqual({ code: "SUB_old", token: "tok_old" });
+    expect(upserts[0]).toMatchObject({ paystack_subscription_code: "SUB_abc", status: "active" });
+    expect([...events.values()][0]?.note).toContain("replaced SUB_old (stopped)");
+  });
+
+  it("stops the old one before recording the new one", async () => {
+    const { deps, requests, upserts } = setupWithOldSubscription();
+    const order: string[] = [];
+    const realFetch = deps.fetch;
+    deps.fetch = (async (url: string | URL | Request, init?: RequestInit) => {
+      if (String(url).endsWith("/subscription/disable")) order.push("disable");
+      return realFetch(url, init);
+    }) as typeof fetch;
+    const store = deps.store;
+    const realUpsert = store.upsertSubscription.bind(store);
+    store.upsertSubscription = async (row) => {
+      order.push("upsert");
+      return realUpsert(row);
+    };
+    await handleWebhook(webhookRequest(createEvent), deps);
+    expect(order).toEqual(["disable", "upsert"]);
+    expect(requests.length).toBeGreaterThan(0);
+    expect(upserts).toHaveLength(1);
+  });
+
+  it("does not disable an old subscription that is already ending or ended", async () => {
+    for (const oldStatus of ["non-renewing", "cancelled", "completed"]) {
+      const { deps, upserts, requests } = setupWithOldSubscription({ oldStatus });
+      await handleWebhook(webhookRequest(createEvent), deps);
+      expect(disableCalls(requests)).toHaveLength(0);
+      expect(upserts).toHaveLength(1);
+    }
+  });
+
+  it("carries on if Paystack no longer knows the old subscription", async () => {
+    const { deps, upserts, requests } = setupWithOldSubscription({ oldMissing: true });
+    await handleWebhook(webhookRequest(createEvent), deps);
+    expect(disableCalls(requests)).toHaveLength(0);
+    expect(upserts).toHaveLength(1);
+  });
+
+  it("fails the event (so Paystack retries) and records nothing if the old one can't be stopped", async () => {
+    const { deps, upserts, events } = setupWithOldSubscription({ disableFails: true });
+    const res = await handleWebhook(webhookRequest(createEvent), deps);
+    expect(res.status).toBe(500);
+    expect(upserts).toHaveLength(0);
+    expect([...events.values()][0]?.status).toBe("failed");
+  });
+
+  it("leaves the old subscription alone for events about the same subscription", async () => {
+    const { deps, requests } = setupWithOldSubscription();
+    await handleWebhook(
+      webhookRequest({ event: "invoice.update", data: { subscription: { subscription_code: "SUB_old" } } }),
+      deps,
+    );
+    expect(disableCalls(requests)).toHaveLength(0);
+  });
+
+  it("does not stop the old one when the incoming subscription is not healthy", async () => {
+    const { deps, requests } = setupWithOldSubscription();
+    const realFetch = deps.fetch;
+    deps.fetch = (async (url: string | URL | Request, init?: RequestInit) => {
+      if (String(url).endsWith("/subscription/SUB_abc")) {
+        return new Response(
+          JSON.stringify({ status: true, data: paystackSubscription({ status: "non-renewing" }) }),
+          { status: 200 },
+        );
+      }
+      return realFetch(url, init);
+    }) as typeof fetch;
+    await handleWebhook(webhookRequest(createEvent), deps);
+    expect(disableCalls(requests)).toHaveLength(0);
   });
 });

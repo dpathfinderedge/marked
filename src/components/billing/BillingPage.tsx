@@ -4,6 +4,8 @@ import { useCheckout } from "@/hooks/useCheckout";
 import { useToast } from "@/hooks/useToast";
 import { Button } from "@/components/ui/Button";
 import { IntervalToggle } from "@/components/billing/IntervalToggle";
+import { ManageSubscription } from "@/components/billing/ManageSubscription";
+import { formatDate } from "@/lib/billing/manage";
 import { PLAN_CODES } from "@/lib/billing/planCodes";
 import {
   ANNUAL_PER_MONTH_NGN,
@@ -69,9 +71,7 @@ export function BillingPage(): JSX.Element {
     );
   }
 
-  const periodEndLabel = currentPeriodEnd
-    ? new Date(currentPeriodEnd).toLocaleDateString()
-    : null;
+  const periodEndLabel = currentPeriodEnd ? formatDate(currentPeriodEnd) : null;
   const isEnding = isPro && (cancelAtPeriodEnd || status === "cancelled");
 
   const currentInterval = getPlanInterval(planCode, PLAN_CODES);
@@ -110,7 +110,8 @@ export function BillingPage(): JSX.Element {
         ) : null}
         {status === "past_due" ? (
           <p className="mt-2 text-sm text-signal-red">
-            Your last payment failed. Upgrade again to restore Pro access.
+            Your last payment failed, so Pro is paused. Update your card below,
+            or subscribe again to restore it.
           </p>
         ) : null}
 
@@ -119,6 +120,8 @@ export function BillingPage(): JSX.Element {
             Payment received. Activating your Pro plan…
           </p>
         ) : null}
+
+        {status === "past_due" ? <ManageSubscription /> : null}
 
         {!isPro ? (
           <>
@@ -159,11 +162,11 @@ export function BillingPage(): JSX.Element {
               Upgrade — {formatNaira(price)}/{unit}
             </Button>
           </>
+        ) : status === "active" ? (
+          <ManageSubscription />
         ) : (
           <p className="mt-4 text-sm text-text-muted">
-            {isEnding
-              ? "You can subscribe again once your Pro access ends."
-              : "To cancel or update your payment method, contact support for now."}
+            You can subscribe again once your Pro access ends.
           </p>
         )}
       </div>
