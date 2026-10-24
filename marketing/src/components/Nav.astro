@@ -54,7 +54,7 @@ import { APP_URL } from "../lib/constants";
       id="mobile-menu-button"
       aria-expanded="false"
       aria-controls="mobile-menu"
-      class="flex h-9 w-9 items-center justify-center rounded-lg text-text transition-colors hover:bg-bg-1 sm:hidden"
+      class="relative flex h-9 w-9 items-center justify-center rounded-lg text-text transition-colors hover:bg-bg-1 sm:hidden"
     >
       <svg id="icon-menu" width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
         <path d="M3 5H17M3 10H17M3 15H17" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
@@ -66,50 +66,97 @@ import { APP_URL } from "../lib/constants";
     </button>
   </div>
 
-  <div
-    id="mobile-menu"
-    class="hidden flex flex-col gap-1 border-t border-line/60 px-6 py-4 sm:hidden"
-  >
-    <a
-      href="/#how-it-works"
-      class="rounded-lg px-3 py-2.5 text-[14px] font-medium text-text-muted transition-colors hover:bg-bg-1 hover:text-text"
-    >
-      How it works
-    </a>
-    <a
-      href="/#features"
-      class="rounded-lg px-3 py-2.5 text-[14px] font-medium text-text-muted transition-colors hover:bg-bg-1 hover:text-text"
-    >
-      Features
-    </a>
-    <a
-      href="/#pricing"
-      class="rounded-lg px-3 py-2.5 text-[14px] font-medium text-text-muted transition-colors hover:bg-bg-1 hover:text-text"
-    >
-      Pricing
-    </a>
-    <a
-      href="/#faq"
-      class="rounded-lg px-3 py-2.5 text-[14px] font-medium text-text-muted transition-colors hover:bg-bg-1 hover:text-text"
-    >
-      FAQ
-    </a>
-    <div class="mt-2 flex flex-col gap-2 border-t border-line/60 pt-4">
-      <a
-        href={APP_URL}
-        class="rounded-lg px-3 py-2.5 text-center text-[14px] font-medium text-text-muted transition-colors hover:bg-bg-1 hover:text-text"
-      >
-        Sign in
-      </a>
-      <a
-        href={APP_URL}
-        class="rounded-lg bg-signal-red px-3 py-2.5 text-center text-[14px] font-semibold text-white transition-opacity hover:opacity-90"
-      >
-        Start free
-      </a>
+  <div id="mobile-menu" class="mobile-menu sm:hidden" aria-hidden="true" inert>
+    <div class="mobile-menu-inner">
+      <div class="flex flex-col gap-1 border-t border-line/60 px-6 py-4">
+        <a
+          href="/#how-it-works"
+          class="rounded-lg px-3 py-2.5 text-[14px] font-medium text-text-muted transition-colors hover:bg-bg-1 hover:text-text"
+        >
+          How it works
+        </a>
+        <a
+          href="/#features"
+          class="rounded-lg px-3 py-2.5 text-[14px] font-medium text-text-muted transition-colors hover:bg-bg-1 hover:text-text"
+        >
+          Features
+        </a>
+        <a
+          href="/#pricing"
+          class="rounded-lg px-3 py-2.5 text-[14px] font-medium text-text-muted transition-colors hover:bg-bg-1 hover:text-text"
+        >
+          Pricing
+        </a>
+        <a
+          href="/#faq"
+          class="rounded-lg px-3 py-2.5 text-[14px] font-medium text-text-muted transition-colors hover:bg-bg-1 hover:text-text"
+        >
+          FAQ
+        </a>
+        <div class="mt-2 flex flex-col gap-2 border-t border-line/60 pt-4">
+          <a
+            href={APP_URL}
+            class="rounded-lg px-3 py-2.5 text-center text-[14px] font-medium text-text-muted transition-colors hover:bg-bg-1 hover:text-text"
+          >
+            Sign in
+          </a>
+          <a
+            href={APP_URL}
+            class="rounded-lg bg-signal-red px-3 py-2.5 text-center text-[14px] font-semibold text-white transition-opacity hover:opacity-90"
+          >
+            Start free
+          </a>
+        </div>
+      </div>
     </div>
   </div>
 </header>
+
+<style>
+  .mobile-menu {
+    display: grid;
+    grid-template-rows: 0fr;
+    opacity: 0;
+    visibility: hidden;
+    transition:
+      grid-template-rows 280ms cubic-bezier(0.32, 0.72, 0, 1),
+      opacity 200ms ease,
+      visibility 0s linear 280ms;
+  }
+  .mobile-menu[data-open="true"] {
+    grid-template-rows: 1fr;
+    opacity: 1;
+    visibility: visible;
+    transition:
+      grid-template-rows 280ms cubic-bezier(0.32, 0.72, 0, 1),
+      opacity 240ms ease 40ms,
+      visibility 0s;
+  }
+  .mobile-menu-inner {
+    overflow: hidden;
+    min-height: 0;
+  }
+  .mobile-menu-inner > div {
+    transform: translateY(-6px);
+    transition: transform 280ms cubic-bezier(0.32, 0.72, 0, 1);
+  }
+  .mobile-menu[data-open="true"] .mobile-menu-inner > div {
+    transform: translateY(0);
+  }
+  #mobile-menu-button svg {
+    transition:
+      opacity 160ms ease,
+      transform 220ms cubic-bezier(0.32, 0.72, 0, 1);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .mobile-menu,
+    .mobile-menu[data-open="true"],
+    .mobile-menu-inner > div,
+    #mobile-menu-button svg {
+      transition: none;
+    }
+  }
+</style>
 
 <script>
   const button = document.getElementById("mobile-menu-button");
@@ -117,27 +164,37 @@ import { APP_URL } from "../lib/constants";
   const iconMenu = document.getElementById("icon-menu");
   const iconClose = document.getElementById("icon-close");
 
-  function closeMenu(): void {
-    menu?.classList.add("hidden");
-    iconMenu?.classList.remove("hidden");
-    iconClose?.classList.add("hidden");
-    button?.setAttribute("aria-expanded", "false");
+  function setOpen(open: boolean): void {
+    if (!menu) return;
+    menu.dataset.open = String(open);
+    menu.setAttribute("aria-hidden", String(!open));
+    menu.toggleAttribute("inert", !open);
+    button?.setAttribute("aria-expanded", String(open));
+    if (iconMenu) {
+      iconMenu.style.opacity = open ? "0" : "1";
+      iconMenu.style.transform = open ? "rotate(-90deg)" : "rotate(0)";
+    }
+    if (iconClose) {
+      iconClose.style.opacity = open ? "1" : "0";
+      iconClose.style.transform = open ? "rotate(0)" : "rotate(90deg)";
+    }
   }
 
-  function openMenu(): void {
-    menu?.classList.remove("hidden");
-    iconMenu?.classList.add("hidden");
-    iconClose?.classList.remove("hidden");
-    button?.setAttribute("aria-expanded", "true");
+  if (iconMenu && iconClose) {
+    iconClose.classList.remove("hidden");
+    iconClose.style.position = "absolute";
+    setOpen(false);
   }
 
   button?.addEventListener("click", () => {
-    const isOpen = !menu?.classList.contains("hidden");
-    if (isOpen) closeMenu();
-    else openMenu();
+    setOpen(menu?.dataset.open !== "true");
   });
 
   menu?.querySelectorAll("a").forEach((link) => {
-    link.addEventListener("click", closeMenu);
+    link.addEventListener("click", () => setOpen(false));
+  });
+
+  window.matchMedia("(min-width: 640px)").addEventListener("change", (e) => {
+    if (e.matches) setOpen(false);
   });
 </script>
