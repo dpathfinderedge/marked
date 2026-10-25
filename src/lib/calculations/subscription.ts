@@ -45,10 +45,10 @@ export function countTradesThisMonth(
   trades: Trade[],
   now: Date = new Date(),
 ): number {
-  const year = now.getFullYear();
-  const month = now.getMonth();
+  const year = now.getUTCFullYear();
+  const month = now.getUTCMonth();
   return trades.filter((t) => {
     const created = new Date(t.createdAt);
-    return created.getFullYear() === year && created.getMonth() === month;
+    return created.getUTCFullYear() === year && created.getUTCMonth() === month;
   }).length;
 }

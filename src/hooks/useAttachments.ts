@@ -1,5 +1,6 @@
 import { useCallback } from "react";
 import { supabase } from "@/lib/supabase";
+import { friendlyUploadError } from "@/lib/billing/serverRules";
 import { useAuth } from "@/hooks/useAuth";
 
 export interface Attachment {
@@ -46,7 +47,7 @@ export function useAttachments(): UseAttachmentsResult {
           .from(BUCKET)
           .upload(path, file);
         if (uploadError) {
-          return { error: uploadError.message, count: uploaded };
+          return { error: friendlyUploadError(uploadError.message), count: uploaded };
         }
 
         const { error: insertError } = await supabase
@@ -57,7 +58,7 @@ export function useAttachments(): UseAttachmentsResult {
             storage_path: path,
           });
         if (insertError) {
-          return { error: insertError.message, count: uploaded };
+          return { error: friendlyUploadError(insertError.message), count: uploaded };
         }
 
         uploaded++;
