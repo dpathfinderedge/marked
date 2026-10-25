@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { hasProAccess, PERIOD_GRACE_MS } from "./subscription";
+import { countTradesThisMonth, hasProAccess, PERIOD_GRACE_MS } from "./subscription";
+import { makeTrade } from "./testHelpers";
 
 const END = "2026-11-20T00:00:00.000Z";
 const endMs = Date.parse(END);
@@ -86,5 +87,26 @@ describe("hasProAccess", () => {
       expect(hasProAccess({ ...input, currentPeriodEnd: null })).toBe(false);
       expect(hasProAccess({ ...input, currentPeriodEnd: "garbage" })).toBe(false);
     });
+  });
+});
+
+describe("countTradesThisMonth", () => {
+  const now = new Date("2026-10-15T12:00:00.000Z");
+  const tradeAt = (createdAt: string) => makeTrade({ createdAt });
+
+  it("counts only trades created this month", () => {
+    const trades = [
+      tradeAt("2026-10-01T00:00:00.000Z"),
+      tradeAt("2026-10-14T09:00:00.000Z"),
+      tradeAt("2026-09-30T23:59:59.999Z"),
+      tradeAt("2025-10-10T00:00:00.000Z"),
+    ];
+    expect(countTradesThisMonth(trades, now)).toBe(2);
+  });
+
+  it("uses UTC months, matching the database", () => {
+    const lastInstant = tradeAt("2026-10-31T23:59:59.999Z");
+    const firstInstantNext = tradeAt("2026-11-01T00:00:00.000Z");
+    expect(countTradesThisMonth([lastInstant, firstInstantNext], now)).toBe(1);
   });
 });

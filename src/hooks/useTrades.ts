@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
+import { friendlyTradeError } from "@/lib/billing/serverRules";
 import { useAuth } from "@/hooks/useAuth";
 import { rowToTrade, newTradeToRow, type NewTradeInput } from "@/utils/tradeMappers";
 import type { Trade } from "@/types/trade";
@@ -62,7 +63,7 @@ export function useTrades(): UseTradesResult {
       .select()
       .single();
 
-    if (insertError) return { error: insertError.message };
+    if (insertError) return { error: friendlyTradeError(insertError.message) };
 
     const trade = rowToTrade(data);
     setTrades((prev) => [trade, ...prev]);
@@ -80,7 +81,9 @@ export function useTrades(): UseTradesResult {
       .insert(inputs.map((input) => newTradeToRow(input, user.id)))
       .select();
 
-    if (insertError) return { error: insertError.message, count: 0 };
+    if (insertError) {
+      return { error: friendlyTradeError(insertError.message), count: 0 };
+    }
 
     const inserted = (data ?? []).map(rowToTrade);
     setTrades((prev) => [...inserted, ...prev]);
