@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/Input";
 import { PasswordInput } from "@/components/ui/PasswordInput";
 import { Button } from "@/components/ui/Button";
 import { PlanBadge } from "@/components/billing/PlanBadge";
+import { PageHeader } from "@/components/ui/PageHeader";
 
 const MAX_AVATAR_SIZE_BYTES = 5 * 1024 * 1024;
 
@@ -142,8 +143,8 @@ export function ProfilePage(): JSX.Element {
   };
 
   return (
-    <div className="mx-auto flex max-w-md flex-col gap-8">
-      <h1 className="text-2xl font-bold tracking-tight text-text">Profile</h1>
+    <div className="flex max-w-2xl flex-col gap-6 lg:gap-8">
+      <PageHeader title="Profile" description="Your account details and security." />
 
       <div className="flex items-center gap-4">
         <label className="group relative cursor-pointer">

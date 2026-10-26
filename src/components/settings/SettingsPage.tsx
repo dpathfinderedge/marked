@@ -3,6 +3,7 @@ import { useSettings } from "@/hooks/useSettings";
 import { useToast } from "@/hooks/useToast";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
+import { PageHeader } from "@/components/ui/PageHeader";
 
 export function SettingsPage(): JSX.Element {
   const { threshold, isLoading, error: fetchError, updateThreshold } = useSettings();
@@ -46,8 +47,8 @@ export function SettingsPage(): JSX.Element {
   }
 
   return (
-    <div className="mx-auto flex max-w-md flex-col gap-8">
-      <h1 className="text-2xl font-bold tracking-tight text-text">Settings</h1>
+    <div className="flex max-w-2xl flex-col gap-6 lg:gap-8">
+      <PageHeader title="Settings" description="How Marked flags and tracks your trades." />
 
       {fetchError ? (
         <p className="text-xs text-signal-red">

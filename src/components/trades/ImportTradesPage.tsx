@@ -5,6 +5,7 @@ import { useToast } from "@/hooks/useToast";
 import { useSubscription } from "@/hooks/useSubscription";
 import { UpgradePrompt } from "@/components/billing/UpgradePrompt";
 import { Button } from "@/components/ui/Button";
+import { PageHeader } from "@/components/ui/PageHeader";
 import {
   parseTradesCsv,
   resolveCrossPairRates,
@@ -102,18 +103,19 @@ export function ImportTradesPage(): JSX.Element {
   };
 
   return (
-    <div className="mx-auto flex max-w-3xl flex-col gap-10">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold tracking-tight text-text">
-          Import trades
-        </h1>
-        <Link
-          to="/trades"
-          className="text-xs font-medium uppercase tracking-widest text-text-muted underline underline-offset-4 transition-colors hover:text-text"
-        >
-          Back to trades
-        </Link>
-      </div>
+    <div className="flex max-w-4xl flex-col gap-8">
+      <PageHeader
+        title="Import trades"
+        description="Bring in trades from a CSV file."
+        actions={
+          <Link
+            to="/trades"
+            className="rounded-lg border border-line px-3 py-1.5 text-sm font-medium text-text-muted transition-colors hover:bg-bg-2 hover:text-text"
+          >
+            Back to trades
+          </Link>
+        }
+      />
 
       {!isPro ? (
         <UpgradePrompt feature="CSV import" />

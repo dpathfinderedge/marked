@@ -3,6 +3,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useTrades } from "@/hooks/useTrades";
 import { useSettings } from "@/hooks/useSettings";
 import { StatCard } from "@/components/ui/StatCard";
+import { Card } from "@/components/ui/Card";
 import { NotableTradeCard } from "@/components/stats/NotableTradeCard";
 import { WeekStrip } from "@/components/stats/WeekStrip";
 import { EquityCurveChart } from "@/components/stats/EquityCurveChart";
@@ -36,14 +37,6 @@ function formatRatio(value: number | null): string {
 function formatSignedDollars(value: number): string {
   const sign = value >= 0 ? "+" : "−";
   return `${sign}$${Math.abs(value).toFixed(2)}`;
-}
-
-function SectionLabel({ children }: { children: string }): JSX.Element {
-  return (
-    <p className="text-xs font-medium uppercase tracking-widest text-text-faint">
-      {children}
-    </p>
-  );
 }
 
 export function DashboardPage(): JSX.Element {
@@ -88,7 +81,7 @@ export function DashboardPage(): JSX.Element {
   const streak = stats.currentStreak;
 
   return (
-    <div className="mx-auto flex max-w-3xl flex-col gap-12">
+    <div className="flex flex-col gap-6 lg:gap-8">
       <div>
         <p className="text-sm text-text-muted">
           {greeting}
@@ -136,54 +129,53 @@ export function DashboardPage(): JSX.Element {
         </p>
       </div>
 
-      <div className="flex flex-col gap-3">
-        <SectionLabel>Equity curve</SectionLabel>
-        <EquityCurveChart points={stats.equityCurve} />
-      </div>
+      <div className="grid gap-6 xl:grid-cols-3 xl:gap-8">
+        <Card title="Equity curve" className="xl:col-span-2">
+          <EquityCurveChart points={stats.equityCurve} />
+        </Card>
 
-      <div className="flex flex-col gap-3">
-        <SectionLabel>This week</SectionLabel>
-        <WeekStrip dailyPnl={stats.dailyPnl} />
-      </div>
+        <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-1 xl:gap-8">
+          <Card title="This week">
+            <WeekStrip dailyPnl={stats.dailyPnl} />
+          </Card>
 
-      <div className="flex flex-col gap-3">
-        <SectionLabel>Performance</SectionLabel>
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-          <StatCard label="Win rate" value={formatPercent(stats.winRate)} />
-          <StatCard
-            label="Profit factor"
-            value={formatRatio(stats.profitFactor)}
-          />
-          <StatCard label="Avg R" value={formatRatio(stats.avgR)} />
-          <StatCard
-            label="Flagged"
-            value={String(stats.flaggedCount)}
-            tone={stats.flaggedCount > 0 ? "negative" : "neutral"}
-          />
+          <Card title="Performance">
+            <div className="grid grid-cols-2 gap-3">
+              <StatCard label="Win rate" value={formatPercent(stats.winRate)} />
+              <StatCard
+                label="Profit factor"
+                value={formatRatio(stats.profitFactor)}
+              />
+              <StatCard label="Avg R" value={formatRatio(stats.avgR)} />
+              <StatCard
+                label="Flagged"
+                value={String(stats.flaggedCount)}
+                tone={stats.flaggedCount > 0 ? "negative" : "neutral"}
+              />
+            </div>
+          </Card>
+
+          <Card title="Notable trades" className="sm:col-span-2 xl:col-span-1">
+            <div className="grid grid-cols-2 gap-3">
+              <NotableTradeCard
+                label="Largest gain"
+                trade={stats.largestGain}
+                tone="positive"
+              />
+              <NotableTradeCard
+                label="Largest loss"
+                trade={stats.largestLoss}
+                tone="negative"
+              />
+            </div>
+          </Card>
         </div>
       </div>
 
-      <div className="flex flex-col gap-3">
-        <SectionLabel>Notable trades</SectionLabel>
-        <div className="grid grid-cols-2 gap-4">
-          <NotableTradeCard
-            label="Largest gain"
-            trade={stats.largestGain}
-            tone="positive"
-          />
-          <NotableTradeCard
-            label="Largest loss"
-            trade={stats.largestLoss}
-            tone="negative"
-          />
-        </div>
-      </div>
-
-      <div className="flex flex-col gap-3">
-        <SectionLabel>Breakdown</SectionLabel>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-          <BreakdownTable title="By pair" groups={stats.byPair} />
-          <BreakdownTable title="By session" groups={stats.bySession} />
+      <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3 xl:gap-8">
+        <BreakdownTable title="By pair" groups={stats.byPair} />
+        <BreakdownTable title="By session" groups={stats.bySession} />
+        <div className="sm:col-span-2 xl:col-span-1">
           <BreakdownTable title="By tag" groups={stats.byTag} />
         </div>
       </div>

@@ -11,15 +11,8 @@ import { countTradesThisMonth, FREE_TRADE_LIMIT } from "@/lib/calculations";
 import { UpgradePrompt } from "@/components/billing/UpgradePrompt";
 import { TradeForm } from "@/components/trades/TradeForm";
 import { TradeList } from "@/components/trades/TradeList";
+import { PageHeader } from "@/components/ui/PageHeader";
 import type { NewTradeInput } from "@/utils/tradeMappers";
-
-function SectionLabel({ children }: { children: string }): JSX.Element {
-  return (
-    <p className="text-xs font-medium uppercase tracking-widest text-text-faint">
-      {children}
-    </p>
-  );
-}
 
 export function TradesPage(): JSX.Element {
   const { trades, isLoading, error, addTrade } = useTrades();
@@ -69,35 +62,36 @@ export function TradesPage(): JSX.Element {
     return { error: null };
   };
 
+  const countLabel = isLoading
+    ? undefined
+    : `${trades.length} trade${trades.length === 1 ? "" : "s"} logged`;
+
   return (
-    <div className="mx-auto flex max-w-3xl flex-col gap-10">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold tracking-tight text-text">Trades</h1>
-        <Link
-          to="/trades/import"
-          className="flex items-center gap-1.5 rounded-lg border border-line px-3 py-1.5 text-sm font-medium text-text-muted transition-colors hover:bg-bg-2 hover:text-text"
-        >
-          <Upload size={14} />
-          Import CSV
-        </Link>
-      </div>
+    <div className="flex flex-col gap-6 lg:gap-8">
+      <PageHeader
+        title="Trades"
+        description={countLabel}
+        actions={
+          <Link
+            to="/trades/import"
+            className="flex items-center gap-1.5 rounded-lg border border-line px-3 py-1.5 text-sm font-medium text-text-muted transition-colors hover:bg-bg-2 hover:text-text"
+          >
+            <Upload size={14} />
+            Import CSV
+          </Link>
+        }
+      />
 
-      <div className="flex flex-col gap-3">
-        <SectionLabel>New trade</SectionLabel>
-        {isAtFreeLimit ? (
-          <UpgradePrompt feature={`Logging more than ${FREE_TRADE_LIMIT} trades/month`} />
-        ) : (
-          <TradeForm onSubmit={handleAddTrade} />
-        )}
-        {error ? <p className="text-xs text-signal-red">{error}</p> : null}
-      </div>
+      <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,26rem)_minmax(0,1fr)] lg:gap-8">
+        <div className="flex flex-col gap-3 lg:sticky lg:top-7">
+          {isAtFreeLimit ? (
+            <UpgradePrompt feature={`Logging more than ${FREE_TRADE_LIMIT} trades/month`} />
+          ) : (
+            <TradeForm onSubmit={handleAddTrade} />
+          )}
+          {error ? <p className="text-xs text-signal-red">{error}</p> : null}
+        </div>
 
-      <div className="flex flex-col gap-3">
-        <SectionLabel>
-          {isLoading
-            ? "Trades"
-            : `${trades.length} trade${trades.length === 1 ? "" : "s"}`}
-        </SectionLabel>
         <TradeList
           trades={trades}
           isLoading={isLoading}
