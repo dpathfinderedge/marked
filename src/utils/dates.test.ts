@@ -1,9 +1,15 @@
 import { describe, it, expect } from "vitest";
 import {
   addDaysToIso,
+  daysInMonth,
   formatLongDate,
+  formatMonthLabel,
   formatShortDate,
+  formatWeekdayDate,
   getWeekDates,
+  isValidIsoDate,
+  monthOfIso,
+  shiftMonth,
   startOfWeek,
   toIsoDate,
   weekdayOfIso,
@@ -63,5 +69,37 @@ describe("calendar-date helpers", () => {
   it("formats dates without involving the time zone", () => {
     expect(formatShortDate("2026-10-05")).toBe("Oct 5");
     expect(formatLongDate("2026-01-31")).toBe("Jan 31, 2026");
+  });
+});
+
+describe("month helpers", () => {
+  it("shifts months across year ends", () => {
+    expect(shiftMonth("2026-12", 1)).toBe("2027-01");
+    expect(shiftMonth("2026-01", -1)).toBe("2025-12");
+    expect(shiftMonth("2026-10", 0)).toBe("2026-10");
+    expect(shiftMonth("2026-10", -13)).toBe("2025-09");
+  });
+
+  it("knows how many days a month has", () => {
+    expect(daysInMonth("2026-10")).toBe(31);
+    expect(daysInMonth("2026-02")).toBe(28);
+    expect(daysInMonth("2028-02")).toBe(29);
+    expect(daysInMonth("2026-04")).toBe(30);
+  });
+
+  it("formats labels", () => {
+    expect(monthOfIso("2026-10-26")).toBe("2026-10");
+    expect(formatMonthLabel("2026-10")).toBe("October 2026");
+    expect(formatWeekdayDate("2026-10-26")).toBe("Monday, Oct 26");
+    expect(formatWeekdayDate("2026-10-25")).toBe("Sunday, Oct 25");
+  });
+
+  it("validates date strings", () => {
+    expect(isValidIsoDate("2026-10-26")).toBe(true);
+    expect(isValidIsoDate("2028-02-29")).toBe(true);
+    expect(isValidIsoDate("2026-02-30")).toBe(false);
+    expect(isValidIsoDate("2026-13-01")).toBe(false);
+    expect(isValidIsoDate("26-10-26")).toBe(false);
+    expect(isValidIsoDate("nonsense")).toBe(false);
   });
 });

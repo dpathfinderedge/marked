@@ -1,4 +1,5 @@
-import { getWeekDates, toIsoDate } from "@/utils/dates";
+import { Link } from "react-router-dom";
+import { formatLongDate, getWeekDates, toIsoDate } from "@/utils/dates";
 import { formatCompactDollars } from "@/utils/format";
 
 interface WeekStripProps {
@@ -27,9 +28,13 @@ export function WeekStrip({ dailyPnl }: WeekStripProps): JSX.Element {
           : "bg-bg-2/40";
 
         return (
-          <div
+          <Link
             key={iso}
-            className={`flex min-w-0 flex-col items-center gap-0.5 rounded-lg border px-1 py-2 ${
+            to={`/calendar?date=${iso}`}
+            aria-label={`${formatLongDate(iso)}${
+              hasTrades ? `: ${formatCompactDollars(pnl ?? 0)}` : ": no trades"
+            }`}
+            className={`flex min-w-0 flex-col items-center gap-0.5 rounded-lg border px-1 py-2 transition-colors hover:border-line-strong ${
               isToday ? "border-signal-red" : "border-line"
             } ${toneClass}`}
           >
@@ -44,7 +49,7 @@ export function WeekStrip({ dailyPnl }: WeekStripProps): JSX.Element {
             >
               {hasTrades ? formatCompactDollars(pnl ?? 0) : ""}
             </span>
-          </div>
+          </Link>
         );
       })}
     </div>
