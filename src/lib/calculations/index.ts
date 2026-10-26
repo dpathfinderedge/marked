@@ -5,3 +5,4 @@ export * from "./rMultiple";
 export * from "./stats";
 export * from "./streaks";
 export * from "./subscription";
+export * from "./series";

@@ -1,4 +1,5 @@
 import { getWeekDates, toIsoDate } from "@/utils/dates";
+import { formatCompactDollars } from "@/utils/format";
 
 interface WeekStripProps {
   dailyPnl: Map<string, number>;
@@ -12,7 +13,7 @@ export function WeekStrip({ dailyPnl }: WeekStripProps): JSX.Element {
   const weekDates = getWeekDates(today);
 
   return (
-    <div className="grid grid-cols-7 gap-2">
+    <div className="grid grid-cols-7 gap-1.5 sm:gap-2">
       {weekDates.map((date, i) => {
         const iso = toIsoDate(date);
         const pnl = dailyPnl.get(iso);
@@ -23,20 +24,25 @@ export function WeekStrip({ dailyPnl }: WeekStripProps): JSX.Element {
           ? (pnl ?? 0) >= 0
             ? "bg-signal-green/10"
             : "bg-signal-red/10"
-          : "bg-bg-1";
+          : "bg-bg-2/40";
 
         return (
           <div
             key={iso}
-            className={`flex flex-col items-center gap-1 rounded-lg border px-2 py-2.5 ${
+            className={`flex min-w-0 flex-col items-center gap-0.5 rounded-lg border px-1 py-2 ${
               isToday ? "border-signal-red" : "border-line"
             } ${toneClass}`}
           >
-            <span className="font-mono text-[10px] uppercase text-text-muted">
+            <span className="font-mono text-[10px] text-text-muted">
               {DAY_LABELS[i]}
             </span>
-            <span className="font-mono text-xs text-text">
-              {date.getDate()}
+            <span className="font-mono text-xs text-text">{date.getDate()}</span>
+            <span
+              className={`h-3 max-w-full truncate font-mono text-[10px] leading-3 ${
+                (pnl ?? 0) >= 0 ? "text-signal-green" : "text-signal-red"
+              }`}
+            >
+              {hasTrades ? formatCompactDollars(pnl ?? 0) : ""}
             </span>
           </div>
         );

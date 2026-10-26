@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 
 interface PageHeaderProps {
   title: string;
-  description?: string;
+  description?: ReactNode;
   actions?: ReactNode;
 }
 
@@ -18,7 +18,7 @@ export function PageHeader({
           {title}
         </h1>
         {description ? (
-          <p className="mt-1 text-sm text-text-muted">{description}</p>
+          <div className="mt-1 text-sm text-text-muted">{description}</div>
         ) : null}
       </div>
       {actions ? (

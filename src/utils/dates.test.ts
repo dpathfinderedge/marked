@@ -1,14 +1,22 @@
 import { describe, it, expect } from "vitest";
-import { toIsoDate, startOfWeek, getWeekDates } from "./dates";
+import {
+  addDaysToIso,
+  formatLongDate,
+  formatShortDate,
+  getWeekDates,
+  startOfWeek,
+  toIsoDate,
+  weekdayOfIso,
+} from "./dates";
 
 describe("toIsoDate", () => {
   it("formats using local date components, not UTC", () => {
-    const date = new Date(2026, 7, 5); // Aug 5, 2026 local time
+    const date = new Date(2026, 7, 5);
     expect(toIsoDate(date)).toBe("2026-08-05");
   });
 
   it("pads single-digit months and days", () => {
-    const date = new Date(2026, 0, 3); // Jan 3
+    const date = new Date(2026, 0, 3); 
     expect(toIsoDate(date)).toBe("2026-01-03");
   });
 });
@@ -36,5 +44,24 @@ describe("getWeekDates", () => {
       "2026-08-07",
       "2026-08-08",
     ]);
+  });
+});
+
+describe("calendar-date helpers", () => {
+  it("adds days across month and year ends", () => {
+    expect(addDaysToIso("2026-10-31", 1)).toBe("2026-11-01");
+    expect(addDaysToIso("2026-12-31", 1)).toBe("2027-01-01");
+    expect(addDaysToIso("2026-03-01", -1)).toBe("2026-02-28");
+    expect(addDaysToIso("2028-03-01", -1)).toBe("2028-02-29");
+  });
+
+  it("finds the weekday of a date", () => {
+    expect(weekdayOfIso("2026-10-25")).toBe(0); 
+    expect(weekdayOfIso("2026-10-26")).toBe(1);
+  });
+
+  it("formats dates without involving the time zone", () => {
+    expect(formatShortDate("2026-10-05")).toBe("Oct 5");
+    expect(formatLongDate("2026-01-31")).toBe("Jan 31, 2026");
   });
 });
