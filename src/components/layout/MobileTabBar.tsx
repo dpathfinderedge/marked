@@ -1,32 +1,48 @@
-import { NavLink } from "react-router-dom";
-import { LayoutDashboard, NotebookPen, Settings } from "lucide-react";
+import { useState } from "react";
+import { NavLink, useLocation } from "react-router-dom";
+import { Ellipsis } from "lucide-react";
+import { ACCOUNT_PATHS, PRIMARY_NAV } from "@/components/layout/navigation";
+import { MoreSheet } from "@/components/layout/MoreSheet";
 
-const TAB_ITEMS = [
-  { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { to: "/trades", label: "Trades", icon: NotebookPen },
-  { to: "/settings", label: "Settings", icon: Settings },
-];
+const TAB_CLASS =
+  "flex flex-1 flex-col items-center gap-1 py-2.5 text-[11px] font-medium transition-colors";
 
 export function MobileTabBar(): JSX.Element {
+  const [isMoreOpen, setIsMoreOpen] = useState(false);
+  const { pathname } = useLocation();
+  const isOnAccountPage = ACCOUNT_PATHS.some((path) => pathname.startsWith(path));
+
   return (
-    <nav
-      className="fixed inset-x-0 bottom-0 z-40 flex border-t border-line bg-bg-1/95 backdrop-blur-md sm:hidden"
-      style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
-    >
-      {TAB_ITEMS.map(({ to, label, icon: Icon }) => (
-        <NavLink
-          key={to}
-          to={to}
-          className={({ isActive }) =>
-            `flex flex-1 flex-col items-center gap-1 py-2.5 text-[11px] font-medium transition-colors ${
-              isActive ? "text-signal-red" : "text-text-muted"
-            }`
-          }
+    <>
+      <nav
+        className="fixed inset-x-0 bottom-0 z-40 flex border-t border-line bg-bg-1/95 backdrop-blur-md sm:hidden"
+        style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
+      >
+        {PRIMARY_NAV.map(({ to, label, icon: Icon }) => (
+          <NavLink
+            key={to}
+            to={to}
+            className={({ isActive }) =>
+              `${TAB_CLASS} ${isActive ? "text-signal-red" : "text-text-muted"}`
+            }
+          >
+            <Icon size={20} />
+            <span>{label}</span>
+          </NavLink>
+        ))}
+        <button
+          type="button"
+          onClick={() => setIsMoreOpen(true)}
+          aria-haspopup="dialog"
+          className={`${TAB_CLASS} ${
+            isOnAccountPage || isMoreOpen ? "text-signal-red" : "text-text-muted"
+          }`}
         >
-          <Icon size={20} />
-          <span>{label}</span>
-        </NavLink>
-      ))}
-    </nav>
+          <Ellipsis size={20} />
+          <span>More</span>
+        </button>
+      </nav>
+      <MoreSheet isOpen={isMoreOpen} onClose={() => setIsMoreOpen(false)} />
+    </>
   );
 }

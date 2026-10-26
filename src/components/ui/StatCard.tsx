@@ -16,11 +16,9 @@ export function StatCard({
   tone = "neutral",
 }: StatCardProps): JSX.Element {
   return (
-    <div className="rounded-xl border border-line bg-bg-1 px-4 py-3">
-      <p className="text-xs font-medium uppercase tracking-widest text-text-faint">
-        {label}
-      </p>
-      <p className={`mt-1 font-mono text-2xl font-medium ${TONE_CLASS[tone]}`}>
+    <div className="rounded-lg bg-bg-2/60 px-3.5 py-3">
+      <p className="text-xs text-text-muted">{label}</p>
+      <p className={`mt-1 font-mono text-xl font-medium ${TONE_CLASS[tone]}`}>
         {value}
       </p>
     </div>

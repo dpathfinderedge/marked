@@ -3,6 +3,7 @@ import { useSubscription } from "@/hooks/useSubscription";
 import { useCheckout } from "@/hooks/useCheckout";
 import { useToast } from "@/hooks/useToast";
 import { Button } from "@/components/ui/Button";
+import { PageHeader } from "@/components/ui/PageHeader";
 import { IntervalToggle } from "@/components/billing/IntervalToggle";
 import { ManageSubscription } from "@/components/billing/ManageSubscription";
 import { formatDate } from "@/lib/billing/manage";
@@ -97,8 +98,8 @@ export function BillingPage(): JSX.Element {
   const canCheckout = Boolean(PLAN_CODES[selectedInterval]);
 
   return (
-    <div className="mx-auto flex max-w-md flex-col gap-8">
-      <h1 className="text-2xl font-bold tracking-tight text-text">Billing</h1>
+    <div className="flex max-w-2xl flex-col gap-6 lg:gap-8">
+      <PageHeader title="Billing" description="Your plan, payments and invoices." />
 
       <div className="rounded-xl border border-line bg-bg-1 p-6">
         <p className="text-xs font-medium uppercase tracking-widest text-text-faint">
