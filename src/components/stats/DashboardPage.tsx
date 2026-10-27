@@ -149,7 +149,7 @@ export function DashboardPage(): JSX.Element {
         }
         actions={
           <Link
-            to="/trades"
+            to="/trades?new=1"
             className="flex items-center gap-1.5 rounded-lg bg-signal-red px-3.5 py-2 text-sm font-semibold text-white transition-opacity hover:opacity-90"
           >
             <Plus size={16} />
@@ -177,10 +177,10 @@ export function DashboardPage(): JSX.Element {
               </p>
             </div>
             <Link
-              to="/trades"
+              to="/trades?new=1"
               className="shrink-0 rounded-lg border border-line px-3.5 py-2 text-sm font-medium text-text transition-colors hover:bg-bg-2"
             >
-              Go to Trades
+              Add a trade
             </Link>
           </div>
         </Card>

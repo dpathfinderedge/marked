@@ -25,7 +25,7 @@ export function DayPanel({ date, trades, className = "" }: DayPanelProps): JSX.E
         <div className="mt-3 flex flex-col items-start gap-3">
           <p className="text-sm text-text-muted">No trades on this day.</p>
           <Link
-            to="/trades"
+            to={`/trades?new=1&date=${date}`}
             className="flex items-center gap-1.5 rounded-lg border border-line px-3 py-1.5 text-sm font-medium text-text transition-colors hover:bg-bg-2"
           >
             <Plus size={15} />
