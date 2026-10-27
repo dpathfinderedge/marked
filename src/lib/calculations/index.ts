@@ -7,3 +7,4 @@ export * from "./streaks";
 export * from "./subscription";
 export * from "./series";
 export * from "./calendar";
+export * from "./tradeFilters";

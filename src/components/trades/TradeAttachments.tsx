@@ -48,26 +48,26 @@ export function TradeAttachments({ tradeId }: TradeAttachmentsProps): JSX.Elemen
 
   if (isLoading) {
     return (
-      <p className="px-4 py-3 font-mono text-xs text-text-muted">
+      <p className="py-3 font-mono text-xs text-text-muted">
         Loading attachments…
       </p>
     );
   }
 
   if (error) {
-    return <p className="px-4 py-3 font-mono text-xs text-signal-red">{error}</p>;
+    return <p className="py-3 font-mono text-xs text-signal-red">{error}</p>;
   }
 
   if (attachments.length === 0) {
     return (
-      <p className="px-4 py-3 font-sans text-xs text-text-muted">
+      <p className="py-3 font-sans text-xs text-text-muted">
         No screenshots attached.
       </p>
     );
   }
 
   return (
-    <div className="flex flex-wrap gap-3 px-4 py-3">
+    <div className="flex flex-wrap gap-3 py-3">
       {attachments.map((attachment) => (
         <div key={attachment.id} className="group relative">
           <a href={attachment.signedUrl} target="_blank" rel="noreferrer">

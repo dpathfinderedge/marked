@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type ChangeEvent, type FormEvent } from "react";
+import { useEffect, useMemo, useRef, useState, type ChangeEvent, type FormEvent } from "react";
 import { useOnlineStatus } from "@/hooks/useOnlineStatus";
 import { useSubscription } from "@/hooks/useSubscription";
 import { UpgradePrompt } from "@/components/billing/UpgradePrompt";
@@ -27,6 +27,10 @@ interface TradeFormProps {
     input: NewTradeInput,
     files: File[],
   ) => Promise<{ error: string | null }>;
+  initialDate?: string;
+  variant?: "card" | "plain";
+  onSaved?: (addAnother: boolean) => void;
+  onCancel?: () => void;
 }
 
 const MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024;
@@ -55,10 +59,17 @@ const CONTRACT_SIZE_OPTIONS = [
   { value: "custom", label: "Custom" },
 ];
 
-export function TradeForm({ onSubmit }: TradeFormProps): JSX.Element {
+export function TradeForm({
+  onSubmit,
+  initialDate,
+  variant = "card",
+  onSaved,
+  onCancel,
+}: TradeFormProps): JSX.Element {
   const isOnline = useOnlineStatus();
   const { isPro } = useSubscription();
-  const [date, setDate] = useState(toIsoDate(new Date()));
+  const [date, setDate] = useState(initialDate ?? toIsoDate(new Date()));
+  const addAnotherRef = useRef(false);
   const [market, setMarket] = useState<Market>("forex");
   const [pair, setPair] = useState("");
   const [direction, setDirection] = useState<Direction>("long");
@@ -265,12 +276,17 @@ export function TradeForm({ onSubmit }: TradeFormProps): JSX.Element {
     }
 
     resetForm();
+    onSaved?.(addAnotherRef.current);
   };
 
   return (
     <form
       onSubmit={handleSubmit}
-      className="flex flex-col gap-4 rounded-xl border border-line bg-bg-1 p-6"
+      className={
+        variant === "card"
+          ? "flex flex-col gap-4 rounded-xl border border-line bg-bg-1 p-6"
+          : "flex flex-col gap-4"
+      }
     >
       <div className="grid grid-cols-2 gap-4">
         <Input
@@ -292,6 +308,7 @@ export function TradeForm({ onSubmit }: TradeFormProps): JSX.Element {
         <Input
           label="Pair"
           placeholder={market === "forex" ? "EURUSD" : "BTCUSDT"}
+          data-autofocus={variant === "plain" ? "" : undefined}
           required
           value={pair}
           onChange={(e) => setPair(e.target.value)}
@@ -396,7 +413,7 @@ export function TradeForm({ onSubmit }: TradeFormProps): JSX.Element {
                 type="button"
                 onClick={() => void handleLookupRate()}
                 disabled={isFetchingRate}
-                className="self-start font-mono text-xs uppercase tracking-wider text-ink underline underline-offset-4 disabled:opacity-50"
+                className="self-start text-xs font-medium text-signal-red underline underline-offset-4 disabled:opacity-50"
               >
                 {isFetchingRate ? "Looking up rate…" : "Look up live rate"}
               </button>
@@ -439,10 +456,10 @@ export function TradeForm({ onSubmit }: TradeFormProps): JSX.Element {
               accept="image/*"
               multiple
               onChange={handleScreenshotsChange}
-              className="font-sans text-sm text-ink file:mr-4 file:rounded-lg file:border file:border-rule file:bg-paper file:px-3 file:py-2 file:font-sans file:text-sm file:text-ink"
+              className="text-sm text-text file:mr-4 file:rounded-lg file:border file:border-line file:bg-bg-2 file:px-3 file:py-2 file:text-sm file:text-text"
             />
             {screenshots.length > 0 ? (
-              <p className="font-mono text-xs text-muted">
+              <p className="font-mono text-xs text-text-muted">
                 {screenshots.length} file{screenshots.length === 1 ? "" : "s"}{" "}
                 selected
               </p>
@@ -471,9 +488,40 @@ export function TradeForm({ onSubmit }: TradeFormProps): JSX.Element {
 
       {error ? <p className="font-mono text-xs text-signal-red">{error}</p> : null}
 
-      <Button type="submit" isLoading={isSubmitting} disabled={!isOnline}>
-        {isOnline ? "Log trade" : "Offline"}
-      </Button>
+      {onSaved ? (
+        <div className="sticky -bottom-5 -mx-5 -mb-5 mt-1 flex flex-col-reverse gap-2 border-t border-line bg-bg-1 px-5 py-3 sm:flex-row sm:justify-end">
+          {onCancel ? (
+            <Button type="button" variant="secondary" onClick={onCancel}>
+              Cancel
+            </Button>
+          ) : null}
+          <Button
+            type="submit"
+            variant="secondary"
+            isLoading={isSubmitting}
+            disabled={!isOnline}
+            onClick={() => {
+              addAnotherRef.current = true;
+            }}
+          >
+            Log &amp; add another
+          </Button>
+          <Button
+            type="submit"
+            isLoading={isSubmitting}
+            disabled={!isOnline}
+            onClick={() => {
+              addAnotherRef.current = false;
+            }}
+          >
+            {isOnline ? "Log trade" : "Offline"}
+          </Button>
+        </div>
+      ) : (
+        <Button type="submit" isLoading={isSubmitting} disabled={!isOnline}>
+          {isOnline ? "Log trade" : "Offline"}
+        </Button>
+      )}
     </form>
   );
 }

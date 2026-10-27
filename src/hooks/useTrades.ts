@@ -15,8 +15,20 @@ interface UseTradesResult {
   addTrades: (
     inputs: NewTradeInput[],
   ) => Promise<{ error: string | null; count: number }>;
+  updateTrade: (
+    id: string,
+    patch: TradePatch,
+  ) => Promise<{ error: string | null }>;
+  deleteTrade: (id: string) => Promise<{ error: string | null }>;
   refetch: () => Promise<void>;
 }
+
+export interface TradePatch {
+  notes?: string;
+  tag?: string;
+}
+
+const ATTACHMENTS_BUCKET = "trade-attachments";
 
 export function useTrades(): UseTradesResult {
   const { user } = useAuth();
@@ -90,5 +102,51 @@ export function useTrades(): UseTradesResult {
     return { error: null, count: inserted.length };
   };
 
-  return { trades, isLoading, error, addTrade, addTrades, refetch: fetchTrades };
+  const updateTrade = async (
+    id: string,
+    patch: TradePatch,
+  ): Promise<{ error: string | null }> => {
+    const { error: updateError } = await supabase
+      .from("trades")
+      .update(patch)
+      .eq("id", id);
+
+    if (updateError) return { error: friendlyTradeError(updateError.message) };
+
+    setTrades((prev) => prev.map((t) => (t.id === id ? { ...t, ...patch } : t)));
+    return { error: null };
+  };
+
+  const deleteTrade = async (id: string): Promise<{ error: string | null }> => {
+    const { data: attachments } = await supabase
+      .from("trade_attachments")
+      .select("storage_path")
+      .eq("trade_id", id);
+
+    const paths = (attachments ?? []).map((row) => row.storage_path);
+    if (paths.length > 0) {
+      await supabase.storage.from(ATTACHMENTS_BUCKET).remove(paths);
+    }
+
+    const { error: deleteError } = await supabase
+      .from("trades")
+      .delete()
+      .eq("id", id);
+
+    if (deleteError) return { error: deleteError.message };
+
+    setTrades((prev) => prev.filter((t) => t.id !== id));
+    return { error: null };
+  };
+
+  return {
+    trades,
+    isLoading,
+    error,
+    addTrade,
+    addTrades,
+    updateTrade,
+    deleteTrade,
+    refetch: fetchTrades,
+  };
 }

@@ -27,6 +27,10 @@ export default {
           to: { transform: "translateY(0)" },
         },
         "fade-in": { from: { opacity: "0" }, to: { opacity: "1" } },
+        "drawer-in": {
+          from: { transform: "translateX(100%)" },
+          to: { transform: "translateX(0)" },
+        },
         "pop-in": {
           from: { opacity: "0", transform: "translateY(4px) scale(0.98)" },
           to: { opacity: "1", transform: "translateY(0) scale(1)" },
@@ -35,6 +39,7 @@ export default {
       animation: {
         "sheet-in": "sheet-in 240ms cubic-bezier(0.32, 0.72, 0, 1)",
         "fade-in": "fade-in 180ms ease-out",
+        "drawer-in": "drawer-in 240ms cubic-bezier(0.32, 0.72, 0, 1)",
         "pop-in": "pop-in 140ms ease-out",
       },
       letterSpacing: {
