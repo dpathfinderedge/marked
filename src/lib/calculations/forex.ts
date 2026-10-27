@@ -50,9 +50,13 @@ export class ForexCrossPairError extends Error {
   }
 }
 
+export function getPipSize(pair: string): number {
+  return pair.toUpperCase().endsWith("JPY") ? 0.01 : 0.0001;
+}
+
 export function calculateForexPnl(input: ForexCalcInput): ForexCalcResult {
   const pair = input.pair.toUpperCase();
-  const pipSize = pair.endsWith("JPY") ? 0.01 : 0.0001;
+  const pipSize = getPipSize(pair);
 
   const priceDiff =
     (input.exitPrice - input.entryPrice) * (input.direction === "long" ? 1 : -1);
