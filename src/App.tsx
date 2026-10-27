@@ -26,6 +26,13 @@ const CalendarPage = lazy(() =>
     default: m.CalendarPage,
   })),
 );
+
+const CalculatorPage = lazy(() =>
+  import("@/components/calculator/CalculatorPage").then((m) => ({
+    default: m.CalculatorPage,
+  })),
+);
+
 const ImportTradesPage = lazy(() =>
   import("@/components/trades/ImportTradesPage").then((m) => ({
     default: m.ImportTradesPage,
@@ -79,6 +86,7 @@ function AppContent(): JSX.Element {
             <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/trades" element={<TradesPage />} />
             <Route path="/calendar" element={<CalendarPage />} />
+            <Route path="/calculator" element={<CalculatorPage />} />
             <Route path="/trades/import" element={<ImportTradesPage />} />
             <Route path="/settings" element={<SettingsPage />} />
             <Route path="/profile" element={<ProfilePage />} />
