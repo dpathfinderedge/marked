@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import { Ellipsis } from "lucide-react";
-import { ACCOUNT_PATHS, PRIMARY_NAV } from "@/components/layout/navigation";
+import { ACCOUNT_PATHS, PRIMARY_NAV, SECONDARY_NAV } from "@/components/layout/navigation";
 import { MoreSheet } from "@/components/layout/MoreSheet";
 
 const TAB_CLASS =
@@ -10,7 +10,10 @@ const TAB_CLASS =
 export function MobileTabBar(): JSX.Element {
   const [isMoreOpen, setIsMoreOpen] = useState(false);
   const { pathname } = useLocation();
-  const isOnAccountPage = ACCOUNT_PATHS.some((path) => pathname.startsWith(path));
+  const isOnMorePage = [
+    ...ACCOUNT_PATHS,
+    ...SECONDARY_NAV.map((item) => item.to),
+  ].some((path) => pathname.startsWith(path));
 
   return (
     <>
@@ -35,7 +38,7 @@ export function MobileTabBar(): JSX.Element {
           onClick={() => setIsMoreOpen(true)}
           aria-haspopup="dialog"
           className={`${TAB_CLASS} ${
-            isOnAccountPage || isMoreOpen ? "text-signal-red" : "text-text-muted"
+            isOnMorePage || isMoreOpen ? "text-signal-red" : "text-text-muted"
           }`}
         >
           <Ellipsis size={20} />

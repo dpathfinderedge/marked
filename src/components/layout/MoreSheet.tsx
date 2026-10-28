@@ -5,6 +5,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useDismiss } from "@/hooks/useDismiss";
 import { useTheme } from "@/hooks/useTheme";
 import { useToast } from "@/hooks/useToast";
+import { SECONDARY_NAV } from "@/components/layout/navigation";
 import { PlanBadge } from "@/components/billing/PlanBadge";
 
 interface MoreSheetProps {
@@ -53,6 +54,13 @@ export function MoreSheet({ isOpen, onClose }: MoreSheetProps): JSX.Element | nu
         style={{ paddingBottom: "calc(env(safe-area-inset-bottom) + 0.75rem)" }}
       >
         <div className="mx-auto mb-2 h-1 w-9 rounded-full bg-line-strong" aria-hidden="true" />
+        {SECONDARY_NAV.map(({ to, label, icon: Icon }) => (
+          <Link key={to} to={to} onClick={onClose} className={ITEM_CLASS}>
+            <Icon size={20} className="text-text-muted" />
+            {label}
+          </Link>
+        ))}
+        <div className="my-1 border-t border-line" />
         <Link to="/profile" onClick={onClose} className={ITEM_CLASS}>
           <User size={20} className="text-text-muted" />
           Profile
