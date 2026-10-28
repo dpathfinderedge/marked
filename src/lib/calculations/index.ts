@@ -9,3 +9,4 @@ export * from "./series";
 export * from "./calendar";
 export * from "./tradeFilters";
 export * from "./calculator";
+export * from "./insights";

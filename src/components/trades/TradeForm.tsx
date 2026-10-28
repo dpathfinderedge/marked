@@ -31,6 +31,7 @@ interface TradeFormProps {
   variant?: "card" | "plain";
   onSaved?: (addAnother: boolean) => void;
   onCancel?: () => void;
+  setupSuggestions?: string[];
 }
 
 const MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024;
@@ -65,6 +66,7 @@ export function TradeForm({
   variant = "card",
   onSaved,
   onCancel,
+  setupSuggestions = [],
 }: TradeFormProps): JSX.Element {
   const isOnline = useOnlineStatus();
   const { isPro } = useSubscription();
@@ -258,7 +260,7 @@ export function TradeForm({
         pair: market === "crypto" ? pair : pair.toUpperCase(),
         direction,
         session,
-        tag,
+        tag: tag.trim().replace(/\s+/g, " "),
         risk: riskValue,
         pnl: finalPnl,
         pips,
@@ -386,12 +388,21 @@ export function TradeForm({
           value={session}
           onChange={(e) => setSession(e.target.value as Session)}
         />
-        <Input
-          label="Tag / setup"
-          placeholder="breakout, reversal…"
-          value={tag}
-          onChange={(e) => setTag(e.target.value)}
-        />
+        <div>
+          <Input
+            label="Setup"
+            placeholder="Breakout, Pullback…"
+            list="trade-setup-suggestions"
+            autoComplete="off"
+            value={tag}
+            onChange={(e) => setTag(e.target.value)}
+          />
+          <datalist id="trade-setup-suggestions">
+            {setupSuggestions.map((suggestion) => (
+              <option key={suggestion} value={suggestion} />
+            ))}
+          </datalist>
+        </div>
       </div>
 
       <Input

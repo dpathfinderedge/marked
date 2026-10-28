@@ -20,6 +20,7 @@ interface TradeDrawerProps {
   onClose: () => void;
   onUpdate: (id: string, patch: TradePatch) => Promise<{ error: string | null }>;
   onDelete: (id: string) => Promise<{ error: string | null }>;
+  setupSuggestions?: string[];
 }
 
 const MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024;
@@ -45,6 +46,7 @@ function DrawerBody({
   onClose,
   onUpdate,
   onDelete,
+  setupSuggestions = [],
 }: Omit<TradeDrawerProps, "trade"> & { trade: Trade }): JSX.Element {
   const { isPro } = useSubscription();
   const { uploadAttachments } = useAttachments();
@@ -158,9 +160,16 @@ function DrawerBody({
             type="text"
             value={tag}
             onChange={(e) => setTag(e.target.value)}
-            placeholder="breakout, reversal…"
+            placeholder="Breakout, Pullback…"
+            list="drawer-setup-suggestions"
+            autoComplete="off"
             className="rounded-lg border border-line bg-bg-0 px-3 py-2 text-sm text-text outline-none transition-colors focus:border-line-strong"
           />
+          <datalist id="drawer-setup-suggestions">
+            {setupSuggestions.map((suggestion) => (
+              <option key={suggestion} value={suggestion} />
+            ))}
+          </datalist>
         </label>
         <label className="flex flex-col gap-1.5 text-xs text-text-muted">
           Notes
@@ -267,6 +276,7 @@ export function TradeDrawer({
   onClose,
   onUpdate,
   onDelete,
+  setupSuggestions,
 }: TradeDrawerProps): JSX.Element {
   return (
     <Dialog
@@ -286,6 +296,7 @@ export function TradeDrawer({
           onClose={onClose}
           onUpdate={onUpdate}
           onDelete={onDelete}
+          setupSuggestions={setupSuggestions}
         />
       ) : null}
     </Dialog>

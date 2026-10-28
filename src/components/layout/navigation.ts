@@ -1,6 +1,7 @@
 import {
   Calculator,
   CalendarDays,
+  ChartNoAxesCombined,
   LayoutDashboard,
   Newspaper,
   NotebookPen,
@@ -21,6 +22,7 @@ export const PRIMARY_NAV: NavItem[] = [
 ];
 
 export const SECONDARY_NAV: NavItem[] = [
+  { to: "/insights", label: "Insights", icon: ChartNoAxesCombined },
   { to: "/news", label: "News", icon: Newspaper },
 ];
 

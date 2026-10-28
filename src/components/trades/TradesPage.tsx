@@ -18,6 +18,7 @@ import {
   detectConsecutiveLossFlags,
   filterTrades,
   paginate,
+  setupSuggestions as buildSetupSuggestions,
   sortTrades,
   type SortKey,
   type SortState,
@@ -69,6 +70,7 @@ export function TradesPage(): JSX.Element {
     [trades, threshold],
   );
 
+  const setupSuggestions = useMemo(() => buildSetupSuggestions(trades), [trades]);
   const filtered = useMemo(() => filterTrades(trades, filters), [trades, filters]);
   const sorted = useMemo(() => sortTrades(filtered, sort), [filtered, sort]);
   const pageData = useMemo(() => paginate(sorted, page, pageSize), [sorted, page, pageSize]);
@@ -293,6 +295,7 @@ export function TradesPage(): JSX.Element {
               if (!addAnother) closeAdd();
             }}
             onCancel={closeAdd}
+            setupSuggestions={setupSuggestions}
           />
         )}
       </Dialog>
@@ -303,6 +306,7 @@ export function TradesPage(): JSX.Element {
         onClose={() => setSelectedId(null)}
         onUpdate={updateTrade}
         onDelete={deleteTrade}
+        setupSuggestions={setupSuggestions}
       />
     </div>
   );
