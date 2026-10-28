@@ -121,10 +121,11 @@ export function parseCalendar(raw: unknown): CalendarEvent[] {
     const row = asRecord(entry);
     if (!row) continue;
 
-    const title = asText(row.name) ?? asText(row.title);
+    const title = asText(row.title) ?? asText(row.name);
     const impact = toImpact(row.impact);
-    const when = resolveEventTime(row.date, row.time_utc ?? row.time);
-    if (title === null || impact === null || when === null) continue;
+    const resolved = resolveEventTime(row.date, row.time_utc ?? row.time);
+    if (title === null || impact === null || resolved === null) continue;
+    const when = row.all_day === true ? { date: resolved.date, time: null } : resolved;
 
     const country = (asText(row.country) ?? "").toUpperCase();
     const givenCurrency = asText(row.currency)?.toUpperCase() ?? null;

@@ -76,6 +76,39 @@ describe("parseCalendar", () => {
     });
   });
 
+    it("reads the shape the live feed returns", () => {
+    const live = {
+      id: "australia-cpi-october-2026",
+      name: "Australia CPI:",
+      title: "Australia CPI: September 2026",
+      country: "AU",
+      impact: "high",
+      date: "2026-10-28",
+      time_utc: "2026-10-28T00:30:00+00:00",
+      all_day: false,
+      consensus: null,
+      prior: null,
+      actual: null,
+      unit: "% y/y",
+    };
+    const [first] = parseCalendar({ events: [live] });
+    expect(first).toMatchObject({
+      title: "Australia CPI: September 2026",
+      currency: "AUD",
+      date: "2026-10-28",
+      time: "2026-10-28T00:30:00.000Z",
+      forecast: null,
+    });
+  });
+
+  it("shows all-day items with no time", () => {
+    const [first] = parseCalendar({
+      events: [{ ...event, all_day: true, time_utc: "2026-11-06T00:00:00+00:00" }],
+    });
+    expect(first?.time).toBeNull();
+    expect(first?.date).toBe("2026-11-06");
+  });
+
   it("also accepts a bare array and prefers a currency the source gives", () => {
     const [first] = parseCalendar([{ ...event, country: "EU", currency: "eur" }]);
     expect(first?.currency).toBe("EUR");
