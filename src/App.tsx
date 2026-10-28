@@ -33,6 +33,12 @@ const CalculatorPage = lazy(() =>
   })),
 );
 
+const InsightsPage = lazy(() =>
+  import("@/components/insights/InsightsPage").then((m) => ({
+    default: m.InsightsPage,
+  })),
+);
+
 const NewsPage = lazy(() =>
   import("@/components/news/NewsPage").then((m) => ({
     default: m.NewsPage,
@@ -93,6 +99,7 @@ function AppContent(): JSX.Element {
             <Route path="/trades" element={<TradesPage />} />
             <Route path="/calendar" element={<CalendarPage />} />
             <Route path="/calculator" element={<CalculatorPage />} />
+            <Route path="/insights" element={<InsightsPage />} />
             <Route path="/news" element={<NewsPage />} />
             <Route path="/trades/import" element={<ImportTradesPage />} />
             <Route path="/settings" element={<SettingsPage />} />
