@@ -5,7 +5,7 @@ import { Stamp } from "@/components/ui/Stamp";
 import { MobileTopBar } from "@/components/layout/MobileTopBar";
 import { MobileTabBar } from "@/components/layout/MobileTabBar";
 import { UserMenu } from "@/components/layout/UserMenu";
-import { PRIMARY_NAV } from "@/components/layout/navigation";
+import { PRIMARY_NAV, SECONDARY_NAV } from "@/components/layout/navigation";
 import { PastDueBanner } from "@/components/billing/PastDueBanner";
 
 interface AppShellProps {
@@ -61,7 +61,7 @@ export function AppShell({ children }: AppShellProps): JSX.Element {
           </div>
 
           <nav className="flex flex-col gap-1">
-            {PRIMARY_NAV.map(({ to, label, icon: Icon }) => (
+            {[...PRIMARY_NAV, ...SECONDARY_NAV].map(({ to, label, icon: Icon }) => (
               <NavLink
                 key={to}
                 to={to}
