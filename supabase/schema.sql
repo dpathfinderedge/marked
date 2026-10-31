@@ -55,10 +55,18 @@ create table if not exists public.user_settings (
   user_id uuid primary key references auth.users (id) on delete cascade,
   consecutive_loss_threshold integer not null default 2,
   checklist_items jsonb not null default '[]'::jsonb,
+  daily_loss_limit numeric,
+  max_trades_per_day smallint,
+  monthly_profit_target numeric,
   updated_at timestamptz not null default now(),
   constraint user_settings_checklist_items_valid check (
     jsonb_typeof(checklist_items) = 'array'
     and jsonb_array_length(checklist_items) <= 10
+  ),
+  constraint user_settings_risk_rules_valid check (
+    (daily_loss_limit is null or (daily_loss_limit > 0 and daily_loss_limit <= 1000000000))
+    and (max_trades_per_day is null or (max_trades_per_day between 1 and 100))
+    and (monthly_profit_target is null or (monthly_profit_target > 0 and monthly_profit_target <= 1000000000))
   )
 );
 

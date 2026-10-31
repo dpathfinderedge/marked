@@ -14,6 +14,7 @@ import {
   calculateWinRate,
   countActiveFilters,
   countTradesThisMonth,
+  dayRiskStatus,
   defaultDirectionFor,
   detectConsecutiveLossFlags,
   filterTrades,
@@ -32,9 +33,11 @@ import { Skeleton } from "@/components/ui/Skeleton";
 import { UpgradePrompt } from "@/components/billing/UpgradePrompt";
 import { TradeDrawer } from "@/components/trades/TradeDrawer";
 import { TradeForm } from "@/components/trades/TradeForm";
+import { RiskNotice } from "@/components/trades/RiskNotice";
+import { useRiskRules } from "@/hooks/useRiskRules";
 import { TradesTable } from "@/components/trades/TradesTable";
 import { TradesToolbar } from "@/components/trades/TradesToolbar";
-import { isValidIsoDate } from "@/utils/dates";
+import { isValidIsoDate, toIsoDate  } from "@/utils/dates";
 import { formatSignedDollars } from "@/utils/format";
 import type { NewTradeInput } from "@/utils/tradeMappers";
 
@@ -43,6 +46,7 @@ const DEFAULT_PAGE_SIZE = 25;
 
 export function TradesPage(): JSX.Element {
   const { trades, isLoading, error, addTrade, updateTrade, deleteTrade } = useTrades();
+  const { rules: riskRules } = useRiskRules();
   const { threshold } = useSettings();
   const { uploadAttachments } = useAttachments();
   const { showToast } = useToast();
@@ -71,6 +75,10 @@ export function TradesPage(): JSX.Element {
   );
 
   const setupSuggestions = useMemo(() => buildSetupSuggestions(trades), [trades]);
+  const todayRisk = useMemo(
+    () => dayRiskStatus(trades, riskRules, toIsoDate(new Date())),
+    [trades, riskRules],
+  );
   const filtered = useMemo(() => filterTrades(trades, filters), [trades, filters]);
   const sorted = useMemo(() => sortTrades(filtered, sort), [filtered, sort]);
   const pageData = useMemo(() => paginate(sorted, page, pageSize), [sorted, page, pageSize]);
@@ -287,16 +295,19 @@ export function TradesPage(): JSX.Element {
         {isAtFreeLimit ? (
           <UpgradePrompt feature={`Logging more than ${FREE_TRADE_LIMIT} trades/month`} />
         ) : (
-          <TradeForm
-            variant="plain"
-            initialDate={addDate}
-            onSubmit={handleAddTrade}
-            onSaved={(addAnother) => {
-              if (!addAnother) closeAdd();
-            }}
-            onCancel={closeAdd}
-            setupSuggestions={setupSuggestions}
-          />
+          <>
+            <RiskNotice status={todayRisk} />
+            <TradeForm
+              variant="plain"
+              initialDate={addDate}
+              onSubmit={handleAddTrade}
+              onSaved={(addAnother) => {
+                if (!addAnother) closeAdd();
+              }}
+              onCancel={closeAdd}
+              setupSuggestions={setupSuggestions}
+            />
+          </>
         )}
       </Dialog>
 
