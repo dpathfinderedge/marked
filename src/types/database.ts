@@ -66,18 +66,27 @@ export interface Database {
           user_id: string;
           consecutive_loss_threshold: number;
           checklist_items: string[];
+          daily_loss_limit: number | null;
+          max_trades_per_day: number | null;
+          monthly_profit_target: number | null;
           updated_at: string;
         };
         Insert: {
           user_id: string;
           consecutive_loss_threshold?: number;
           checklist_items?: string[];
+          daily_loss_limit?: number | null;
+          max_trades_per_day?: number | null;
+          monthly_profit_target?: number | null;
           updated_at?: string;
         };
         Update: {
           user_id?: string;
           consecutive_loss_threshold?: number;
           checklist_items?: string[];
+          daily_loss_limit?: number | null;
+          max_trades_per_day?: number | null;
+          monthly_profit_target?: number | null;
           updated_at?: string;
         };
         Relationships: [];

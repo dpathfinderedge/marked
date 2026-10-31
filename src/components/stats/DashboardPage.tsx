@@ -4,6 +4,7 @@ import { Plus } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useTrades } from "@/hooks/useTrades";
 import { useSettings } from "@/hooks/useSettings";
+import { useRiskRules } from "@/hooks/useRiskRules";
 import { useSubscription } from "@/hooks/useSubscription";
 import { Card } from "@/components/ui/Card";
 import { PageHeader } from "@/components/ui/PageHeader";
@@ -15,8 +16,9 @@ import { NotableTradeCard } from "@/components/stats/NotableTradeCard";
 import { WeekdayCard } from "@/components/stats/WeekdayCard";
 import { BreakdownCard } from "@/components/stats/BreakdownCard";
 import { RecentTradesCard } from "@/components/stats/RecentTradesCard";
+import { RiskStatusCard } from "@/components/stats/RiskStatusCard";
 import { getTimeOfDayGreeting, getDisplayName } from "@/utils/greeting";
-import { toIsoDate } from "@/utils/dates";
+import { monthOfIso, toIsoDate } from "@/utils/dates";
 import { formatSignedDollars } from "@/utils/format";
 import {
   calculateWinRate,
@@ -33,6 +35,8 @@ import {
   breakdownBySession,
   breakdownByTag,
   detectConsecutiveLossFlags,
+  dayRiskStatus,
+  monthlyGoalProgress,
   FREE_TRADE_LIMIT,
 } from "@/lib/calculations";
 
@@ -73,6 +77,7 @@ export function DashboardPage(): JSX.Element {
   const { trades, isLoading, error: tradesError } = useTrades();
   const { threshold } = useSettings();
   const { isPro } = useSubscription();
+  const { rules, isLoading: rulesLoading } = useRiskRules();
 
   const stats = useMemo(() => {
     const todayIso = toIsoDate(new Date());
@@ -99,6 +104,14 @@ export function DashboardPage(): JSX.Element {
       flaggedCount: detectConsecutiveLossFlags(trades, threshold).size,
     };
   }, [trades, threshold]);
+
+  const risk = useMemo(() => {
+    const todayIso = toIsoDate(new Date());
+    return {
+      status: dayRiskStatus(trades, rules, todayIso),
+      goal: monthlyGoalProgress(trades, rules, monthOfIso(todayIso)),
+    };
+  }, [trades, rules]);
 
   const greeting = useMemo(() => getTimeOfDayGreeting(), []);
   const displayName = getDisplayName(user);
@@ -227,6 +240,10 @@ export function DashboardPage(): JSX.Element {
           sub="After losing streaks"
         />
       </div>
+
+      {rulesLoading ? null : (
+        <RiskStatusCard rules={rules} status={risk.status} goal={risk.goal} />
+      )}
 
       <div className="grid gap-6 xl:grid-cols-3 xl:gap-8">
         <EquityCard trades={trades} className="xl:col-span-2" />
