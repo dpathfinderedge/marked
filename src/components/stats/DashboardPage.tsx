@@ -1,6 +1,6 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { Plus } from "lucide-react";
+import { Plus, Share2 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useTrades } from "@/hooks/useTrades";
 import { useSettings } from "@/hooks/useSettings";
@@ -17,6 +17,7 @@ import { WeekdayCard } from "@/components/stats/WeekdayCard";
 import { BreakdownCard } from "@/components/stats/BreakdownCard";
 import { RecentTradesCard } from "@/components/stats/RecentTradesCard";
 import { RiskStatusCard } from "@/components/stats/RiskStatusCard";
+import { ShareCardDialog } from "@/components/share/ShareCardDialog";
 import { getTimeOfDayGreeting, getDisplayName } from "@/utils/greeting";
 import { monthOfIso, toIsoDate } from "@/utils/dates";
 import { formatSignedDollars } from "@/utils/format";
@@ -78,6 +79,7 @@ export function DashboardPage(): JSX.Element {
   const { threshold } = useSettings();
   const { isPro } = useSubscription();
   const { rules, isLoading: rulesLoading } = useRiskRules();
+  const [isShareOpen, setIsShareOpen] = useState(false);
 
   const stats = useMemo(() => {
     const todayIso = toIsoDate(new Date());
@@ -161,13 +163,25 @@ export function DashboardPage(): JSX.Element {
           )
         }
         actions={
-          <Link
-            to="/trades?new=1"
-            className="flex items-center gap-1.5 rounded-lg bg-signal-red px-3.5 py-2 text-sm font-semibold text-white transition-opacity hover:opacity-90"
-          >
-            <Plus size={16} />
-            Log trade
-          </Link>
+          <>
+            {trades.length > 0 ? (
+              <button
+                type="button"
+                onClick={() => setIsShareOpen(true)}
+                className="flex items-center gap-1.5 rounded-lg border border-line px-3.5 py-2 text-sm font-medium text-text transition-colors hover:bg-bg-2"
+              >
+                <Share2 size={16} />
+                Share
+              </button>
+            ) : null}
+            <Link
+              to="/trades?new=1"
+              className="flex items-center gap-1.5 rounded-lg bg-signal-red px-3.5 py-2 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+            >
+              <Plus size={16} />
+              Log trade
+            </Link>
+          </>
         }
       />
 
@@ -283,6 +297,12 @@ export function DashboardPage(): JSX.Element {
           byTag={stats.byTag}
         />
       </div>
+
+      <ShareCardDialog
+        isOpen={isShareOpen}
+        onClose={() => setIsShareOpen(false)}
+        trades={trades}
+      />
     </div>
   );
 }
