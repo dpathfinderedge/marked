@@ -12,3 +12,4 @@ export * from "./calculator";
 export * from "./insights";
 export * from "./checklist";
 export * from "./riskRules";
+export * from "./shareCard";
