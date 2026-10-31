@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { ArrowDownRight, ArrowUpRight, Plus } from "lucide-react";
-import { Card } from "@/components/ui/Card";
+import { Card } from "@/components/ui/Card"
+import { DailyRecap } from "@/components/calendar/DailyRecap";;
 import type { Trade } from "@/types/trade";
 import { formatWeekdayDate } from "@/utils/dates";
 import { formatSignedDollars } from "@/utils/format";
@@ -91,6 +92,8 @@ export function DayPanel({ date, trades, className = "" }: DayPanelProps): JSX.E
           </ul>
         </>
       )}
+
+      <DailyRecap key={date} date={date} />
     </Card>
   );
 }

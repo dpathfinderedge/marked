@@ -151,6 +151,13 @@ function DrawerBody({
         <div className="col-span-2">
           <Field label="P&L">{CALC_MODE_LABEL[trade.calcMode]}</Field>
         </div>
+        <div className="col-span-2">
+          <Field label="Checklist">
+            {trade.checklistPassed !== null && trade.checklistTotal !== null
+              ? `${trade.checklistPassed} of ${trade.checklistTotal} rules followed`
+              : "Not used"}
+          </Field>
+        </div>
       </dl>
 
       <div className="flex flex-col gap-4">

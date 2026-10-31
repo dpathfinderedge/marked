@@ -4,6 +4,7 @@ import { useToast } from "@/hooks/useToast";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 import { PageHeader } from "@/components/ui/PageHeader";
+import { ChecklistEditor } from "@/components/settings/ChecklistEditor";
 
 export function SettingsPage(): JSX.Element {
   const { threshold, isLoading, error: fetchError, updateThreshold } = useSettings();
@@ -83,6 +84,8 @@ export function SettingsPage(): JSX.Element {
           Save
         </Button>
       </form>
+
+      <ChecklistEditor />
     </div>
   );
 }

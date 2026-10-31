@@ -227,6 +227,8 @@ function validateRow(
       rMultiple: calculateRMultiple(pnl, risk),
       notes,
       calcMode,
+      checklistPassed: null, 
+      checklistTotal: null
     },
     error: null,
   };
@@ -323,6 +325,8 @@ export async function resolveCrossPairRates(
         rMultiple: calculateRMultiple(pnl, input.risk),
         notes: input.notes,
         calcMode: "manual",
+        checklistPassed: null, 
+        checklistTotal: null
       },
       error: null,
     };
