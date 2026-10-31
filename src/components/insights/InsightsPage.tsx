@@ -6,6 +6,7 @@ import { SegmentedControl } from "@/components/ui/SegmentedControl";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { UpgradePrompt } from "@/components/billing/UpgradePrompt";
 import { InsightsTable } from "@/components/insights/InsightsTable";
+import { AdherenceCard } from "@/components/insights/AdherenceCard";
 import { useStoredState } from "@/hooks/useStoredState";
 import { useSubscription } from "@/hooks/useSubscription";
 import { useTrades } from "@/hooks/useTrades";
@@ -19,6 +20,7 @@ import {
   type InsightDimension,
   type InsightRow,
   type InsightSortKey,
+  adherenceStats,
 } from "@/lib/calculations";
 import { toIsoDate } from "@/utils/dates";
 import { formatSignedDollars } from "@/utils/format";
@@ -108,6 +110,7 @@ export function InsightsPage(): JSX.Element {
     [inRange],
   );
   const untagged = useMemo(() => untaggedShare(inRange), [inRange]);
+  const adherence = useMemo(() => adherenceStats(inRange), [inRange]);
 
   if (isLoading || isPlanLoading) return <InsightsSkeleton />;
 
@@ -208,6 +211,8 @@ export function InsightsPage(): JSX.Element {
               </p>
             </Card>
           </div>
+
+          <AdherenceCard adherence={adherence} />
 
           <Card className="!p-0">
             <div className="flex flex-wrap items-start justify-between gap-x-4 gap-y-3 px-5 pb-4 pt-5">

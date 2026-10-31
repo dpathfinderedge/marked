@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useRef, useState, type ChangeEvent, type FormEvent } from "react";
 import { useOnlineStatus } from "@/hooks/useOnlineStatus";
 import { useSubscription } from "@/hooks/useSubscription";
+import { useChecklist } from "@/hooks/useChecklist";
+import { ChecklistSection } from "@/components/trades/ChecklistSection";
 import { UpgradePrompt } from "@/components/billing/UpgradePrompt";
 import { toIsoDate } from "@/utils/dates";
 import { Input } from "@/components/ui/Input";
@@ -70,6 +72,8 @@ export function TradeForm({
 }: TradeFormProps): JSX.Element {
   const isOnline = useOnlineStatus();
   const { isPro } = useSubscription();
+  const { items: checklistItems } = useChecklist();
+  const [checkedRules, setCheckedRules] = useState<Set<string>>(() => new Set());
   const [date, setDate] = useState(initialDate ?? toIsoDate(new Date()));
   const addAnotherRef = useRef(false);
   const [market, setMarket] = useState<Market>("forex");
@@ -196,7 +200,17 @@ export function TradeForm({
     }
   };
 
+  const toggleRule = (rule: string): void => {
+    setCheckedRules((current) => {
+      const next = new Set(current);
+      if (next.has(rule)) next.delete(rule);
+      else next.add(rule);
+      return next;
+    });
+  };
+
   const resetForm = (): void => {
+    setCheckedRules(new Set());
     setPair("");
     setEntryPrice("");
     setExitPrice("");
@@ -267,6 +281,11 @@ export function TradeForm({
         rMultiple: calculateRMultiple(finalPnl, riskValue),
         notes,
         calcMode,
+        checklistPassed:
+          checklistItems.length > 0
+            ? checklistItems.filter((rule) => checkedRules.has(rule)).length
+            : null,
+        checklistTotal: checklistItems.length > 0 ? checklistItems.length : null,
       },
       screenshots,
     );
@@ -405,6 +424,8 @@ export function TradeForm({
         </div>
       </div>
 
+      <ChecklistSection items={checklistItems} checked={checkedRules} onToggle={toggleRule} />
+      
       <Input
         label="Risk ($, optional)"
         type="number"

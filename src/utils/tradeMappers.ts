@@ -21,6 +21,8 @@ export function rowToTrade(row: TradeRow): Trade {
     rMultiple: row.r_multiple,
     notes: row.notes,
     calcMode: row.calc_mode,
+    checklistPassed: row.checklist_passed,
+    checklistTotal: row.checklist_total,
   };
 }
 
@@ -41,5 +43,7 @@ export function newTradeToRow(input: NewTradeInput, userId: string): TradeInsert
     r_multiple: input.rMultiple,
     notes: input.notes,
     calc_mode: input.calcMode,
+    checklist_passed: input.checklistPassed,
+    checklist_total: input.checklistTotal,
   };
 }

@@ -20,6 +20,8 @@ export function makeTrade(overrides: Partial<Trade> = {}): Trade {
     rMultiple: null,
     notes: "",
     calcMode: "direct",
+    checklistPassed: null,
+    checklistTotal: null,
     ...overrides,
   };
 }

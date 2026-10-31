@@ -24,6 +24,8 @@ export interface Trade {
   rMultiple: number | null; 
   notes: string;
   calcMode: CalcMode;
+  checklistPassed: number | null;
+  checklistTotal: number | null;
 }
 
 export interface ForexCalcInput {

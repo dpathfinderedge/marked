@@ -17,6 +17,8 @@ export interface Database {
           r_multiple: number | null;
           notes: string;
           calc_mode: "direct" | "converted" | "manual";
+          checklist_passed: number | null;
+          checklist_total: number | null;
           created_at: string;
         };
         Insert: {
@@ -34,6 +36,8 @@ export interface Database {
           r_multiple?: number | null;
           notes?: string;
           calc_mode: "direct" | "converted" | "manual";
+          checklist_passed?: number | null;
+          checklist_total?: number | null;
           created_at?: string;
         };
         Update: {
@@ -51,6 +55,8 @@ export interface Database {
           r_multiple?: number | null;
           notes?: string;
           calc_mode?: "direct" | "converted" | "manual";
+          checklist_passed?: number | null;
+          checklist_total?: number | null;
           created_at?: string;
         };
         Relationships: [];
@@ -59,16 +65,19 @@ export interface Database {
         Row: {
           user_id: string;
           consecutive_loss_threshold: number;
+          checklist_items: string[];
           updated_at: string;
         };
         Insert: {
           user_id: string;
           consecutive_loss_threshold?: number;
+          checklist_items?: string[];
           updated_at?: string;
         };
         Update: {
           user_id?: string;
           consecutive_loss_threshold?: number;
+          checklist_items?: string[];
           updated_at?: string;
         };
         Relationships: [];
@@ -110,6 +119,12 @@ export interface Database {
         };
         Insert: never;
         Update: never;
+        Relationships: [];
+      };
+      daily_recaps: {
+        Row: { user_id: string; date: string; note: string; updated_at: string };
+        Insert: { user_id: string; date: string; note: string; updated_at?: string };
+        Update: { user_id?: string; date?: string; note?: string; updated_at?: string };
         Relationships: [];
       };
     };
