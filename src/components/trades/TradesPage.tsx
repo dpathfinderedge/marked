@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { NotebookPen, Plus, Upload } from "lucide-react";
+import { Download, NotebookPen, Plus, Upload } from "lucide-react";
 import { useTrades } from "@/hooks/useTrades";
 import { useSettings } from "@/hooks/useSettings";
 import { useAttachments } from "@/hooks/useAttachments";
@@ -33,6 +33,7 @@ import { Skeleton } from "@/components/ui/Skeleton";
 import { UpgradePrompt } from "@/components/billing/UpgradePrompt";
 import { TradeDrawer } from "@/components/trades/TradeDrawer";
 import { TradeForm } from "@/components/trades/TradeForm";
+import { downloadTradesCsv } from "@/lib/csv/exportTradesCsv";
 import { RiskNotice } from "@/components/trades/RiskNotice";
 import { useRiskRules } from "@/hooks/useRiskRules";
 import { TradesTable } from "@/components/trades/TradesTable";
@@ -92,6 +93,11 @@ export function TradesPage(): JSX.Element {
   );
 
   const hasFilters = countActiveFilters(filters) > 0;
+
+  const handleExport = (): void => {
+    downloadTradesCsv(sorted, toIsoDate(new Date()));
+    showToast(`Exported ${sorted.length} trade${sorted.length === 1 ? "" : "s"}.`);
+  };
 
   const changeFilters = (patch: Partial<TradeFilters>): void => {
     setFilters((current) => ({ ...current, ...patch }));
@@ -163,6 +169,31 @@ export function TradesPage(): JSX.Element {
               <Upload size={14} />
               Import CSV
             </Link>
+            {trades.length > 0 ? (
+              isPro ? (
+                <button
+                  type="button"
+                  onClick={handleExport}
+                  disabled={sorted.length === 0}
+                  className="flex items-center gap-1.5 rounded-lg border border-line px-3 py-2 text-sm font-medium text-text-muted transition-colors hover:bg-bg-2 hover:text-text disabled:pointer-events-none disabled:opacity-50"
+                >
+                  <Download size={14} />
+                  {hasFilters ? `Export ${sorted.length} filtered` : "Export CSV"}
+                </button>
+              ) : (
+                <Link
+                  to="/billing"
+                  title="Exporting is a Pro feature. Upgrade to unlock it."
+                  className="flex items-center gap-1.5 rounded-lg border border-line px-3 py-2 text-sm font-medium text-text-muted transition-colors hover:bg-bg-2 hover:text-text"
+                >
+                  <Download size={14} />
+                  Export CSV
+                  <span className="rounded bg-bg-2 px-1.5 text-[10px] font-semibold leading-4 tracking-wide text-text-muted">
+                    PRO
+                  </span>
+                </Link>
+              )
+            ) : null}
             <button
               type="button"
               onClick={openAdd}
