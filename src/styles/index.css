@@ -9,10 +9,11 @@
   --line: 228 228 231;    
   --line-strong: 209 209 214; 
   --text: 19 19 22;
-  --text-muted: 110 110 118;
-  --text-faint: 161 161 170;
+  --text-muted: 90 90 98;
+  --text-faint: 110 110 118;
   --signal-red: 193 55 42;
   --signal-green: 31 122 77;
+  color-scheme: light;
 }
 
 .dark {
@@ -22,10 +23,15 @@
   --line: 39 39 44;
   --line-strong: 52 52 59;
   --text: 242 242 240;
-  --text-muted: 140 140 147;
-  --text-faint: 92 92 100;
+  --text-muted: 168 168 175;
+  --text-faint: 132 132 140;
   --signal-red: 226 88 75;
   --signal-green: 63 174 114;
+  color-scheme: dark;
+}
+
+.dark .bg-signal-red {
+  background-color: rgb(200 60 48);
 }
 
 body {
