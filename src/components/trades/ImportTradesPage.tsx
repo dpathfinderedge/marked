@@ -48,7 +48,7 @@ function plural(count: number, word: string): string {
 export function ImportTradesPage(): JSX.Element {
   const { addTrades, trades: existingTrades } = useTrades();
   const { showToast } = useToast();
-  const { isPro } = useSubscription();
+  const { isPro, isLoading: isPlanLoading } = useSubscription();
   const [source, setSource] = useState<Source>("marked");
   const [rows, setRows] = useState<CsvImportRow[]>([]);
   const [fileText, setFileText] = useState<string | null>(null);
@@ -140,6 +140,7 @@ export function ImportTradesPage(): JSX.Element {
   };
 
   const handleImport = async (): Promise<void> => {
+    if (!isPro) return;
     setIsImporting(true);
     setImportError(null);
 
@@ -192,8 +193,8 @@ export function ImportTradesPage(): JSX.Element {
         }
       />
 
-      {!isPro ? (
-        <UpgradePrompt feature="CSV import" />
+      {isPlanLoading ? null : !isPro ? (
+        <UpgradePrompt feature="Importing trades" />
       ) : (
         <>
           <div className="inline-flex self-start rounded-lg bg-bg-2 p-1">
