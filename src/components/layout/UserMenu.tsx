@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import {
   ChevronsUpDown,
   CreditCard,
+  Keyboard,
   LogOut,
   Moon,
   Settings,
@@ -18,6 +19,7 @@ import { getAvatarUrl, getDisplayName } from "@/utils/greeting";
 
 interface UserMenuProps {
   isCollapsed: boolean;
+  onShowShortcuts: () => void;
 }
 
 function getInitial(name: string): string {
@@ -27,7 +29,7 @@ function getInitial(name: string): string {
 const ITEM_CLASS =
   "flex w-full items-center gap-2.5 rounded-md px-2.5 py-2 text-left text-sm text-text-muted transition-colors hover:bg-bg-2 hover:text-text";
 
-export function UserMenu({ isCollapsed }: UserMenuProps): JSX.Element {
+export function UserMenu({ isCollapsed, onShowShortcuts }: UserMenuProps): JSX.Element {
   const { user, signOut } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const { showToast } = useToast();
@@ -103,6 +105,21 @@ export function UserMenu({ isCollapsed }: UserMenuProps): JSX.Element {
             <PlanBadge className="ml-auto" />
           </Link>
           <div className="my-1.5 border-t border-line" />
+          <button
+            type="button"
+            role="menuitem"
+            onClick={() => {
+              close();
+              onShowShortcuts();
+            }}
+            className={ITEM_CLASS}
+          >
+            <Keyboard size={16} />
+            Keyboard shortcuts
+            <kbd className="ml-auto rounded border border-line bg-bg-2 px-1.5 font-mono text-[11px] leading-4 text-text-faint">
+              ?
+            </kbd>
+          </button>
           <button
             type="button"
             role="menuitem"

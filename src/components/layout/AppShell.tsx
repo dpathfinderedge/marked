@@ -1,4 +1,4 @@
-import { useEffect, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useState, type ReactNode } from "react";
 import { NavLink } from "react-router-dom";
 import { PanelLeftClose, PanelLeftOpen } from "lucide-react";
 import { Stamp } from "@/components/ui/Stamp";
@@ -7,6 +7,8 @@ import { MobileTabBar } from "@/components/layout/MobileTabBar";
 import { UserMenu } from "@/components/layout/UserMenu";
 import { PRIMARY_NAV, SECONDARY_NAV } from "@/components/layout/navigation";
 import { PastDueBanner } from "@/components/billing/PastDueBanner";
+import { ShortcutsDialog } from "@/components/layout/ShortcutsDialog";
+import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 
 interface AppShellProps {
   children: ReactNode;
@@ -21,6 +23,9 @@ function getInitialCollapsed(): boolean {
 
 export function AppShell({ children }: AppShellProps): JSX.Element {
   const [isCollapsed, setIsCollapsed] = useState(getInitialCollapsed);
+  const [isHelpOpen, setIsHelpOpen] = useState(false);
+  const openHelp = useCallback(() => setIsHelpOpen(true), []);
+  useKeyboardShortcuts(openHelp);
 
   useEffect(() => {
     window.localStorage.setItem(SIDEBAR_STORAGE_KEY, String(isCollapsed));
@@ -75,7 +80,7 @@ export function AppShell({ children }: AppShellProps): JSX.Element {
           </nav>
         </div>
 
-        <UserMenu isCollapsed={isCollapsed} />
+        <UserMenu isCollapsed={isCollapsed} onShowShortcuts={openHelp} />
       </aside>
 
       <MobileTopBar />
@@ -88,6 +93,8 @@ export function AppShell({ children }: AppShellProps): JSX.Element {
       </main>
 
       <MobileTabBar />
+
+      <ShortcutsDialog isOpen={isHelpOpen} onClose={() => setIsHelpOpen(false)} />
     </div>
   );
 }
