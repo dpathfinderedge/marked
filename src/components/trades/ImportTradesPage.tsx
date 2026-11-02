@@ -12,7 +12,8 @@ import {
   resolveCrossPairRates,
   type CsvImportRow,
 } from "@/lib/csv/parseTradesCsv";
-import { findDuplicateRows, parseBrokerCsv } from "@/lib/csv/parseBrokerCsv";
+import { findDuplicateRows } from "@/lib/csv/parseBrokerCsv";
+import { decodeStatementFile, parseBrokerStatement } from "@/lib/csv/parseBrokerHtml";
 import { downloadCsvTemplate } from "@/lib/csv/csvTemplate";
 import type { NewTradeInput } from "@/utils/tradeMappers";
 
@@ -63,7 +64,7 @@ export function ImportTradesPage(): JSX.Element {
   const brokerResult = useMemo(
     () =>
       source === "broker" && fileText !== null
-        ? parseBrokerCsv(fileText, { utcOffsetHours: Number(utcOffset) })
+        ? parseBrokerStatement(fileText, { utcOffsetHours: Number(utcOffset) })
         : null,
     [source, fileText, utcOffset],
   );
@@ -107,11 +108,10 @@ export function ImportTradesPage(): JSX.Element {
     setImportedCount(null);
     setImportError(null);
 
-    const text = await file.text();
     if (source === "broker") {
-      setFileText(text);
+      setFileText(decodeStatementFile(await file.arrayBuffer()));
     } else {
-      setRows(parseTradesCsv(text).rows);
+      setRows(parseTradesCsv(await file.text()).rows);
     }
   };
 
@@ -220,12 +220,13 @@ export function ImportTradesPage(): JSX.Element {
             ) : (
               <div className="flex flex-col gap-4">
                 <p className="font-sans text-sm text-text-muted">
-                  Import closed trades from a MetaTrader history saved as CSV. In MT5,
-                  open the History tab, right-click and choose Report, then save it as
-                  CSV (Positions or Deals both work). In MT4, use the same menu on the
-                  Account History tab. P&L is the broker&apos;s own profit plus
-                  commission, fees and swap. Setups and risk aren&apos;t in the file, so
-                  you can add them to each trade afterwards.
+                  Import closed trades from a MetaTrader history. In MT5, open the
+                  History tab, right-click and choose Report, then save it as HTML or
+                  CSV (the Positions report is the most exact). In MT4, right-click the
+                  Account History tab and choose Save as Detailed Report (HTML). P&L is
+                  the broker&apos;s own profit plus commission, fees and swap. Setups and
+                  risk aren&apos;t in the file, so you can add them to each trade
+                  afterwards.
                 </p>
                 <div className="max-w-xs">
                   <Select
@@ -246,7 +247,7 @@ export function ImportTradesPage(): JSX.Element {
               <input
                 key={source}
                 type="file"
-                accept={source === "broker" ? ".csv,.tsv,.txt" : ".csv"}
+                accept={source === "broker" ? ".csv,.tsv,.txt,.htm,.html" : ".csv"}
                 onChange={(e) => void handleFileChange(e)}
                 className="font-sans text-sm text-text file:mr-4 file:rounded-lg file:border file:border-line file:bg-bg-0 file:px-3 file:py-2 file:font-sans file:text-sm file:text-text"
               />

@@ -121,9 +121,11 @@ function fail(rowNumber: number, error: string): CsvImportRow {
 export function parseBrokerCsv(csvText: string, options: BrokerParseOptions): BrokerParseResult {
   const text = csvText.charCodeAt(0) === 0xfeff ? csvText.slice(1) : csvText;
   const parsed = Papa.parse<string[]>(text, { header: false, skipEmptyLines: true });
-  const data = parsed.data;
+  return parseBrokerRows(parsed.data, options);
+}
 
-  const headerIndex = data.findIndex((row, i) => i < 40 && isHeaderRow(row.map(clean)));
+export function parseBrokerRows(data: string[][], options: BrokerParseOptions): BrokerParseResult {
+  const headerIndex = data.findIndex((row, i) => i < 80 && isHeaderRow(row.map(clean)));
   if (headerIndex < 0) {
     return {
       layout: null,
@@ -159,6 +161,7 @@ export function parseBrokerCsv(csvText: string, options: BrokerParseOptions): Br
     if (!row) continue;
     const rowNumber = i + 1;
     if (isHeaderRow(row.map(clean))) break;
+    if (row.filter((cell) => cell.trim() !== "").length === 1) break;
 
     const type = clean(row[cols.type]);
     const symbolRaw = (row[cols.symbol] ?? "").trim();
