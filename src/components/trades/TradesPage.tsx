@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { Download, NotebookPen, Plus, Upload } from "lucide-react";
+import { Download, FileText, NotebookPen, Plus, Upload } from "lucide-react";
 import { useTrades } from "@/hooks/useTrades";
 import { useSettings } from "@/hooks/useSettings";
 import { useAttachments } from "@/hooks/useAttachments";
@@ -34,6 +34,8 @@ import { UpgradePrompt } from "@/components/billing/UpgradePrompt";
 import { TradeDrawer } from "@/components/trades/TradeDrawer";
 import { TradeForm } from "@/components/trades/TradeForm";
 import { downloadTradesCsv } from "@/lib/csv/exportTradesCsv";
+import { downloadTradesPdf } from "@/lib/pdf/downloadTradesPdf";
+import { describeFilters } from "@/lib/pdf/tradeReport";
 import { RiskNotice } from "@/components/trades/RiskNotice";
 import { useRiskRules } from "@/hooks/useRiskRules";
 import { TradesTable } from "@/components/trades/TradesTable";
@@ -59,6 +61,7 @@ export function TradesPage(): JSX.Element {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [isPdfLoading, setIsPdfLoading] = useState(false);
 
   const isAddOpen = searchParams.has("new");
   const dateParam = searchParams.get("date");
@@ -97,6 +100,21 @@ export function TradesPage(): JSX.Element {
   const handleExport = (): void => {
     downloadTradesCsv(sorted, toIsoDate(new Date()));
     showToast(`Exported ${sorted.length} trade${sorted.length === 1 ? "" : "s"}.`);
+  };
+
+  const handleExportPdf = async (): Promise<void> => {
+    setIsPdfLoading(true);
+    try {
+      await downloadTradesPdf(sorted, {
+        filters: describeFilters(filters),
+        today: toIsoDate(new Date()),
+      });
+      showToast(`Exported ${sorted.length} trade${sorted.length === 1 ? "" : "s"} to PDF.`);
+    } catch {
+      showToast("Couldn't make the PDF. Try again.", "error");
+    } finally {
+      setIsPdfLoading(false);
+    }
   };
 
   const changeFilters = (patch: Partial<TradeFilters>): void => {
@@ -177,23 +195,34 @@ export function TradesPage(): JSX.Element {
             </Link>
             {trades.length > 0 ? (
               isPro ? (
-                <button
-                  type="button"
-                  onClick={handleExport}
-                  disabled={sorted.length === 0}
-                  className="flex items-center gap-1.5 rounded-lg border border-line px-3 py-2 text-sm font-medium text-text-muted transition-colors hover:bg-bg-2 hover:text-text disabled:pointer-events-none disabled:opacity-50"
-                >
-                  <Download size={14} />
-                  {hasFilters ? `Export ${sorted.length} filtered` : "Export CSV"}
-                </button>
+                <>
+                  <button
+                    type="button"
+                    onClick={handleExport}
+                    disabled={sorted.length === 0}
+                    className="flex items-center gap-1.5 rounded-lg border border-line px-3 py-2 text-sm font-medium text-text-muted transition-colors hover:bg-bg-2 hover:text-text disabled:pointer-events-none disabled:opacity-50"
+                  >
+                    <Download size={14} />
+                    {hasFilters ? `Export ${sorted.length} filtered` : "Export CSV"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => void handleExportPdf()}
+                    disabled={sorted.length === 0 || isPdfLoading}
+                    className="flex items-center gap-1.5 rounded-lg border border-line px-3 py-2 text-sm font-medium text-text-muted transition-colors hover:bg-bg-2 hover:text-text disabled:pointer-events-none disabled:opacity-50"
+                  >
+                    <FileText size={14} />
+                    {isPdfLoading ? "Preparing…" : "Export PDF"}
+                  </button>
+                </>
               ) : (
                 <Link
                   to="/billing"
-                  title="Exporting is a Pro feature. Upgrade to unlock it."
+                  title="Exporting (CSV and PDF) is a Pro feature. Upgrade to unlock it."
                   className="flex items-center gap-1.5 rounded-lg border border-line px-3 py-2 text-sm font-medium text-text-muted transition-colors hover:bg-bg-2 hover:text-text"
                 >
                   <Download size={14} />
-                  Export CSV
+                  Export
                   <span className="rounded bg-bg-2 px-1.5 text-[10px] font-semibold leading-4 tracking-wide text-text-muted">
                     PRO
                   </span>
