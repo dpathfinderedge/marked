@@ -163,11 +163,17 @@ export function TradesPage(): JSX.Element {
         actions={
           <>
             <Link
-              to="/trades/import"
+              to={isPro ? "/trades/import" : "/billing"}
+              title={isPro ? undefined : "Importing is a Pro feature. Upgrade to unlock it."}
               className="flex items-center gap-1.5 rounded-lg border border-line px-3 py-2 text-sm font-medium text-text-muted transition-colors hover:bg-bg-2 hover:text-text"
             >
               <Upload size={14} />
               Import CSV
+              {isPro ? null : (
+                <span className="rounded bg-bg-2 px-1.5 text-[10px] font-semibold leading-4 tracking-wide text-text-muted">
+                  PRO
+                </span>
+              )}
             </Link>
             {trades.length > 0 ? (
               isPro ? (
@@ -241,11 +247,17 @@ export function TradesPage(): JSX.Element {
                 Add trade
               </button>
               <Link
-                to="/trades/import"
+                to={isPro ? "/trades/import" : "/billing"}
+                title={isPro ? undefined : "Importing is a Pro feature. Upgrade to unlock it."}
                 className="flex items-center gap-1.5 rounded-lg border border-line px-3.5 py-2 text-sm font-medium text-text transition-colors hover:bg-bg-2"
               >
                 <Upload size={14} />
                 Import CSV
+                {isPro ? null : (
+                  <span className="rounded bg-bg-2 px-1.5 text-[10px] font-semibold leading-4 tracking-wide text-text-muted">
+                    PRO
+                  </span>
+                )}
               </Link>
             </div>
           </div>
