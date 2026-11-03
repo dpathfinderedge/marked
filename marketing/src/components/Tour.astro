@@ -1,0 +1,137 @@
+---
+import { Image } from "astro:assets";
+import insights from "../assets/tour-insights.webp";
+import rules from "../assets/tour-rules.webp";
+import calendar from "../assets/tour-calendar.webp";
+
+const rows = [
+  {
+    id: "insights",
+    plan: "Pro",
+    title: "Find out what actually pays.",
+    intro:
+      "Insights compares your setups, sessions and rules, so you can see where the money comes from and where it leaks.",
+    points: [
+      "Your best and weakest setup, ranked by P&L",
+      "“Do your rules pay?” compares trades where you followed your checklist with trades where you skipped it",
+      "Look back over 30 days, 90 days or all time",
+    ],
+    image: insights,
+    alt: "Marked Insights page with a best and worst setup summary and a card comparing trades that followed the checklist with trades that skipped it",
+    width: 1100,
+    height: 760,
+  },
+  {
+    id: "rules",
+    plan: "Free",
+    title: "Check your rules before you click Log.",
+    intro:
+      "Write your own pre-trade checklist and set limits for the day and month. Marked reminds you while you're still in the form.",
+    points: [
+      "Your checklist, ticked off on every trade",
+      "A daily loss limit and a trades-per-day cap",
+      "A monthly profit goal with a progress bar",
+      "A warning in the form when you're near or past a limit",
+    ],
+    image: rules,
+    alt: "Marked add-trade dialog with a pre-trade checklist",
+    width: 1100,
+    height: 900,
+  },
+  {
+    id: "calendar",
+    plan: "Free",
+    title: "Every day at a glance.",
+    intro:
+      "The calendar turns a month of trading into green and red days, so a bad week is easy to spot.",
+    points: [
+      "Daily results with weekly totals",
+      "Click a day to open its trades",
+      "Write a short recap for the day while it's fresh",
+    ],
+    image: calendar,
+    alt: "Marked calendar showing daily results and weekly totals for a month",
+    width: 1100,
+    height: 760,
+  },
+];
+---
+
+<section id="tour" class="border-t border-line py-24 sm:py-32">
+  <div class="mx-auto max-w-6xl px-6">
+    <div class="reveal">
+      <p class="text-[11px] font-semibold uppercase tracking-widest text-signal-red">
+        Inside the app
+      </p>
+      <h2 class="mt-3 max-w-lg text-[28px] font-bold leading-tight tracking-tight text-text sm:text-[34px]">
+        Built to change how you trade, not just record it.
+      </h2>
+    </div>
+
+    <div class="mt-16 flex flex-col gap-20 sm:gap-28">
+      {
+        rows.map((row, i) => (
+          <div
+            id={row.id}
+            class="reveal grid items-center gap-8 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-14"
+          >
+            <div class={i % 2 === 1 ? "lg:order-2" : ""}>
+              <span
+                class={
+                  row.plan === "Pro"
+                    ? "inline-block rounded-full bg-signal-red/15 px-2 py-0.5 text-[11px] font-semibold text-signal-red"
+                    : "inline-block rounded-full bg-signal-green/15 px-2 py-0.5 text-[11px] font-semibold text-signal-green"
+                }
+              >
+                {row.plan === "Pro" ? "Pro" : "Free"}
+              </span>
+              <h3 class="mt-4 text-[22px] font-bold leading-snug tracking-tight text-text sm:text-[26px]">
+                {row.title}
+              </h3>
+              <p class="mt-3 max-w-md text-[15px] leading-relaxed text-text-muted">
+                {row.intro}
+              </p>
+              <ul class="mt-6 flex max-w-md flex-col gap-2.5 text-[14px] leading-relaxed text-text-muted">
+                {row.points.map((point) => (
+                  <li class="flex gap-2.5">
+                    <svg
+                      class="mt-1 h-4 w-4 shrink-0 text-text-faint"
+                      viewBox="0 0 16 16"
+                      fill="none"
+                      aria-hidden="true"
+                    >
+                      <path
+                        d="M3.5 8.5L6.5 11.5L12.5 4.5"
+                        stroke="currentColor"
+                        stroke-width="1.8"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                    </svg>
+                    <span>{point}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div
+              class={`overflow-hidden rounded-xl border border-line bg-bg-1 shadow-[0_30px_60px_-30px_rgba(0,0,0,0.8)] ${
+                i % 2 === 1 ? "lg:order-1" : ""
+              }`}
+            >
+              <Image
+                src={row.image}
+                alt={row.alt}
+                width={row.width}
+                height={row.height}
+                widths={[600, 900, 1100]}
+                sizes="(min-width: 1024px) 640px, 100vw"
+                loading="lazy"
+                class="block h-auto w-full"
+              />
+            </div>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</section>

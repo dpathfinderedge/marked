@@ -4,11 +4,27 @@ import { FREE_TRADE_LIMIT } from "../lib/pricing";
 const items = [
   {
     q: "Can I try Marked before paying?",
-    a: `Yes. The Free plan has no time limit and doesn't ask for a card. You can log up to ${FREE_TRADE_LIMIT} trades a month and use the analytics, equity curve and consecutive-loss flag.`,
+    a: `Yes. The Free plan has no time limit and doesn't ask for a card. You can log up to ${FREE_TRADE_LIMIT} trades a month and use the dashboard, equity curve, calendar, calculator, news, pre-trade checklist, risk limits and consecutive-loss flag. Insights, import, export, screenshots and live FX rates are Pro.`,
   },
   {
     q: `What happens when I reach ${FREE_TRADE_LIMIT} trades in a month?`,
     a: "You can still open, review and analyse everything you've logged. Adding more trades waits until the next month, or you can upgrade to Pro to log without a limit.",
+  },
+  {
+    q: "Can I import my MetaTrader history?",
+    a: "Yes, on Pro. Upload an MT4 or MT5 account history as a CSV export or an HTML statement. Marked uses your broker's profit figures, skips trades you've already imported, and shows a preview before anything is saved. You don't enter any broker login.",
+  },
+  {
+    q: "Does Marked place trades or connect to my broker?",
+    a: "No. Marked is a journal. It never places trades and never asks for your broker login. You add trades by hand or import a history file.",
+  },
+  {
+    q: "Can I export my trades?",
+    a: "Yes, on Pro. Download a CSV, or a PDF report with your stats and equity curve. Any filters you've applied on the trades page carry over to the export.",
+  },
+  {
+    q: "Does it work on my phone?",
+    a: "Yes. Marked installs as an app on desktop and mobile, in dark or light. When you're offline it tells you plainly instead of silently losing a trade.",
   },
   {
     q: "How do I pay?",
