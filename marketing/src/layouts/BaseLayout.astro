@@ -90,6 +90,15 @@ const structuredData = {
         "(prefers-reduced-motion: reduce)",
       ).matches;
 
+      document.querySelectorAll<HTMLElement>("[data-stagger]").forEach((group) => {
+        const columns = window.innerWidth >= 1024 ? 3 : window.innerWidth >= 640 ? 2 : 1;
+        group.querySelectorAll<HTMLElement>(":scope > .reveal, :scope > ol > .reveal").forEach((el, i) => {
+          el.style.setProperty("--reveal-delay", `${(i % Math.max(columns, 3)) * 110}ms`);
+        });
+      });
+
+      const targets = document.querySelectorAll(".reveal");
+
       if (!prefersReducedMotion && "IntersectionObserver" in window) {
         const observer = new IntersectionObserver(
           (entries) => {
@@ -100,14 +109,12 @@ const structuredData = {
               }
             }
           },
-          { threshold: 0.15 },
+          { threshold: 0.12, rootMargin: "0px 0px -6% 0px" },
         );
 
-        document.querySelectorAll(".reveal").forEach((el) => observer.observe(el));
+        targets.forEach((el) => observer.observe(el));
       } else {
-        document
-          .querySelectorAll(".reveal")
-          .forEach((el) => el.classList.add("is-visible"));
+        targets.forEach((el) => el.classList.add("is-visible"));
       }
     </script>
   </body>

@@ -24,21 +24,56 @@ body {
   font-feature-settings: "ss01" 1;
 }
 
+:root {
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
 .reveal {
   opacity: 0;
-  transform: translateY(16px);
+  transform: translate3d(0, 28px, 0) scale(0.98);
   transition:
-    opacity 0.6s ease,
-    transform 0.6s ease;
+    opacity 0.8s var(--ease-out),
+    transform 0.9s var(--ease-out);
+  transition-delay: var(--reveal-delay, 0ms);
+}
+
+.reveal[data-reveal="left"] {
+  transform: translate3d(-36px, 0, 0);
+}
+
+.reveal[data-reveal="right"] {
+  transform: translate3d(36px, 0, 0);
+}
+
+.reveal[data-reveal="zoom"] {
+  transform: scale(0.94);
+}
+
+.reveal[data-reveal="line"] {
+  opacity: 1;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 1.4s var(--ease-out) 0.3s;
+  background: linear-gradient(
+    to right,
+    rgb(var(--signal-red) / 0.7),
+    rgb(var(--line-strong)) 60%,
+    rgb(var(--line))
+  );
 }
 
 .reveal.is-visible {
   opacity: 1;
-  transform: translateY(0);
+  transform: none;
+}
+
+.reveal[data-reveal="line"].is-visible {
+  transform: scaleX(1);
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .reveal {
+  .reveal,
+  .reveal[data-reveal] {
     opacity: 1;
     transform: none;
     transition: none;

@@ -1,57 +1,99 @@
 ---
-const features: { title: string; body: string; pro?: boolean }[] = [
+import Icon from "./Icon.astro";
+
+type Visual = "setups" | "limits" | "calendar";
+
+const features: {
+  title: string;
+  body: string;
+  icon: string;
+  pro?: boolean;
+  wide?: boolean;
+  visual?: Visual;
+}[] = [
+  {
+    title: "Insights",
+    body: "See your best and weakest setups and whether following your rules pays, over 30 days, 90 days or all time.",
+    icon: "bulb",
+    pro: true,
+    wide: true,
+    visual: "setups",
+  },
   {
     title: "Real P&L math",
     body: "Direct, converted and manual pricing paths for forex, plus straightforward crypto math.",
+    icon: "swap",
   },
   {
     title: "Equity curve & breakdowns",
     body: "Win rate, profit factor, average R and cumulative P&L, broken down by pair, session and setup tag.",
-  },
-  {
-    title: "Insights",
-    body: "See your best and weakest setups and whether following your rules pays, over 30 days, 90 days or all time.",
-    pro: true,
-  },
-  {
-    title: "Pre-trade checklist",
-    body: "Write your own rules and tick them off on every trade, so skipped rules show up in your results.",
+    icon: "bars",
   },
   {
     title: "Risk limits",
     body: "Set a daily loss limit, a trades-per-day cap and a monthly profit goal. The trade form warns you near a limit.",
-  },
-  {
-    title: "The consecutive-loss flag",
-    body: "Set your own threshold. Trades that follow a losing streak are marked in the ledger and on the dashboard.",
+    icon: "shield",
+    wide: true,
+    visual: "limits",
   },
   {
     title: "Trading calendar",
     body: "Green and red days with weekly totals. Open any day to see its trades and write a recap.",
+    icon: "calendar",
+    wide: true,
+    visual: "calendar",
+  },
+  {
+    title: "Pre-trade checklist",
+    body: "Write your own rules and tick them off on every trade, so skipped rules show up in your results.",
+    icon: "checklist",
+  },
+  {
+    title: "The consecutive-loss flag",
+    body: "Set your own threshold. Trades that follow a losing streak are marked in the ledger and on the dashboard.",
+    icon: "flag",
   },
   {
     title: "MetaTrader import",
     body: "Bring in your MT4 or MT5 history from a CSV export or an HTML statement, with duplicates skipped and a preview first.",
+    icon: "upload",
     pro: true,
   },
   {
     title: "CSV and PDF export",
     body: "Download your trades as a CSV, or as a PDF report with your stats and equity curve. Filters carry over.",
+    icon: "download",
     pro: true,
   },
   {
     title: "Screenshots & live rates",
     body: "Attach chart screenshots to any trade and look up live FX rates for cross pairs.",
+    icon: "image",
     pro: true,
   },
   {
     title: "Calculator, news and share card",
     body: "Size a position before you enter, check the news calendar, and share a trade as a card.",
+    icon: "share",
   },
   {
     title: "Installable, offline-aware",
     body: "An installable app on desktop and mobile, in dark or light, with clear offline handling instead of silently failed writes.",
+    icon: "phone",
   },
+];
+
+const setupBars = [
+  { name: "Reversal", value: "+$182", width: 92 },
+  { name: "Range fade", value: "+$92", width: 52 },
+  { name: "Pullback", value: "+$122", width: 66 },
+];
+
+const heat = [
+  [0, 1, 1, -1, 1, 0, 0],
+  [1, 1, -1, 1, -1, 0, 0],
+  [-1, 0, 1, 1, -1, 1, 0],
+  [1, 1, 0, 0, 1, 0, 0],
 ];
 ---
 
@@ -66,27 +108,144 @@ const features: { title: string; body: string; pro?: boolean }[] = [
       </h2>
     </div>
 
-    <div class="mt-16 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    <div
+      class="mt-16 grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
+      data-stagger
+    >
       {
-        features.map((feature, i) => (
+        features.map((feature) => (
           <div
-            class="reveal rounded-xl border border-line bg-bg-1 p-6 transition-colors hover:border-line-strong"
-            style={`transition-delay: ${i * 70}ms`}
+            class={`reveal ${feature.wide ? "sm:col-span-2" : ""} sm:max-lg:last:col-span-2`}
+            data-reveal="rise"
           >
-            <h3 class="flex items-center gap-2 text-[15px] font-semibold text-text">
-              {feature.title}
-              {feature.pro ? (
-                <span class="rounded-full bg-signal-red/15 px-1.5 py-0.5 text-[10px] font-semibold text-signal-red">
-                  Pro
-                </span>
-              ) : null}
-            </h3>
-            <p class="mt-2 text-[14px] leading-relaxed text-text-muted">
-              {feature.body}
-            </p>
+            <article class="feature-card group relative h-full overflow-hidden rounded-2xl border border-line bg-bg-1 p-6 transition-colors duration-300 hover:border-line-strong">
+              <div
+                class={
+                  feature.visual
+                    ? "relative grid gap-6 md:grid-cols-2 md:items-center"
+                    : "relative"
+                }
+              >
+                <div>
+                  <div class="flex items-start justify-between gap-3">
+                    <span class="flex h-10 w-10 items-center justify-center rounded-xl border border-line bg-bg-2 text-text-muted transition-colors duration-300 group-hover:border-signal-red/40 group-hover:bg-signal-red/10 group-hover:text-signal-red">
+                      <Icon name={feature.icon} />
+                    </span>
+                    {feature.pro ? (
+                      <span class="rounded-full bg-signal-red/15 px-2 py-0.5 text-[11px] font-semibold text-signal-red">
+                        Pro
+                      </span>
+                    ) : null}
+                  </div>
+                  <h3 class="mt-5 text-[16px] font-semibold tracking-tight text-text">
+                    {feature.title}
+                  </h3>
+                  <p class="mt-2 text-[14px] leading-relaxed text-text-muted">
+                    {feature.body}
+                  </p>
+                </div>
+
+                {feature.visual === "setups" && (
+                  <div class="rounded-xl border border-line bg-bg-0 p-4" aria-hidden="true">
+                    <p class="text-[11px] text-text-faint">Average P&amp;L per trade</p>
+                    <div class="mt-3 flex flex-col gap-3">
+                      {setupBars.map((bar) => (
+                        <div>
+                          <div class="flex justify-between text-[12px]">
+                            <span class="text-text-muted">{bar.name}</span>
+                            <span class="font-mono text-signal-green">{bar.value}</span>
+                          </div>
+                          <div class="mt-1.5 h-1.5 rounded-full bg-bg-2">
+                            <div
+                              class="bar h-full rounded-full bg-signal-green"
+                              style={`width:${bar.width}%`}
+                            />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {feature.visual === "limits" && (
+                  <div class="rounded-xl border border-line bg-bg-0 p-4" aria-hidden="true">
+                    <div class="flex justify-between text-[12px]">
+                      <span class="text-text-muted">Daily loss limit</span>
+                      <span class="font-mono text-text">$0 of $300 lost</span>
+                    </div>
+                    <div class="mt-1.5 h-1.5 rounded-full bg-bg-2">
+                      <div class="bar h-full w-[3%] rounded-full bg-signal-green" />
+                    </div>
+                    <div class="mt-4 flex justify-between text-[12px]">
+                      <span class="text-text-muted">Monthly goal</span>
+                      <span class="font-mono text-text">+$475 of $1,000</span>
+                    </div>
+                    <div class="mt-1.5 h-1.5 rounded-full bg-bg-2">
+                      <div class="bar h-full w-[47%] rounded-full bg-signal-green" />
+                    </div>
+                    <div class="mt-4 flex justify-between text-[12px]">
+                      <span class="text-text-muted">Trades today</span>
+                      <span class="font-mono text-text">4 of 5</span>
+                    </div>
+                    <div class="mt-1.5 h-1.5 rounded-full bg-bg-2">
+                      <div class="bar h-full w-[80%] rounded-full bg-signal-red" />
+                    </div>
+                  </div>
+                )}
+
+                {feature.visual === "calendar" && (
+                  <div class="rounded-xl border border-line bg-bg-0 p-4" aria-hidden="true">
+                    <div class="grid grid-cols-7 gap-1.5">
+                      {heat.flat().map((day) => (
+                        <span
+                          class={`aspect-[5/3] rounded-[5px] ${
+                            day === 1
+                              ? "bg-signal-green/35"
+                              : day === -1
+                                ? "bg-signal-red/35"
+                                : "bg-bg-2"
+                          }`}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </article>
           </div>
         ))
       }
     </div>
   </div>
 </section>
+
+<style>
+  .feature-card::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 120px;
+    background: radial-gradient(60% 100% at 50% 0%, rgba(226, 88, 75, 0.1), transparent 100%);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    pointer-events: none;
+  }
+  .feature-card:hover::before {
+    opacity: 1;
+  }
+
+  .bar {
+    transform-origin: left;
+    transform: scaleX(0);
+    transition: transform 1s cubic-bezier(0.22, 1, 0.36, 1) 0.35s;
+  }
+  :global(.is-visible) .bar {
+    transform: scaleX(1);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .bar {
+      transform: none;
+      transition: none;
+    }
+  }
+</style>
