@@ -13,15 +13,20 @@ import {
 const freeFeatures = [
   `Log up to ${FREE_TRADE_LIMIT} trades a month`,
   "Real forex and crypto P&L math",
-  "Win rate, profit factor, avg R and equity curve",
+  "Win rate, profit factor and equity curve",
   "Breakdowns by pair, session and setup",
+  "Trading calendar with daily recaps",
+  "Pre-trade checklist and risk limits",
+  "Calculator, news and share card",
   "Consecutive-loss flag",
-  "Installable app, works offline-aware",
+  "Installable app in dark or light",
 ];
 
 const proFeatures = [
   "Unlimited trades",
-  "CSV bulk import",
+  "Insights: which setups and rules pay",
+  "MetaTrader (MT4 and MT5) import",
+  "CSV import and CSV or PDF export",
   "Screenshot attachments on every trade",
   "Live FX rate lookup for cross pairs",
 ];
@@ -30,9 +35,16 @@ const comparison: { feature: string; free: boolean | string; pro: boolean | stri
   { feature: "Trades per month", free: String(FREE_TRADE_LIMIT), pro: "Unlimited" },
   { feature: "P&L, win rate, profit factor, equity curve", free: true, pro: true },
   { feature: "Breakdowns by pair, session and setup", free: true, pro: true },
+  { feature: "Trading calendar and daily recaps", free: true, pro: true },
+  { feature: "Pre-trade checklist", free: true, pro: true },
+  { feature: "Daily loss limit, trade cap and monthly goal", free: true, pro: true },
   { feature: "Consecutive-loss flag", free: true, pro: true },
-  { feature: "Installable app", free: true, pro: true },
-  { feature: "CSV bulk import", free: false, pro: true },
+  { feature: "Calculator, news and share card", free: true, pro: true },
+  { feature: "Installable app, dark and light themes", free: true, pro: true },
+  { feature: "Insights", free: false, pro: true },
+  { feature: "MetaTrader (MT4 and MT5) import", free: false, pro: true },
+  { feature: "CSV import", free: false, pro: true },
+  { feature: "CSV and PDF export", free: false, pro: true },
   { feature: "Screenshot attachments", free: false, pro: true },
   { feature: "Live FX rate lookup for cross pairs", free: false, pro: true },
 ];

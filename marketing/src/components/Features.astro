@@ -1,20 +1,56 @@
 ---
-const features = [
+const features: { title: string; body: string; pro?: boolean }[] = [
   {
     title: "Real P&L math",
-    body: "Direct, converted, and manual pricing paths for forex — including a live rate lookup for true cross pairs — plus straightforward crypto math.",
+    body: "Direct, converted and manual pricing paths for forex, plus straightforward crypto math.",
   },
   {
     title: "Equity curve & breakdowns",
-    body: "Win rate, profit factor, average R, and cumulative P&L, broken down by pair, session, and setup tag.",
+    body: "Win rate, profit factor, average R and cumulative P&L, broken down by pair, session and setup tag.",
+  },
+  {
+    title: "Insights",
+    body: "See your best and weakest setups and whether following your rules pays, over 30 days, 90 days or all time.",
+    pro: true,
+  },
+  {
+    title: "Pre-trade checklist",
+    body: "Write your own rules and tick them off on every trade, so skipped rules show up in your results.",
+  },
+  {
+    title: "Risk limits",
+    body: "Set a daily loss limit, a trades-per-day cap and a monthly profit goal. The trade form warns you near a limit.",
   },
   {
     title: "The consecutive-loss flag",
-    body: "Set your own threshold. Trades that follow a losing streak get marked automatically, in the ledger and on the dashboard.",
+    body: "Set your own threshold. Trades that follow a losing streak are marked in the ledger and on the dashboard.",
+  },
+  {
+    title: "Trading calendar",
+    body: "Green and red days with weekly totals. Open any day to see its trades and write a recap.",
+  },
+  {
+    title: "MetaTrader import",
+    body: "Bring in your MT4 or MT5 history from a CSV export or an HTML statement, with duplicates skipped and a preview first.",
+    pro: true,
+  },
+  {
+    title: "CSV and PDF export",
+    body: "Download your trades as a CSV, or as a PDF report with your stats and equity curve. Filters carry over.",
+    pro: true,
+  },
+  {
+    title: "Screenshots & live rates",
+    body: "Attach chart screenshots to any trade and look up live FX rates for cross pairs.",
+    pro: true,
+  },
+  {
+    title: "Calculator, news and share card",
+    body: "Size a position before you enter, check the news calendar, and share a trade as a card.",
   },
   {
     title: "Installable, offline-aware",
-    body: "A real installable app on desktop and mobile — not just a bookmarked tab — with clear offline handling instead of silently failed writes.",
+    body: "An installable app on desktop and mobile, in dark or light, with clear offline handling instead of silently failed writes.",
   },
 ];
 ---
@@ -30,14 +66,21 @@ const features = [
       </h2>
     </div>
 
-    <div class="mt-16 grid gap-4 sm:grid-cols-2">
+    <div class="mt-16 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
       {
         features.map((feature, i) => (
           <div
             class="reveal rounded-xl border border-line bg-bg-1 p-6 transition-colors hover:border-line-strong"
             style={`transition-delay: ${i * 70}ms`}
           >
-            <h3 class="text-[15px] font-semibold text-text">{feature.title}</h3>
+            <h3 class="flex items-center gap-2 text-[15px] font-semibold text-text">
+              {feature.title}
+              {feature.pro ? (
+                <span class="rounded-full bg-signal-red/15 px-1.5 py-0.5 text-[10px] font-semibold text-signal-red">
+                  Pro
+                </span>
+              ) : null}
+            </h3>
             <p class="mt-2 text-[14px] leading-relaxed text-text-muted">
               {feature.body}
             </p>
