@@ -1,14 +1,11 @@
 import { useState, type FormEvent } from "react";
+import { Lock, Mail } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
-import { Input } from "@/components/ui/Input";
-import { PasswordInput } from "@/components/ui/PasswordInput";
 import { Button } from "@/components/ui/Button";
+import { AuthField } from "@/components/auth/AuthField";
+import { AuthError } from "@/components/auth/AuthError";
 
-interface LoginFormProps {
-  onSwitchToSignUp: () => void;
-}
-
-export function LoginForm({ onSwitchToSignUp }: LoginFormProps): JSX.Element {
+export function LoginForm(): JSX.Element {
   const { signIn } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -30,32 +27,30 @@ export function LoginForm({ onSwitchToSignUp }: LoginFormProps): JSX.Element {
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-      <Input
+      <AuthField
         label="Email"
+        icon={Mail}
         type="email"
         autoComplete="email"
+        placeholder="you@example.com"
         required
         value={email}
         onChange={(e) => setEmail(e.target.value)}
       />
-      <PasswordInput
+      <AuthField
         label="Password"
+        icon={Lock}
+        type="password"
         autoComplete="current-password"
+        placeholder="Your password"
         required
         value={password}
         onChange={(e) => setPassword(e.target.value)}
-        error={error}
       />
-      <Button type="submit" isLoading={isSubmitting}>
+      {error ? <AuthError message={error} /> : null}
+      <Button type="submit" isLoading={isSubmitting} className="h-11 w-full">
         Log in
       </Button>
-      <button
-        type="button"
-        onClick={onSwitchToSignUp}
-        className="font-mono text-xs uppercase tracking-wider text-text-muted underline underline-offset-4"
-      >
-        Need an account? Sign up
-      </button>
     </form>
   );
 }
