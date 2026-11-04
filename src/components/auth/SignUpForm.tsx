@@ -1,15 +1,17 @@
 import { useState, type FormEvent } from "react";
-import { ArrowLeft, Check, Lock, Mail, MailCheck, User } from "lucide-react";
+import { ArrowLeft, Lock, Mail, MailCheck, User } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/Button";
 import { AuthField } from "@/components/auth/AuthField";
 import { AuthError } from "@/components/auth/AuthError";
+import {
+  MIN_PASSWORD_LENGTH,
+  PasswordRule,
+} from "@/components/auth/PasswordRule";
 
 interface SignUpFormProps {
   onSwitchToLogin: () => void;
 }
-
-const MIN_PASSWORD_LENGTH = 8;
 
 export function SignUpForm({
   onSwitchToLogin,
@@ -23,8 +25,6 @@ export function SignUpForm({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [confirmationSent, setConfirmationSent] = useState(false);
 
-  const isLongEnough = password.length >= MIN_PASSWORD_LENGTH;
-
   const handleSubmit = async (event: FormEvent): Promise<void> => {
     event.preventDefault();
     setError(null);
@@ -37,7 +37,7 @@ export function SignUpForm({
       setError("Passwords don't match.");
       return;
     }
-    if (!isLongEnough) {
+    if (password.length < MIN_PASSWORD_LENGTH) {
       setError("Password must be at least 8 characters.");
       return;
     }
@@ -114,14 +114,7 @@ export function SignUpForm({
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
-        <p
-          className={`flex items-center gap-1.5 text-xs transition-colors ${
-            isLongEnough ? "text-signal-green" : "text-text-faint"
-          }`}
-        >
-          <Check size={13} aria-hidden="true" />
-          At least {MIN_PASSWORD_LENGTH} characters
-        </p>
+        <PasswordRule password={password} />
       </div>
       <AuthField
         label="Confirm password"

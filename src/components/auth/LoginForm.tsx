@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from "react";
+import { Link, useLocation } from "react-router-dom";
 import { Lock, Mail } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/Button";
@@ -7,6 +8,7 @@ import { AuthError } from "@/components/auth/AuthError";
 
 export function LoginForm(): JSX.Element {
   const { signIn } = useAuth();
+  const location = useLocation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -39,6 +41,15 @@ export function LoginForm(): JSX.Element {
       />
       <AuthField
         label="Password"
+        labelAction={
+          <Link
+            to="/auth/forgot"
+            state={location.state}
+            className="text-[13px] text-text-muted underline-offset-4 transition-colors hover:text-text hover:underline"
+          >
+            Forgot password?
+          </Link>
+        }
         icon={Lock}
         type="password"
         autoComplete="current-password"

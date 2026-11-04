@@ -1,11 +1,17 @@
 import { lazy, Suspense } from "react";
-import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import {
+  BrowserRouter,
+  Navigate,
+  Route,
+  Routes,
+  useLocation,
+} from "react-router-dom";
 import { AuthProvider } from "@/context/AuthContext";
 import { SubscriptionProvider } from "@/context/SubscriptionContext";
 import { ThemeProvider } from "@/context/ThemeContext";
 import { ToastProvider } from "@/context/ToastContext";
 import { useAuth } from "@/hooks/useAuth";
-import { AuthPage } from "@/components/auth/AuthPage";
+import { AuthRoutes } from "@/components/auth/AuthRoutes";
 import { AppShell } from "@/components/layout/AppShell";
 import { OfflineBanner } from "@/components/pwa/OfflineBanner";
 import { UpdatePrompt } from "@/components/pwa/UpdatePrompt";
@@ -78,37 +84,54 @@ function LoadingScreen(): JSX.Element {
   );
 }
 
+function RedirectToAuth(): JSX.Element {
+  const location = useLocation();
+
+  return <Navigate to="/auth" replace state={{ from: location }} />;
+}
+
+function AuthenticatedApp(): JSX.Element {
+  const { session } = useAuth();
+
+  if (!session) {
+    return <RedirectToAuth />;
+  }
+
+  return (
+    <AppShell>
+      <Suspense fallback={<LoadingScreen />}>
+        <Routes>
+          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          <Route path="/dashboard" element={<DashboardPage />} />
+          <Route path="/trades" element={<TradesPage />} />
+          <Route path="/calendar" element={<CalendarPage />} />
+          <Route path="/calculator" element={<CalculatorPage />} />
+          <Route path="/insights" element={<InsightsPage />} />
+          <Route path="/news" element={<NewsPage />} />
+          <Route path="/trades/import" element={<ImportTradesPage />} />
+          <Route path="/settings" element={<SettingsPage />} />
+          <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/billing" element={<BillingPage />} />
+          <Route path="*" element={<Navigate to="/dashboard" replace />} />
+        </Routes>
+      </Suspense>
+    </AppShell>
+  );
+}
+
 function AppContent(): JSX.Element {
-  const { session, isLoading } = useAuth();
+  const { isLoading } = useAuth();
 
   if (isLoading) {
     return <LoadingScreen />;
   }
 
-  if (!session) {
-    return <AuthPage />;
-  }
-
   return (
     <BrowserRouter>
-      <AppShell>
-        <Suspense fallback={<LoadingScreen />}>
-          <Routes>
-            <Route path="/" element={<Navigate to="/dashboard" replace />} />
-            <Route path="/dashboard" element={<DashboardPage />} />
-            <Route path="/trades" element={<TradesPage />} />
-            <Route path="/calendar" element={<CalendarPage />} />
-            <Route path="/calculator" element={<CalculatorPage />} />
-            <Route path="/insights" element={<InsightsPage />} />
-            <Route path="/news" element={<NewsPage />} />
-            <Route path="/trades/import" element={<ImportTradesPage />} />
-            <Route path="/settings" element={<SettingsPage />} />
-            <Route path="/profile" element={<ProfilePage />} />
-            <Route path="/billing" element={<BillingPage />} />
-            <Route path="*" element={<Navigate to="/dashboard" replace />} />
-          </Routes>
-        </Suspense>
-      </AppShell>
+      <Routes>
+        <Route path="/auth/*" element={<AuthRoutes />} />
+        <Route path="*" element={<AuthenticatedApp />} />
+      </Routes>
     </BrowserRouter>
   );
 }
