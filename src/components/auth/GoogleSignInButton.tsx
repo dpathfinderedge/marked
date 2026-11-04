@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
+import { AuthError } from "@/components/auth/AuthError";
 
 function GoogleLogo(): JSX.Element {
   return (
-    <svg width="16" height="16" viewBox="0 0 18 18" aria-hidden="true">
+    <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true">
       <path
         fill="#4285F4"
         d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84a4.14 4.14 0 0 1-1.8 2.72v2.26h2.92c1.7-1.57 2.68-3.88 2.68-6.62z"
@@ -47,12 +48,12 @@ export function GoogleSignInButton(): JSX.Element {
         type="button"
         onClick={() => void handleClick()}
         disabled={isRedirecting}
-        className="flex items-center justify-center gap-3 rounded-lg border border-line bg-bg-0 px-4 py-2 font-sans text-sm font-medium text-text transition-colors hover:bg-bg-2 disabled:cursor-not-allowed disabled:opacity-50"
+        className="flex h-11 w-full items-center justify-center gap-3 rounded-lg border border-line bg-bg-1 px-4 text-sm font-medium text-text transition-colors hover:border-line-strong hover:bg-bg-2 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-signal-red/10 disabled:cursor-not-allowed disabled:opacity-50"
       >
         <GoogleLogo />
         {isRedirecting ? "Redirecting…" : "Continue with Google"}
       </button>
-      {error ? <p className="font-mono text-xs text-signal-red">{error}</p> : null}
+      {error ? <AuthError message={error} /> : null}
     </div>
   );
 }
