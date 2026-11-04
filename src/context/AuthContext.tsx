@@ -63,6 +63,20 @@ export function AuthProvider({
     return { error };
   };
 
+  const resetPassword: AuthContextValue["resetPassword"] = async (email) => {
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/auth/reset`,
+    });
+    return { error };
+  };
+
+  const updatePassword: AuthContextValue["updatePassword"] = async (
+    password,
+  ) => {
+    const { error } = await supabase.auth.updateUser({ password });
+    return { error };
+  };
+
   const signOut = async (): Promise<{ error: AuthError | null }> => {
     const { error } = await supabase.auth.signOut();
     return { error };
@@ -75,6 +89,8 @@ export function AuthProvider({
     signUp,
     signIn,
     signInWithGoogle,
+    resetPassword,
+    updatePassword,
     signOut,
   };
 

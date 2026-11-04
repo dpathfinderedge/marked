@@ -1,23 +1,36 @@
-import { forwardRef, useId, useState, type InputHTMLAttributes } from "react";
+import {
+  forwardRef,
+  useId,
+  useState,
+  type InputHTMLAttributes,
+  type ReactNode,
+} from "react";
 import { Eye, EyeOff, type LucideIcon } from "lucide-react";
 
 export interface AuthFieldProps
   extends Omit<InputHTMLAttributes<HTMLInputElement>, "id"> {
   label: string;
   icon: LucideIcon;
+  labelAction?: ReactNode;
 }
 
 export const AuthField = forwardRef<HTMLInputElement, AuthFieldProps>(
-  function AuthField({ label, icon: Icon, type = "text", className = "", ...rest }, ref) {
+  function AuthField(
+    { label, icon: Icon, labelAction, type = "text", className = "", ...rest },
+    ref,
+  ) {
     const id = useId();
     const [isRevealed, setIsRevealed] = useState(false);
     const isPassword = type === "password";
 
     return (
       <div className="flex flex-col gap-1.5">
-        <label htmlFor={id} className="text-[13px] font-medium text-text">
-          {label}
-        </label>
+        <div className="flex items-center justify-between gap-3">
+          <label htmlFor={id} className="text-[13px] font-medium text-text">
+            {label}
+          </label>
+          {labelAction}
+        </div>
         <div className="group relative">
           <Icon
             size={16}
