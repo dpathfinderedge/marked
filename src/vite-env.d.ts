@@ -9,6 +9,7 @@ interface ImportMetaEnv {
   readonly VITE_PAYSTACK_PUBLIC_KEY: string;
   readonly VITE_PAYSTACK_PLAN_CODE: string;
   readonly VITE_PAYSTACK_PLAN_CODE_ANNUAL?: string;
+  readonly VITE_MARKETING_URL?: string;
 }
 
 interface ImportMeta {
