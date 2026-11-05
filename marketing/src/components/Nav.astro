@@ -1,5 +1,5 @@
 ---
-import { APP_URL } from "../lib/constants";
+import { SIGN_IN_URL, SIGN_UP_URL } from "../lib/constants";
 ---
 
 <header class="sticky top-0 z-50 border-b border-line/60 bg-bg-0/80 backdrop-blur-md">
@@ -36,13 +36,13 @@ import { APP_URL } from "../lib/constants";
 
     <div class="hidden items-center gap-5 sm:flex">
       <a
-        href={APP_URL}
+        href={SIGN_IN_URL}
         class="text-[13px] font-medium text-text-muted transition-colors hover:text-text"
       >
         Sign in
       </a>
       <a
-        href={`${APP_URL}/signup`}
+        href={SIGN_UP_URL}
         class="rounded-lg bg-signal-red px-4 py-2 text-[13px] font-semibold text-white transition-opacity hover:opacity-90"
       >
         Start free
@@ -95,13 +95,13 @@ import { APP_URL } from "../lib/constants";
         </a>
         <div class="mt-2 flex flex-col gap-2 border-t border-line/60 pt-4">
           <a
-            href={APP_URL}
+            href={SIGN_IN_URL}
             class="rounded-lg px-3 py-2.5 text-center text-[14px] font-medium text-text-muted transition-colors hover:bg-bg-1 hover:text-text"
           >
             Sign in
           </a>
           <a
-            href={`${APP_URL}/signup`}
+            href={SIGN_UP_URL}
             class="rounded-lg bg-signal-red px-3 py-2.5 text-center text-[14px] font-semibold text-white transition-opacity hover:opacity-90"
           >
             Start free

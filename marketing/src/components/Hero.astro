@@ -1,6 +1,6 @@
 ---
 import { Image } from "astro:assets";
-import { APP_URL } from "../lib/constants";
+import { APP_HOST, SIGN_UP_URL } from "../lib/constants";
 import dashboardDesktop from "../assets/hero-dashboard.webp";
 import dashboardMobile from "../assets/hero-dashboard-mobile.webp";
 
@@ -41,7 +41,7 @@ const headlines = [
     </p>
     <div class="mt-9 flex flex-wrap items-center justify-center gap-4">
       <a
-        href={`${APP_URL}/signup`}
+        href={SIGN_UP_URL}
         class="rounded-lg bg-signal-red px-6 py-3 text-[14px] font-semibold text-white transition-opacity hover:opacity-90"
       >
         Start journaling free
@@ -72,7 +72,7 @@ const headlines = [
               <rect x="1.5" y="4.5" width="7" height="4.5" rx="1" stroke="currentColor" />
               <path d="M3 4.5V3a2 2 0 0 1 4 0v1.5" stroke="currentColor" />
             </svg>
-            app-marked.vercel.app/dashboard
+            {APP_HOST}/dashboard
           </div>
           <div class="w-[42px]" aria-hidden="true"></div>
         </div>
