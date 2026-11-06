@@ -12,6 +12,8 @@ import { ThemeProvider } from "@/context/ThemeContext";
 import { ToastProvider } from "@/context/ToastContext";
 import { useAuth } from "@/hooks/useAuth";
 import { AuthRoutes } from "@/components/auth/AuthRoutes";
+import { VerifyEmailPage } from "@/components/auth/VerifyEmailPage";
+import { isEmailVerified } from "@/lib/emailVerification";
 import { AppShell } from "@/components/layout/AppShell";
 import { OfflineBanner } from "@/components/pwa/OfflineBanner";
 import { UpdatePrompt } from "@/components/pwa/UpdatePrompt";
@@ -95,6 +97,10 @@ function AuthenticatedApp(): JSX.Element {
 
   if (!session) {
     return <RedirectToAuth />;
+  }
+
+  if (!isEmailVerified(session.user)) {
+    return <VerifyEmailPage />;
   }
 
   return (

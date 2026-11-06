@@ -9,7 +9,7 @@ export interface AuthContextValue {
     email: string,
     password: string,
     name: string,
-  ) => Promise<{ error: AuthError | null }>;
+  ) => Promise<{ error: AuthError | null; needsConfirmation: boolean }>;
   signIn: (
     email: string,
     password: string,
@@ -17,6 +17,8 @@ export interface AuthContextValue {
   signInWithGoogle: () => Promise<{ error: AuthError | null }>;
   resetPassword: (email: string) => Promise<{ error: AuthError | null }>;
   updatePassword: (password: string) => Promise<{ error: AuthError | null }>;
+  resendConfirmation: (email: string) => Promise<{ error: AuthError | null }>;
+  refreshSession: () => Promise<{ error: AuthError | null }>;
   signOut: () => Promise<{ error: AuthError | null }>;
 }
 
