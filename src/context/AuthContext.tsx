@@ -37,12 +37,12 @@ export function AuthProvider({
   }, [session]);
 
   const signUp: AuthContextValue["signUp"] = async (email, password, name) => {
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: { data: { full_name: name } },
     });
-    return { error };
+    return { error, needsConfirmation: !error && !data.session };
   };
 
   const signIn: AuthContextValue["signIn"] = async (email, password) => {
@@ -77,6 +77,18 @@ export function AuthProvider({
     return { error };
   };
 
+  const resendConfirmation: AuthContextValue["resendConfirmation"] = async (
+    email,
+  ) => {
+    const { error } = await supabase.auth.resend({ type: "signup", email });
+    return { error };
+  };
+
+  const refreshSession: AuthContextValue["refreshSession"] = async () => {
+    const { error } = await supabase.auth.refreshSession();
+    return { error };
+  };
+
   const signOut = async (): Promise<{ error: AuthError | null }> => {
     const { error } = await supabase.auth.signOut();
     return { error };
@@ -91,6 +103,8 @@ export function AuthProvider({
     signInWithGoogle,
     resetPassword,
     updatePassword,
+    resendConfirmation,
+    refreshSession,
     signOut,
   };
 

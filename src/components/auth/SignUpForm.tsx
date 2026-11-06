@@ -4,6 +4,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/Button";
 import { AuthField } from "@/components/auth/AuthField";
 import { AuthError } from "@/components/auth/AuthError";
+import { ResendConfirmationButton } from "@/components/auth/ResendConfirmationButton";
 import {
   MIN_PASSWORD_LENGTH,
   PasswordRule,
@@ -43,7 +44,11 @@ export function SignUpForm({
     }
 
     setIsSubmitting(true);
-    const { error: signUpError } = await signUp(email, password, name.trim());
+    const { error: signUpError, needsConfirmation } = await signUp(
+      email,
+      password,
+      name.trim(),
+    );
     setIsSubmitting(false);
 
     if (signUpError) {
@@ -51,7 +56,9 @@ export function SignUpForm({
       return;
     }
 
-    setConfirmationSent(true);
+    if (needsConfirmation) {
+      setConfirmationSent(true);
+    }
   };
 
   if (confirmationSent) {
@@ -70,6 +77,7 @@ export function SignUpForm({
             finish setting up your account.
           </p>
         </div>
+        <ResendConfirmationButton email={email} />
         <button
           type="button"
           onClick={onSwitchToLogin}
